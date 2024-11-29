@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <title>Flask-Sock Demo</title>
+    <link rel="stylesheet" href="../css/materialicons.css">
+    <link rel="stylesheet" href="../css/jqueryui.css">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <nav>
+        <i class="material-icons">dataset</i>
+        <div>Retrogile</div>
+    </nav>
+
+
+<ul id="sortable">
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 1</li>
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 2</li>
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 3</li>
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 4</li>
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 5</li>
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 6</li>
+  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 7</li>
+</ul>
+ 
+ 
+
+
+    <h1>Flask-Sock Demo</h1>
+    <div id="log"></div>
+    <br>
+    <form id="form">
+        <label for="text">Input: </label>
+        <input type="text" id="text" autofocus>
+    </form>
+    <script>
+        const log = (text, color) => {
+            document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;
+        };
+
+
+        let ws;
+        let reconnectInterval = 1000; // Délai initial de reconnexion en millisecondes
+
+        function connect() {
+            ws = new WebSocket('ws://' + location.host + '/socket');
+
+            ws.addEventListener('message', ev => {
+                log('<<< ' + ev.data, 'blue');
+            });
+
+            document.getElementById('form').onsubmit = ev => {
+                ev.preventDefault();
+                const textField = document.getElementById('text');
+                log('>>> ' + textField.value, 'red');
+                ws.send(JSON.stringify({
+                    type: "message",
+                    content: textField.value
+                }));
+                textField.value = '';
+            };
+
+            ws.onopen = () => {
+                console.log('Connexion établie');
+                // ... votre code ici pour envoyer des messages, etc.
+            };
+
+            ws.onmessage = (event) => {
+                console.log('Message reçu:', event.data);
+            };
+
+            ws.onerror = (error) => {
+                console.error('Erreur de connexion:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('Connexion fermée');
+                setTimeout(connect, reconnectInterval);
+                reconnectInterval *= 2; // Double le délai à chaque tentative
+            };
+        }
+
+        connect();
+    </script>
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery-ui.min.js"></script>
+
+  <script>
+  $( function() {
+    $( "#sortable" ).sortable();
+  } );
+  </script>
+
+</body>
+
+</html>
