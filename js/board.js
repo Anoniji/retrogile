@@ -32,6 +32,7 @@ if(username !== null) {
     let user_id = false;
     var pos_x;
     var pos_y;
+    var curr_highlightUser;
 
 
     document.getElementById("board_copy_link").onclick=async() => {
@@ -132,16 +133,23 @@ if(username !== null) {
         }
     }
 
+
     function highlightUser(Husername) {
-        $('.col li').each(function() {
-            const $li = $(this);
-            if ($li.hasClass(`user_${Husername}`)) {
-                $li.animate({'opacity': 1}, 300);
-            } else {
-                $li.animate({'opacity': .2}, 300);
-            }
-        });
-    }
+        if(curr_highlightUser != Husername) {
+            $('.col li').each(function() {
+                const $li = $(this);
+                if ($li.hasClass(`user_${Husername}`)) {
+                    $li.animate({'opacity': 1}, 300);
+                } else {
+                    $li.animate({'opacity': .2}, 300);
+                }
+            });
+        } else {
+            $('.col li').each(function() {
+                $(this).animate({'opacity': 1}, 300);
+            });
+        }
+        curr_highlightUser = Husername    }
 
     function connect() {
         ws = new WebSocket('ws://' + location.hostname + ':8009');
@@ -240,7 +248,7 @@ if(username !== null) {
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
             } else if (ws_data.type == 'card_add') {
-                html = `<li class="ui-state-default user_${ws_data.card_add.author_id} pos_${ws_data.card_add.pos}">
+                html = `<li class="ui-state-default user_${ws_data.card_add.author} pos_${ws_data.card_add.pos}">
                     <div class="votes">${parseInt(ws_data.card_add.votes)}</div>
                     <div class="info">`
 
