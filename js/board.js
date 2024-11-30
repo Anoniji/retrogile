@@ -186,7 +186,7 @@ if(username !== null) {
                     }
                 });
             } else if (ws_data.type == 'user_add') {
-                if(ws_data.board_id == board_id) {
+                if(user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(ws_data.username + ' >>> connected', 'yellow');
                     $("#users").append(`<div id="user_${ws_data.user_id}" class="user" title="${ws_data.username}" onclick="highlightUser('${ws_data.username}');"><i class="material-icons">face</i></div>`)
                     $("#cursors").append(`<div id="cursor_${ws_data.user_id}" class="cursor"><div class="username">${ws_data.username}</div></div>`)
