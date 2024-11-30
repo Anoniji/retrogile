@@ -2,7 +2,8 @@
 <html lang="fr">
 
 <head>
-    <title>Flask-Sock Demo</title>
+    <title>Retrogile</title>
+    <link rel="icon" type="image/png" href="../img/icone.png" />
     <link rel="stylesheet" href="../css/materialicons.css">
     <link rel="stylesheet" href="../css/jqueryui.css">
     <link rel="stylesheet" href="../css/app.css">
@@ -11,88 +12,45 @@
 <body>
     <nav>
         <i class="material-icons">dataset</i>
-        <div>Retrogile</div>
+        <div id="app_title" onclick="location.href = '../';">Retrogile</div>
+        <div id="users"></div>
     </nav>
 
+    <section id="cursors"></section>
+    <section id="wallpaper"></section>
+    <section id="board-params">
+        <div id="board_name"></div>
+        <button id="board_timer" onclick="startTimer()">
+            <i class="material-icons">timer</i>
+            <div class="title">Timer</div>
+        </button>
+        <button id="board_vote">
+            <i class="material-icons">how_to_vote</i>
+            <div class="title">Vote</div>
+        </button>
+        <div id="r_menu">
+            <button id="board_add_bloc" onclick="addCol()">
+                <i class="material-icons">space_dashboard</i>
+                <div class="title">Add Zone</div>
+            </button>
+            <button id="board_copy_link">
+                <i class="material-icons">content_copy</i>
+                <div class="title">Copy Board link</div>
+            </button>
+        </div>
+    </section>
+    <section id="board"></section>
+    <section id="console">
+        <h3><i class="material-icons">terminal</i> Console</h3>
+        <div id="board_log"></div>
+        <form id="form">
+            <input type="text" id="chat_msg" placeholder="Post message on board console">
+        </form>
+    </section>
 
-<ul id="sortable">
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 1</li>
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 2</li>
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 3</li>
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 4</li>
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 5</li>
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 6</li>
-  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>Item 7</li>
-</ul>
- 
- 
-
-
-    <h1>Flask-Sock Demo</h1>
-    <div id="log"></div>
-    <br>
-    <form id="form">
-        <label for="text">Input: </label>
-        <input type="text" id="text" autofocus>
-    </form>
-    <script>
-        const log = (text, color) => {
-            document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;
-        };
-
-
-        let ws;
-        let reconnectInterval = 1000; // Délai initial de reconnexion en millisecondes
-
-        function connect() {
-            ws = new WebSocket('ws://' + location.host + '/socket');
-
-            ws.addEventListener('message', ev => {
-                log('<<< ' + ev.data, 'blue');
-            });
-
-            document.getElementById('form').onsubmit = ev => {
-                ev.preventDefault();
-                const textField = document.getElementById('text');
-                log('>>> ' + textField.value, 'red');
-                ws.send(JSON.stringify({
-                    type: "message",
-                    content: textField.value
-                }));
-                textField.value = '';
-            };
-
-            ws.onopen = () => {
-                console.log('Connexion établie');
-                // ... votre code ici pour envoyer des messages, etc.
-            };
-
-            ws.onmessage = (event) => {
-                console.log('Message reçu:', event.data);
-            };
-
-            ws.onerror = (error) => {
-                console.error('Erreur de connexion:', error);
-            };
-
-            ws.onclose = () => {
-                console.log('Connexion fermée');
-                setTimeout(connect, reconnectInterval);
-                reconnectInterval *= 2; // Double le délai à chaque tentative
-            };
-        }
-
-        connect();
-    </script>
     <script src="../js/jquery.min.js"></script>
     <script src="../js/jquery-ui.min.js"></script>
-
-  <script>
-  $( function() {
-    $( "#sortable" ).sortable();
-  } );
-  </script>
-
+    <script src="../js/board.js"></script>
 </body>
 
 </html>

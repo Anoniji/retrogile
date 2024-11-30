@@ -11,15 +11,16 @@ function start_board() {
 	localStorage.setItem('username', username);
 
 	if(boardname) {
-		$.getJSON(`./create_board/${boardname}`).done(function(data) {
+		$.getJSON(`./create_board/${boardname}/${username}`).done(function(data) {
 			location.href = data;
-		}).fail(function() {
-			console.log('NOK');
 		});
 	} else {
 		$( "#boardname" ).effect( "highlight" )
 	}
-
-
-
 }
+
+$("#boardname").keypress(function(event) {
+    if (event.which === 13) {
+		start_board()
+	}
+});
