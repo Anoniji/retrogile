@@ -24,7 +24,7 @@
             <i class="material-icons">timer</i>
             <div class="title">Timer</div>
         </button>
-        <button id="board_vote">
+        <button id="board_vote" onclick="startVote()">
             <i class="material-icons">how_to_vote</i>
             <div class="title">Vote</div>
         </button>
@@ -32,6 +32,10 @@
             <button id="board_add_bloc" onclick="addCol()">
                 <i class="material-icons">space_dashboard</i>
                 <div class="title">Add Zone</div>
+            </button>
+            <button id="board_vote_order" onclick="board_vote_order()">
+                <i class="material-icons">filter_list</i>
+                <div class="title">Temporarily sort votes</div>
             </button>
             <button id="board_copy_link">
                 <i class="material-icons">content_copy</i>

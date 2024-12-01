@@ -33,6 +33,31 @@ def updateTimerInBoard(board_id, new_timer_value):
     else:
         return False
 
+def reset_votes_in_nested_dict(my_dict):
+    for key, value in my_dict.items():
+        if isinstance(value, dict):
+            reset_votes_in_nested_dict(value)
+        elif key == "votes":
+            my_dict[key] = 0
+
+    return my_dict
+
+
+def boardVotesResetById(board_id, data):
+    board_info = getBoardInfoById(board_id)
+    if not board_info:
+        return False
+
+    for key, value in board_info['data'].items():
+        if isinstance(value, dict):
+            reset_votes_in_nested_dict(value)
+        elif key == "votes":
+            board_info['data'][key] = 0
+
+    board_path = f'./board/{board_id}.json'
+    with open(board_path, 'w') as f:
+        json.dump(board_info, f, indent=4)
+
 
 def boardManagerById(board_id, mode, data):
     board_info = getBoardInfoById(board_id)
@@ -40,6 +65,7 @@ def boardManagerById(board_id, mode, data):
         return False
 
     card_uuid = uuid.uuid4().hex
+    card_votes = 0
     if mode == 'card_add':
         board_info['data'][data.get('col_id')][card_uuid] = {
             'pos': data.get('pos'),
@@ -53,6 +79,11 @@ def boardManagerById(board_id, mode, data):
         if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
             board_info['data'][data.get('col_id')][data.get('card_uuid')]['content'] = data.get('cardContent')
 
+    elif mode == 'card_vote':
+        if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
+            board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes'] += 1
+            card_votes = board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes']
+
     elif mode == 'card_delete':
         if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
             del board_info['data'][data.get('col_id')][data.get('card_uuid')]
@@ -60,7 +91,7 @@ def boardManagerById(board_id, mode, data):
     board_path = f'./board/{board_id}.json'
     with open(board_path, 'w') as f:
         json.dump(board_info, f, indent=4)
-    return card_uuid
+    return card_uuid, card_votes
 
 
 def colManagerByBoardId(board_id, mode, data):
@@ -73,6 +104,18 @@ def colManagerByBoardId(board_id, mode, data):
             return False
 
         board_info['data'][data.get('colName')] = {}
+
+    elif mode == 'col_order':
+        try:
+            cnt = 0
+            for uuid in data.get('uuidList'):
+                uuid = uuid[5:]
+                if uuid in board_info['data'][data.get('colName')]:
+                    board_info['data'][data.get('colName')][uuid]["pos"] = cnt
+                    cnt += 1
+
+        except Exception as e:
+            print(e)
 
     elif mode == 'col_delete':
         if data.get('colName') not in board_info['data']:
@@ -180,17 +223,23 @@ async def handler(websocket):
                         'timerInSeconds': timerInSeconds
                     }))
 
-            elif message_type in ('card_add', 'card_edit', 'card_delete'):
-                card_uuid = boardManagerById(board_id, message_type, data)
+            elif message_type == 'start_vote':
+                boardVotesResetById(board_id, data)
+                for ws in clients:
+                    await ws.send(json.dumps(data))
+
+            elif message_type in ('card_add', 'card_edit', 'card_vote', 'card_delete'):
+                card_uuid, card_votes = boardManagerById(board_id, message_type, data)
                 for ws in clients:
                     await ws.send(json.dumps({
                         'type': message_type,
                         'board_id': board_id,
                         'card_uuid': card_uuid,
+                        'card_votes': card_votes,
                         message_type: data
                     }))
 
-            elif message_type in ('col_add', 'col_edit', 'col_delete'):
+            elif message_type in ('col_add', 'col_order', 'col_delete'):
                 colManagerByBoardId(board_id, message_type, data)
                 for ws in clients:
                     await ws.send(json.dumps({

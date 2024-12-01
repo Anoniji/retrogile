@@ -189,6 +189,10 @@ nav div {
     cursor: pointer;
 }
 
+#board .col .drop_icon {
+    margin: 2px 5px 0 0;
+}
+
 #board .col .edit_icon {
     position: absolute;
     right: 18px;

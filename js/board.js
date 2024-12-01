@@ -23,6 +23,21 @@ function board_timer(timerInSeconds) {
         $('#board_timer .title').html('Timer');
     }
 }
+
+function board_vote(maxVote) {
+    $('#board_vote .title').html(maxVote);
+}
+
+function board_vote_order() {
+    $(".sortable").each(function() {
+        const $sortableList = $(this);
+        $sortableList.find("li").sort(function(a, b) {
+            const aVotes = parseInt($(a).find(".votes").text());
+            const bVotes = parseInt($(b).find(".votes").text());
+            return bVotes - aVotes;
+        }).appendTo($sortableList);
+    });
+}
     
 if(username !== null) {
     let ws;
@@ -33,6 +48,7 @@ if(username !== null) {
     var pos_x;
     var pos_y;
     var curr_highlightUser;
+    var maxVoteTotal;
 
 
     document.getElementById('board_copy_link').onclick=async() => {
@@ -52,6 +68,18 @@ if(username !== null) {
                 type: 'start_timer',
                 board_id: board_id,
                 timerInSeconds: timerInSeconds,
+            }));
+        }
+    }
+
+    function startVote() {
+        if (board_author != username) return;
+        let maxVote = prompt('Max votes');
+        if(maxVote) {
+            ws.send(JSON.stringify({
+                type: 'start_vote',
+                board_id: board_id,
+                maxVote: maxVote,
             }));
         }
     }
@@ -95,6 +123,25 @@ if(username !== null) {
         }
     }
 
+    function voteCard(col_id, card_uuid) {
+        var maxVote = $('#board_vote .title').text();
+        if (!isNaN(maxVote)) {
+            maxVote = parseInt(maxVote);
+            maxVote -= 1
+            if (maxVote >= 0) {
+                $('#board_vote .title').text(maxVote);
+                ws.send(JSON.stringify({
+                    type: 'card_vote',
+                    author: username,
+                    board_id: board_id,
+                    user_id: user_id,
+                    col_id: col_id,
+                    card_uuid: card_uuid
+                })); 
+            }
+        } 
+    }
+
     function deleteCard(col_id, card_uuid) {
         ws.send(JSON.stringify({
             type: 'card_delete',
@@ -135,7 +182,7 @@ if(username !== null) {
             author: username,
             board_id: board_id,
             user_id: user_id,
-            colName: name,
+            colName: name.slice(4),
             uuidList: uuid_list
         }));
     }
@@ -264,7 +311,7 @@ if(username !== null) {
 
                     $.each(sortedData,function(uuid,value){ 
                         html = `<li class='ui-state-default user_${value.author} uuid_${uuid} pos_${value.pos}'>
-                            <div class='votes'>${value.votes}</div>
+                            <div class='votes' onclick='voteCard("${index}", "${uuid}");'>${value.votes}</div>
                             <div class='info'>`
 
                         if(value.author == username) {
@@ -279,15 +326,21 @@ if(username !== null) {
                         </li>`;
                         $(`#col_${index} .sortable`).append(html);
                     });
-                    $(`#col_${index} .sortable`).sortable({connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
+                    $(`#col_${index} .sortable`).sortable({update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
+                    //connectWith:".sortable",
                 });
 
                 $('#board_name').html(ws_data.board_info.board_name);
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
+            } else if (ws_data.type == 'start_vote') {
+                maxVoteTotal = $("#users .user").length * ws_data.maxVote;
+                $(".votes").text("0");
+                log('Vote Session >>> started', 'red');
+                board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
                 html = `<li class='ui-state-default user_${ws_data.card_add.author} pos_${ws_data.card_add.pos}'>
-                    <div class='votes'>${parseInt(ws_data.card_add.votes)}</div>
+                    <div class='votes' onclick='voteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
                     <div class='info'>`
 
                 if(ws_data.card_add.author == username) {
@@ -301,11 +354,25 @@ if(username !== null) {
                     </div>
                 </li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
-                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
-            } else if (ws_data.type == 'card_delete') {
-                $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
+                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
+                //connectWith:".sortable",
             } else if (ws_data.type == 'card_edit') {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
+            } else if (ws_data.type == 'card_vote') { 
+                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
+                if (board_author == username) {
+                    var elementsVotes = $(".votes");
+                    var totalVotes = 0;
+                    elementsVotes.each(function() {
+                        var valeurVote = parseInt($(this).text());
+                        if (!isNaN(valeurVote)) {
+                            totalVotes += valeurVote;
+                        }
+                    });
+                    log(`Total Vote >>> ${totalVotes} / ${maxVoteTotal}`, 'cyan');
+                } 
+            } else if (ws_data.type == 'card_delete') {
+                $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
             } else if (ws_data.type == 'col_add') {
                 html = `<div id='col_${ws_data.col_add.colName}' class='col'><h1>${ws_data.col_add.colName}<i onclick='addCard("${ws_data.col_add.colName}");' class='add_icon material-icons'>add</i>`
                 if (board_author == username) {
@@ -313,6 +380,17 @@ if(username !== null) {
                 }
                 html += `</h1><ul class='sortable'></ul></div>`
                 $('#board').append(html);
+            } else if (ws_data.type == 'col_order') {
+                const sortableList = document.querySelector(`#col_${ws_data.col_order.colName} .sortable`);
+                const fragment = document.createDocumentFragment();
+                ws_data.col_order.uuidList.forEach(uuid => {
+                    const li = sortableList.querySelector(`li[class*="${uuid}"]`);
+                    if (li) {
+                        fragment.appendChild(li);
+                    }
+                });
+                sortableList.innerHTML = '';
+                sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
             } else {
