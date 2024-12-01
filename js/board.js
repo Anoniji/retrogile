@@ -202,7 +202,6 @@ if(username !== null) {
 
     function highlightUser(Husername) {
         if(curr_highlightUser != Husername) {
-
             $('#users div').each(function() {
                 const $user = $(this);
                 if ($user.attr('title') == Husername) {
@@ -220,8 +219,8 @@ if(username !== null) {
                     $li.css('display', 'none');
                 }
             });
+            curr_highlightUser = Husername;
         } else {
-
             $('#users div').each(function() {
                 $(this).animate({'opacity': 1}, 300);
             });
@@ -229,8 +228,8 @@ if(username !== null) {
             $('.col li').each(function() {
                 $(this).css('display', 'block');
             });
+            curr_highlightUser = false;
         }
-        curr_highlightUser = Husername 
     }
 
     function connect() {
@@ -264,13 +263,15 @@ if(username !== null) {
                 $.each(ws_data.users_list,function(index,value){ 
                     if(user_id && user_id != index && value.board_id == board_id) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor'><div class='username'>${value.username}</div></div>`)
+                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
+                    } else {
+                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons'>face</i></div>`)
                     }
-                    $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons'>face</i></div>`)
                 });
             } else if (ws_data.type == 'user_add') {
                 if(user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(ws_data.username + ' >>> connected', 'yellow');
-                    $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' onclick='highlightUser("${ws_data.username}");'><i class='material-icons'>face</i></div>`)
+                    $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`)
                 }
             } else if (ws_data.type == 'user_remove') {

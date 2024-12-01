@@ -6,10 +6,18 @@ import sys
 import json
 import time
 import uuid
+import hashlib
 
 users = {}
 clients = set()
 pos = 0
+
+
+def generate_color(_key):
+    hash_object = hashlib.sha256(_key.encode('utf-8'))
+    hex_dig = hash_object.hexdigest()
+    color_hex = f"#{hex_dig[:6]}"
+    return color_hex
 
 
 def getBoardInfoById(board_id):
@@ -165,6 +173,7 @@ async def handler(websocket):
                 message_username = data.get('username')
                 users[client_id] = {
                     'username': message_username,
+                    'color': generate_color(message_username),
                     'board_id': board_id
                 }
 
@@ -186,7 +195,8 @@ async def handler(websocket):
                         'type': 'user_add',
                         'user_id': client_id,
                         'username': message_username,
-                        'board_id': board_id
+                        'board_id': board_id,
+                        'color': generate_color(message_username)
                     }))
 
             elif message_type == 'cursor_user':

@@ -1,39 +1,25 @@
-def trier_dict_par_liste_uuid(liste_uuid, dict_a_trier):
-    """Trie un dictionnaire par ordre d'une liste d'UUIDs.
+import hashlib
 
-    Args:
-        liste_uuid (list): Liste des UUIDs spécifiant l'ordre.
-        dict_a_trier (dict): Dictionnaire à trier.
+def generate_color_from_xorg_key(xorg_key):
+  """Génère un code couleur hexadécimal à partir d'une clé Xorg.
 
-    Returns:
-        dict: Nouveau dictionnaire trié selon l'ordre de la liste.
-    """
+  Args:
+    xorg_key: La clé Xorg à utiliser.
 
-    dict_trie = {}
-    for uuid in liste_uuid:
-        uuid = uuid[5:]
-        if uuid in dict_a_trier["Start"]:
-            dict_trie[uuid] = dict_a_trier["Start"][uuid]
-    return dict_trie
+  Returns:
+    Une chaîne de caractères représentant le code couleur hexadécimal.
+  """
 
-liste_ordre = ["uuid_229b2ab803904152b3201f7beca7bee4", "uuid_2e1560ecb1b94df29b66db044591b5a0"]
-mon_dict = {"Start": {
-    "2e1560ecb1b94df29b66db044591b5a0": {
-        "pos": 20,
-        "author": "toto",
-        "author_id": 2,
-        "content": "toto",
-        "votes": 0
-    },
-    "229b2ab803904152b3201f7beca7bee4": {
-        "pos": 4,
-        "author": "test",
-        "author_id": 24,
-        "content": "qefqef",
-        "votes": 0
-    }
-}}
+  # Choisir une fonction de hachage (ici, SHA-256)
+  hash_object = hashlib.sha256(xorg_key.encode('utf-8'))
+  hex_dig = hash_object.hexdigest()
 
-print(mon_dict)
-resultat = trier_dict_par_liste_uuid(liste_ordre, mon_dict)
-print(resultat)
+  # Prendre les 6 premiers caractères du hachage pour former le code couleur
+  color_hex = f"#{hex_dig[:6]}"
+
+  return color_hex
+
+# Exemple d'utilisation :
+xorg_key = "ma_cle_xorg"
+color = generate_color_from_xorg_key(xorg_key)
+print(color)
