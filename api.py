@@ -35,9 +35,9 @@ def create_board(board_name, author):
             "author": author,
             "timer": False,
             "data": {
-                "start": [],
-                "stop": [],
-                "continue": []
+                "start": {},
+                "stop": {},
+                "continue": {}
             },
         }, fichier, indent=4)
 

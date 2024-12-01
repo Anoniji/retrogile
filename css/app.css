@@ -207,7 +207,8 @@ nav div {
 
 #board .col ul {
     list-style: none;
-    padding: 0;
+    padding: 5px 0;
+    margin: -4px 0 8px;
     max-height: calc(100vh - 3vw - 364px);
     scrollbar-width: thin;
     overflow-y: auto;
