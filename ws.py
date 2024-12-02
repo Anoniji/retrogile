@@ -295,7 +295,7 @@ async def handler(websocket):
             del users[client_id]
 
 async def main():
-    async with websockets.serve(handler, 'localhost', 8009):
+    async with websockets.serve(handler, '0.0.0.0', 8009):
         await asyncio.Future()  # Run forever
 
 if __name__ == '__main__':
