@@ -8,7 +8,7 @@ function start_board() {
 	username = $('#username').val();
 	const boardname = $('#boardname').val();
 
-	localStorage.setItem('username', username);
+	localStorage.setItem('username', username.replaceAll(' ', '_'));
 
 	if(boardname) {
 		$.getJSON(`./create_board/${boardname}/${username}`).done(function(data) {
