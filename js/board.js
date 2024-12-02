@@ -3,6 +3,7 @@ if (username === null) {
     let username = prompt('Your username');
     if(username) {
         localStorage.setItem('username', username);
+        location.reload();
     } else {
         location.href = '../';
     }
