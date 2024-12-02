@@ -328,8 +328,7 @@ if(username !== null) {
                         </li>`;
                         $(`#col_${index} .sortable`).append(html);
                     });
-                    $(`#col_${index} .sortable`).sortable({update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
-                    //connectWith:".sortable",
+                    $(`#col_${index} .sortable`).sortable({connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
                 });
 
                 $('#board_name').html(ws_data.board_info.board_name);
@@ -356,8 +355,7 @@ if(username !== null) {
                     </div>
                 </li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
-                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
-                //connectWith:".sortable",
+                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
             } else if (ws_data.type == 'card_edit') {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_vote') { 
