@@ -41,6 +41,7 @@ nav {
     padding: 10px 10px;
     font-weight: bold;
     cursor: default;
+    user-select: none;
 }
 
 nav i {
