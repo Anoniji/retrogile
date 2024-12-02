@@ -1,17 +1,77 @@
+function removeNonAlphanumeric(str) {
+    return str.replace(/[^a-zA-Z0-9]/g, '');
+}
+
 var username = localStorage.getItem('username');
 if (username === null) {
     let username = prompt('Your username');
     if(username) {
-        localStorage.setItem('username', username.replaceAll(' ', '_'));
+        localStorage.setItem('username', removeNonAlphanumeric(username));
         location.reload();
     } else {
         location.href = '../';
     }
 }
 
+function customPrompt(message, defaultValue) {
+    const dialog = document.createElement('div');
+    dialog.classList.add('custom-prompt');
+
+    const title = document.createElement('p');
+    title.textContent = message;
+    dialog.appendChild(title);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = defaultValue || '';
+    input.autofocus = true;
+    dialog.appendChild(input);
+
+    const button = document.createElement('button');
+    button.textContent = 'OK';
+    dialog.appendChild(button);
+
+    document.body.appendChild(dialog);
+    dialog.style.display = 'block';
+
+    return new Promise((resolve) => {
+        button.addEventListener('click', () => {
+            const value = input.value;
+            dialog.remove();
+            resolve(value);
+        });
+
+        input.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                const value = input.value;
+                dialog.remove();
+                resolve(value);
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'Escape') {
+                dialog.remove();
+                resolve(null);
+            }
+        });
+    });
+}
+
 const log = (text, color) => {
     $('#board_log').append(`<span style='color: ${color}'>${text}</span><br>`).animate({ scrollTop: $(document).height() }, 200);
 };
+
+function searchKey(object, classes) {
+    for (const key in object) {
+        if (object.hasOwnProperty(key)) {
+            if (key.includes(classes)) {
+                return object[key];
+            }
+        }
+    }
+    return false;
+}
 
 function board_timer(timerInSeconds) {
     $('#board_timer .title').html(timerInSeconds);
@@ -50,11 +110,12 @@ if(username !== null) {
     var pos_y;
     var curr_highlightUser;
     var maxVoteTotal;
+    var stockList = {};
 
 
-    document.getElementById('board_copy_link').onclick=async() => {
+    function board_copy_link() {
         try {
-            await navigator.clipboard.writeText(window.location.href);
+            navigator.clipboard.writeText(window.location.href);
             log(username + ' >>> url copied!', 'yellow');
         } catch (err) {
             console.error('Error_copy:', err);
@@ -94,34 +155,36 @@ if(username !== null) {
     }
 
     function addCard(col_id) {
-        let cardContent = prompt('Card content');
-        if(cardContent) {
-            ws.send(JSON.stringify({
-                type: 'card_add',
-                pos: $(`#col_${col_id} ul`).children('li').length,
-                author: username,
-                board_id: board_id,
-                user_id: user_id,
-                col_id: col_id,
-                votes: 0,
-                cardContent: cardContent,
-            }));
-        }
+        customPrompt('Add new Card', '').then(cardContent => {
+            if(cardContent) {
+                ws.send(JSON.stringify({
+                    type: 'card_add',
+                    pos: $(`#col_${col_id} ul`).children('li').length,
+                    author: username,
+                    board_id: board_id,
+                    user_id: user_id,
+                    col_id: col_id,
+                    votes: 0,
+                    cardContent: cardContent,
+                }));
+            }
+        });
     }
 
     function editCard(col_id, card_uuid) {
-        let cardContent = prompt('Card content');
-        if(cardContent) {
-            ws.send(JSON.stringify({
-                type: 'card_edit',
-                author: username,
-                board_id: board_id,
-                user_id: user_id,
-                col_id: col_id,
-                card_uuid: card_uuid,
-                cardContent: cardContent
-            })); 
-        }
+        customPrompt('Editing Card content', $(`#col_${col_id} .uuid_${card_uuid} .info .info_content`).text()).then(cardContent => {
+            if(cardContent) {
+                ws.send(JSON.stringify({
+                    type: 'card_edit',
+                    author: username,
+                    board_id: board_id,
+                    user_id: user_id,
+                    col_id: col_id,
+                    card_uuid: card_uuid,
+                    cardContent: cardContent
+                })); 
+            }
+        });
     }
 
     function voteCard(col_id, card_uuid) {
@@ -205,7 +268,7 @@ if(username !== null) {
         if(curr_highlightUser != Husername) {
             $('#users div').each(function() {
                 const $user = $(this);
-                if ($user.attr('title') == Husername) {
+                if ($user.attr('data-username') == Husername) {
                     $user.animate({'opacity': 1}, 300);
                 } else {
                     $user.animate({'opacity': .2}, 300);
@@ -264,16 +327,18 @@ if(username !== null) {
                 $.each(ws_data.users_list,function(index,value){ 
                     if(user_id && user_id != index && value.board_id == board_id) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor'><div class='username'>${value.username}</div></div>`)
-                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
-                    } else if(value.board_id == board_id) {
-                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons'>face</i></div>`)
+                    } 
+                    if(value.board_id == board_id) {
+                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
+                        $(document).tooltip({position: {my: "center top",at: "center bottom"}});
                     }
                 });
             } else if (ws_data.type == 'user_add') {
                 if(user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(ws_data.username + ' >>> connected', 'yellow');
-                    $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
-                    $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`)
+                    $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
+                    $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`);
+                    $(document).tooltip({position: {my: "center top",at: "center bottom"}});
                 }
             } else if (ws_data.type == 'user_remove') {
                 log(ws_data.username + ' >>> disconnected', 'red');
@@ -299,6 +364,12 @@ if(username !== null) {
                 }
 
                 $('#board').html('');
+                if(!board_data){
+                    $('#board_name').html('This board does not exist, <a href="../">return to home page</a>');
+                    $('#board_timer, #board_vote, #r_menu').remove();
+                    return;
+                }
+
                 $.each(board_data,function(index,value){ 
                     html = `<div id='col_${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`
                     if (board_author == username) {
@@ -387,8 +458,14 @@ if(username !== null) {
                     const li = sortableList.querySelector(`li[class*="${uuid}"]`);
                     if (li) {
                         fragment.appendChild(li);
+                    } else {
+                        ws.send(JSON.stringify({
+                            type: 'board_info',
+                            board_id: board_id
+                        }));
                     }
                 });
+
                 sortableList.innerHTML = '';
                 sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
