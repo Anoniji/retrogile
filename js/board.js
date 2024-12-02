@@ -265,7 +265,7 @@ if(username !== null) {
                     if(user_id && user_id != index && value.board_id == board_id) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor'><div class='username'>${value.username}</div></div>`)
                         $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
-                    } else {
+                    } else if(value.board_id == board_id) {
                         $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons'>face</i></div>`)
                     }
                 });
