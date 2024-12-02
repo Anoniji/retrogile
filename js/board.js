@@ -2,7 +2,7 @@ var username = localStorage.getItem('username');
 if (username === null) {
     let username = prompt('Your username');
     if(username) {
-        localStorage.setItem('username', username);
+        localStorage.setItem('username', username.replaceAll(' ', '_'));
         location.reload();
     } else {
         location.href = '../';
