@@ -39,6 +39,7 @@ def create_board(board_name, author):
                 "stop": {},
                 "continue": {}
             },
+            "tmps": {}
         }, fichier, indent=4)
 
     return jsonify(["./board/" + board_id])
