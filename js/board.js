@@ -340,7 +340,7 @@ if(username !== null) {
                 log('Vote Session >>> started', 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default user_${ws_data.card_add.author} pos_${ws_data.card_add.pos}'>
+                html = `<li class='ui-state-default user_${ws_data.card_add.author} uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}'>
                     <div class='votes' onclick='voteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
                     <div class='info'>`
 
