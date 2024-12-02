@@ -13,6 +13,55 @@ if (username === null) {
     }
 }
 
+function play_confetti(duration = 5000) {
+    $('#board_confetti').prop('disabled', true);
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const confettiCount = 100;
+    const confetti = [];
+    for (let i = 0; i < confettiCount; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: canvas.height,
+            width: Math.random() * 10 + 5,
+            height: Math.random() * 10 + 5,
+            angle: Math.random() * 2 * Math.PI,
+            speed: Math.random() * 2 + 1,
+            color: '#' + Math.floor(Math.random() * 16777215).toString(16),
+        });
+    }
+
+    const startTime = Date.now();
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        confetti.forEach(confetto => {
+            confetto.y -= confetto.speed;
+            confetto.x += Math.cos(confetto.angle) * confetto.speed;
+
+            ctx.fillStyle = confetto.color;
+            ctx.fillRect(confetto.x, confetto.y, confetto.width, confetto.height);
+
+            if (confetto.y < -confetto.height) {
+                confetto.y = canvas.height;
+                confetto.x = Math.random() * canvas.width;
+            }
+        });
+
+        if (Date.now() - startTime >= duration) {
+            $('#board_confetti').prop('disabled', false);
+            canvas.remove();
+            return;
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
 function customPrompt(message, defaultValue) {
     const dialog = document.createElement('div');
     dialog.classList.add('custom-prompt');
@@ -144,6 +193,13 @@ if(username !== null) {
                 maxVote: maxVote,
             }));
         }
+    }
+
+    function startConfetti() {
+        ws.send(JSON.stringify({
+            type: 'start_confetti',
+            board_id: board_id,
+        }));
     }
 
     function start_timer() {
@@ -405,6 +461,8 @@ if(username !== null) {
                 $('#board_name').html(ws_data.board_info.board_name);
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
+            } else if (ws_data.type == 'start_confetti') {
+                play_confetti();
             } else if (ws_data.type == 'start_vote') {
                 maxVoteTotal = $("#users .user").length * ws_data.maxVote;
                 $(".votes").text("0");

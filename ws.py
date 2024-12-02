@@ -257,6 +257,10 @@ async def handler(websocket):
                 for ws in clients:
                     await ws.send(json.dumps(data))
 
+            elif message_type == 'start_confetti':
+                for ws in clients:
+                    await ws.send(json.dumps(data))
+
             elif message_type in ('card_add', 'card_edit', 'card_vote', 'card_delete'):
                 card_uuid, card_votes = boardManagerById(board_id, message_type, data)
                 for ws in clients:
