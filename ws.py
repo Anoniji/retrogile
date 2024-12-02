@@ -122,8 +122,27 @@ def colManagerByBoardId(board_id, mode, data):
                     board_info['data'][data.get('colName')][uuid]["pos"] = cnt
                     cnt += 1
 
+                else:
+                    for col_name, col_data in board_info["data"].items():
+                        if uuid in col_data:
+                            board_info["tmps"][uuid] = board_info["data"][col_name][
+                                uuid
+                            ]
+                            del board_info["data"][col_name][uuid]
+
+                if uuid in board_info["tmps"]:
+                    board_info["data"][data.get("colName")][uuid] = board_info["tmps"][
+                        uuid
+                    ]
+                    del board_info["tmps"][uuid]
+                    board_info["data"][data.get("colName")][uuid]["pos"] = cnt
+                    cnt += 1
+        
         except Exception as e:
             print(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
 
     elif mode == 'col_delete':
         if data.get('colName') not in board_info['data']:
