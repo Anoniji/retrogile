@@ -19,6 +19,7 @@ body {
 .cursor .username {
     margin: 12px 0 0 20px;
     font-size: 12px;
+    user-select: none;
 }
 
 #wallpaper {
@@ -127,6 +128,7 @@ nav div {
     width: calc(100vw - 2.5vw - 32px);
     margin: 1.5vw 0 0 2.5vw;
     padding: 16px;
+    user-select: none;
 }
 
 #board-params #board_name {
@@ -165,6 +167,10 @@ nav div {
 #board-params button:hover {
     opacity: .6;
 } 
+
+#board {
+    user-select: none;
+}
 
 #board .col {
     background-color: #212121;
