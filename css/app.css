@@ -304,8 +304,8 @@ nav div {
 
 #console #chat_msg {
     width: calc(100vw - 30px);
-    padding: 8px;
-    font-size: 14px;
+    padding: 6px;
+    font-size: 12px;
 }
 
 .ui-tooltip {
