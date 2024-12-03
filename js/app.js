@@ -22,8 +22,6 @@ function start_board() {
 		$('#username').effect('highlight');
 		return;
 	}
-	
-	
 
 	if(boardname) {
 		$.getJSON(`./create_board/${boardname}/${username}`).done(function(data) {
