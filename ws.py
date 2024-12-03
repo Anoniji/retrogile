@@ -80,6 +80,7 @@ def boardManagerById(board_id, mode, data):
             'author': data.get('author'),
             'author_id': data.get('user_id'),
             'content': data.get('cardContent'),
+            'hidden': True,
             'votes': 0
         }
 
