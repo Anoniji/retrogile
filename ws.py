@@ -20,12 +20,21 @@ def generate_color(_key):
     return color_hex
 
 
-def getBoardInfoById(board_id):
+def getBoardInfoById(board_id, username_filter=False):
     if board_id:
         board_path = f'./board/{board_id}.json'
         if os.path.isfile(board_path):
             with open(board_path) as f:
-                return json.load(f)
+                _tmps = json.load(f)
+                if not username_filter:
+                    return _tmps
+
+                for col_name in _tmps['data']:
+                    for card_uuid, card_data in _tmps['data'][col_name].items():
+                        if card_data["author"] != username_filter and card_data['hidden']:
+                            _tmps['data'][col_name][card_uuid]['content'] = '~~~'
+
+                return _tmps
 
     return False
 
@@ -88,6 +97,12 @@ def boardManagerById(board_id, mode, data):
         if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
             board_info['data'][data.get('col_id')][data.get('card_uuid')]['content'] = data.get('cardContent')
 
+    elif mode == 'card_view':
+        for col_name in board_info["data"]:
+            for card_uuid, card_data in board_info["data"][col_name].items():
+                if card_data["author"] == data.get('author'):
+                    board_info["data"][col_name][card_uuid]["hidden"] = False
+
     elif mode == 'card_vote':
         if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
             board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes'] += 1
@@ -140,10 +155,9 @@ def colManagerByBoardId(board_id, mode, data):
                     cnt += 1
         
         except Exception as e:
-            print(e)
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print(e, exc_type, fname, exc_tb.tb_lineno)
 
     elif mode == 'col_delete':
         if data.get('colName') not in board_info['data']:
@@ -157,10 +171,8 @@ def colManagerByBoardId(board_id, mode, data):
     return True
 
 async def board_timer(clients, msg):
-    print(msg, type(msg))
     timerInSeconds = int(msg.get('timerInSeconds'))
     while timerInSeconds:
-        print(timerInSeconds)
         for ws in clients:
             await ws.send(json.dumps({
                 'type': 'timer',
@@ -235,7 +247,7 @@ async def handler(websocket):
             elif message_type == 'board_info':
                 await websocket.send(json.dumps({
                     'type': 'board_info',
-                    'board_info': getBoardInfoById(board_id),
+                    'board_info': getBoardInfoById(board_id, data.get('username', False)),
                     'board_id': board_id
                 }))
 
@@ -262,7 +274,7 @@ async def handler(websocket):
                 for ws in clients:
                     await ws.send(json.dumps(data))
 
-            elif message_type in ('card_add', 'card_edit', 'card_vote', 'card_delete'):
+            elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
                 card_uuid, card_votes = boardManagerById(board_id, message_type, data)
                 for ws in clients:
                     await ws.send(json.dumps({
@@ -299,10 +311,9 @@ async def handler(websocket):
                 print('unknow_type:', message_type, msg)
 
     except Exception as e:
-        print(e)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(exc_type, fname, exc_tb.tb_lineno)
+        print(e, exc_type, fname, exc_tb.tb_lineno)
 
     finally:
         clients.remove(websocket)

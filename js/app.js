@@ -2,14 +2,18 @@ function removeNonAlphanumeric(str) {
     return str.replace(/[^a-zA-Z0-9]/g, '');
 }
 
+function removeNonAlphanumericSpace(str) {
+    return str.replace(/[^a-zA-Z0-9 ]/g, '');
+}
+
 var username = localStorage.getItem("username");
 if (username !== null) {
 	$('#username').val(username);
 }
 
 function start_board() {
-	username = $('#username').val().trim();
-	const boardname = $('#boardname').val();
+	let username = $('#username').val().trim();
+	let boardname = $('#boardname').val();
 
 	if(username) {
 		username = removeNonAlphanumeric(username).trim();
@@ -24,6 +28,11 @@ function start_board() {
 	}
 
 	if(boardname) {
+		boardname = removeNonAlphanumericSpace(boardname).trim();
+		if(boardname == "") {
+			$('#boardname').effect('highlight');
+			return;
+		}
 		$.getJSON(`./create_board/${boardname}/${username}`).done(function(data) {
 			location.href = data;
 		});

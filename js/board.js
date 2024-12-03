@@ -72,7 +72,8 @@ function play_confetti(duration = 5000) {
     draw();
 }
 
-function customPrompt(message, defaultValue) {
+function customPrompt(col_id, message, defaultValue) {
+    $('.custom-prompt').remove();
     const dialog = document.createElement('div');
     dialog.classList.add('custom-prompt');
 
@@ -90,8 +91,8 @@ function customPrompt(message, defaultValue) {
     button.textContent = 'OK';
     dialog.appendChild(button);
 
-    document.body.appendChild(dialog);
-    dialog.style.display = 'block';
+    const el = document.querySelector(`#col_${col_id} ul`);
+    el.prepend(dialog);
 
     return new Promise((resolve) => {
         button.addEventListener('click', () => {
@@ -185,7 +186,7 @@ if(username !== null) {
         if (board_author != username) return;
         let timerInSeconds = prompt('Timer in secondes');
 
-	timerInSeconds = removeNonNumeric(timerInSeconds);	
+        timerInSeconds = removeNonNumeric(timerInSeconds);	
         if(timerInSeconds && timerInSeconds != "") {
             ws.send(JSON.stringify({
                 type: 'start_timer',
@@ -199,7 +200,7 @@ if(username !== null) {
         if (board_author != username) return;
         let maxVote = prompt('Max votes');
 
-	maxVote = removeNonNumeric(maxVote);	    
+        maxVote = removeNonNumeric(maxVote);	    
         if(maxVote && maxVote != "") {
             ws.send(JSON.stringify({
                 type: 'start_vote',
@@ -225,7 +226,7 @@ if(username !== null) {
     }
 
     function addCard(col_id) {
-        customPrompt('Add new Card', '').then(cardContent => {
+        customPrompt(col_id, 'Add new Card', '').then(cardContent => {
             if(cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_add',
@@ -242,7 +243,7 @@ if(username !== null) {
     }
 
     function editCard(col_id, card_uuid) {
-        customPrompt('Editing Card content', $(`#col_${col_id} .uuid_${card_uuid} .info .info_content`).text()).then(cardContent => {
+        customPrompt(col_id, 'Editing Card content', $(`#col_${col_id} .uuid_${card_uuid} .info .info_content`).text()).then(cardContent => {
             if(cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_edit',
@@ -299,6 +300,15 @@ if(username !== null) {
                 colName: colName,
             }));
         }
+    }
+
+    function viewCard() {
+        ws.send(JSON.stringify({
+            type: 'card_view',
+            author: username,
+            board_id: board_id,
+            user_id: user_id,
+        }));
     }
 
     function orderCol(name, data) {
@@ -440,6 +450,12 @@ if(username !== null) {
                     return;
                 }
 
+                if (board_author != username) {
+                    $('#board_add_bloc').remove();
+                } else {
+                    $('#board_add_bloc').show();
+                }
+
                 $.each(board_data,function(index,value){ 
                     html = `<div id='col_${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`
                     if (board_author == username) {
@@ -492,15 +508,24 @@ if(username !== null) {
                     html += `<div class='delete_icon material-icons' title='delete card' onclick='deleteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>delete</i></div>`;
                 }
 
-                html += `
-                        <div class='info_author'>by ${ws_data.card_add.author}</div>
-                        <div class='info_content'>${ws_data.card_add.cardContent}</div>
-                    </div>
-                </li>`;
+                html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
+                if(ws_data.card_add.author == username) {
+                    html += `<div class='info_content'>${ws_data.card_add.cardContent}</div>`;
+                } else {
+                    html += `<div class='info_content'>~~~~</div>`;
+                }
+
+                html += '</div></li>';
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
                 $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
             } else if (ws_data.type == 'card_edit') {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
+            } else if (ws_data.type == 'card_view') {
+                ws.send(JSON.stringify({
+                    type: 'board_info',
+                    board_id: board_id,
+                    username: username
+                }));
             } else if (ws_data.type == 'card_vote') { 
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
                 if (board_author == username) {
@@ -533,7 +558,8 @@ if(username !== null) {
                     } else {
                         ws.send(JSON.stringify({
                             type: 'board_info',
-                            board_id: board_id
+                            board_id: board_id,
+                            username: username
                         }));
                     }
                 });
@@ -568,7 +594,8 @@ if(username !== null) {
 
             ws.send(JSON.stringify({
                 type: 'board_info',
-                board_id: board_id
+                board_id: board_id,
+                username: username
             }));
 
             setInterval(function() { mouse_position() }, 2000);
