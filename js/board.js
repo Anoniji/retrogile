@@ -5,12 +5,18 @@ function removeNonAlphanumeric(str) {
 var username = localStorage.getItem('username');
 if (username === null) {
     let username = prompt('Your username');
-    if(username) {
+	if(username) {
+		username = removeNonAlphanumeric(username).trim();
+		if(username == "") {
+			location.href = '../';
+			return;
+		}
         localStorage.setItem('username', removeNonAlphanumeric(username));
         location.reload();
-    } else {
-        location.href = '../';
-    }
+	} else {
+		location.href = '../';
+		return;
+	}
 }
 
 function play_confetti(duration = 5000) {
