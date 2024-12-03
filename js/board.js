@@ -2,6 +2,10 @@ function removeNonAlphanumeric(str) {
     return str.replace(/[^a-zA-Z0-9]/g, '');
 }
 
+function removeNonNumeric(str) {
+    return str.replace(/[^0-9]/g, '');
+}
+
 var username = localStorage.getItem('username');
 if (username === null) {
     let username = prompt('Your username');
@@ -180,7 +184,9 @@ if(username !== null) {
     function startTimer() {
         if (board_author != username) return;
         let timerInSeconds = prompt('Timer in secondes');
-        if(timerInSeconds) {
+
+	timerInSeconds = removeNonNumeric(timerInSeconds);	
+        if(timerInSeconds && timerInSeconds != "") {
             ws.send(JSON.stringify({
                 type: 'start_timer',
                 board_id: board_id,
@@ -192,7 +198,9 @@ if(username !== null) {
     function startVote() {
         if (board_author != username) return;
         let maxVote = prompt('Max votes');
-        if(maxVote) {
+
+	maxVote = removeNonNumeric(maxVote);	    
+        if(maxVote && maxVote != "") {
             ws.send(JSON.stringify({
                 type: 'start_vote',
                 board_id: board_id,
