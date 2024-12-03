@@ -13,13 +13,13 @@ if (username === null) {
 		username = removeNonAlphanumeric(username).trim();
 		if(username == "") {
 			location.href = '../';
-			return;
+			username = null;
 		}
         localStorage.setItem('username', removeNonAlphanumeric(username));
         location.reload();
 	} else {
 		location.href = '../';
-		return;
+		username = null;
 	}
 }
 
