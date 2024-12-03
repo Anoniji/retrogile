@@ -8,17 +8,29 @@ if (username !== null) {
 }
 
 function start_board() {
-	username = $('#username').val();
+	username = $('#username').val().trim();
 	const boardname = $('#boardname').val();
 
-	localStorage.setItem('username', removeNonAlphanumeric(username));
+	if(username) {
+		username = removeNonAlphanumeric(username).trim();
+		if(username == "") {
+			$('#username').effect('highlight');
+			return;
+		}
+		localStorage.setItem('username', username);
+	} else {
+		$('#username').effect('highlight');
+		return;
+	}
+	
+	
 
 	if(boardname) {
 		$.getJSON(`./create_board/${boardname}/${username}`).done(function(data) {
 			location.href = data;
 		});
 	} else {
-		$( "#boardname" ).effect( "highlight" )
+		$('#boardname').effect('highlight');
 	}
 }
 
