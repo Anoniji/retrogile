@@ -512,7 +512,7 @@ if(username !== null) {
                 if(ws_data.card_add.author == username) {
                     html += `<div class='info_content'>${ws_data.card_add.cardContent}</div>`;
                 } else {
-                    html += `<div class='info_content'>~~~~</div>`;
+                    html += `<div class='info_content'>~~~</div>`;
                 }
 
                 html += '</div></li>';
