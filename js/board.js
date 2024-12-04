@@ -77,13 +77,10 @@ function customPrompt(col_id, message, defaultValue) {
     const dialog = document.createElement('div');
     dialog.classList.add('custom-prompt');
 
-    const title = document.createElement('p');
-    title.textContent = message;
-    dialog.appendChild(title);
-
     const input = document.createElement('input');
     input.type = 'text';
     input.value = defaultValue || '';
+    input.placeholder = message;
     input.autofocus = true;
     dialog.appendChild(input);
 
@@ -94,6 +91,7 @@ function customPrompt(col_id, message, defaultValue) {
     const el = document.querySelector(`#col_${col_id} ul`);
     el.prepend(dialog);
 
+    $(`#col_${col_id} ul`).scrollTop(0);
     return new Promise((resolve) => {
         button.addEventListener('click', () => {
             const value = input.value;
@@ -175,8 +173,14 @@ if(username !== null) {
 
     function board_copy_link() {
         try {
-            navigator.clipboard.writeText(window.location.href);
-            log(username + ' >>> url copied!', 'yellow');
+            navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+                if (result.state == "granted" || result.state == "prompt") {
+                    navigator.clipboard.writeText(window.location.href);
+                    log(username + ' >>> url copied!', 'yellow');
+                } else {
+                    log(username + ' >>> clipboard access denied!', 'red');
+                }
+            });
         } catch (err) {
             console.error('Error_copy:', err);
         }
@@ -377,7 +381,11 @@ if(username !== null) {
     }
 
     function connect() {
-        ws = new WebSocket('ws://' + location.hostname + ':8009');
+        ws_path = `ws://${location.hostname}:8009`;
+        if (window.location.protocol === 'https:') {
+            ws_path = `wss://wss-${location.hostname}`;
+        }
+        ws = new WebSocket(ws_path);
 
         $(document).on('mousemove', function (event) { 
             pos_x = event.pageX;
