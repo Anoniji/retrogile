@@ -228,7 +228,7 @@ nav div {
 #board .col ul {
     list-style: none;
     padding: 5px 0;
-    margin: -4px 0 8px;
+    margin: -6px 0 12px;
     max-height: calc(100vh - 3vw - 364px);
     scrollbar-width: thin;
     overflow-y: auto;
@@ -249,6 +249,8 @@ nav div {
     display: inline-block;
     width: 32px;
     height: 32px;
+    background-color: #212121;
+    color: #f2f2f2;
     border: 1px solid #212121;
     border-radius: 10px;
     text-align: center;
@@ -258,12 +260,16 @@ nav div {
 }
 #board .col ul li .info {
     display: inline-block;
+    max-width: calc(100% - 40px);
 }
 #board .col ul li .info .info_author {
     padding: 3px 0;
     font-size: 12px;
 }
-#board .col ul li .info .info_content {}
+#board .col ul li .info .info_content {
+    word-break: break-all;
+    font-weight: 600;
+}
 
 
 
@@ -327,8 +333,13 @@ nav div {
 .custom-prompt input {
     display: block;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 0 0 15px 15px;
     width: calc(100% - 25px);
+    margin-top: -4px;
+    border-left: 2px solid #212121;
+    border-bottom: 2px solid #212121;
+    border-right: 2px solid #212121;
+    border-top: none;
 }
 
 .custom-prompt button {
@@ -339,6 +350,7 @@ nav div {
     cursor: pointer;
     padding: 8px 25px;
     margin-top: 5px;
+    font-weight: 700;
 }
 
 canvas {
