@@ -4,3 +4,6 @@
 Agile Retrospective Management Tool
 
 The version provided is currently in development and may have missing features or even operational issues.
+
+# Demo
+![Test server](https://retrogile.anoniji.dev)
