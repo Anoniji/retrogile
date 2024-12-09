@@ -337,6 +337,9 @@ async def handler(websocket):
             else:
                 print('unknow_type:', message_type, msg)
 
+    except websockets.exceptions.ConnectionClosedOK:
+        print('close_client>')
+
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
