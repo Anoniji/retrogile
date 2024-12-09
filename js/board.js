@@ -516,6 +516,11 @@ if(username !== null) {
                 });
 
                 $('#board_name').html(ws_data.board_info.board_name);
+                if(curr_highlightUser) {
+                    let tmps_highlightUser = curr_highlightUser;
+                    curr_highlightUser = false;
+                    highlightUser(tmps_highlightUser);
+                }
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
             } else if (ws_data.type == 'start_confetti') {
@@ -540,6 +545,12 @@ if(username !== null) {
                 html += '</div></li>';
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
                 $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
+
+                if(curr_highlightUser) {
+                    let tmps_highlightUser = curr_highlightUser;
+                    curr_highlightUser = false;
+                    highlightUser(tmps_highlightUser);
+                }
             } else if (ws_data.type == 'card_edit') {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
