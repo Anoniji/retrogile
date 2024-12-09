@@ -528,7 +528,11 @@ if(username !== null) {
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
                 $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
             } else if (ws_data.type == 'card_edit') {
-                $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
+                if(ws_data.card_edit.author == username) {
+                    $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
+                } else {
+                    $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html('~~~');
+                }
             } else if (ws_data.type == 'card_view') {
                 ws.send(JSON.stringify({
                     type: 'board_info',
