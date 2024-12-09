@@ -284,6 +284,7 @@ nav div {
     padding: 5px 5px;
     font-weight: bold;
     cursor: default;
+    user-select: none;
 }
 
 #console h3 {
@@ -291,6 +292,7 @@ nav div {
     margin: 0;
     font-size: 12px;
     border-bottom: 1px solid #f2f2f2;
+    cursor: pointer;
 }
 
 #console h3 i {

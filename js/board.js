@@ -118,8 +118,15 @@ function customPrompt(col_id, message, defaultValue) {
 }
 
 const log = (text, color) => {
-    $('#board_log').append(`<span style='color: ${color}'>${text}</span><br>`).animate({ scrollTop: $(document).height() }, 200);
+    var board_log = $('#board_log');
+    board_log.append(`<span style='color: ${color}'>${text}</span><br>`);
+    var log_height = board_log[0].scrollHeight;
+    board_log.animate({ scrollTop: log_height }, 200);
 };
+
+$('#console h3').dblclick(function() {
+    $('#console').hide('slide', {direction: 'down'}, 300);
+});
 
 function searchKey(object, classes) {
     for (const key in object) {
@@ -132,17 +139,28 @@ function searchKey(object, classes) {
     return false;
 }
 
-function board_timer(timerInSeconds) {
-    $('#board_timer .title').html(timerInSeconds);
-    timerInSeconds -= 1;
-    if (timerInSeconds >= 0) {
-        setTimeout(function(){ board_timer(timerInSeconds) }, 1000)
-    }
-    if (timerInSeconds == -1) {
-        $( '#wallpaper' ).effect( 'highlight' )
-        $('#board_timer .title').html('Timer');
-    }
+
+function board_timer(seconds) {
+    const $countdownElement = $('#board_timer .title');
+    clearInterval($countdownElement.data('intervalId'));
+    const countDownDate = new Date().getTime() + seconds * 1000;
+    const updateCount = () => {
+        const now = new Date().getTime();
+        const distance = countDownDate - now;
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        $countdownElement.text(`${minutes}m ${seconds}s`);
+        if (distance < 0) {
+            clearInterval($countdownElement.data('intervalId'));
+            $countdownElement.text('Timer');
+            $('#wallpaper').effect('highlight');
+        }
+    };
+    const intervalId = setInterval(updateCount, 1000);
+    $countdownElement.data('intervalId', intervalId);
+    updateCount();
 }
+
 
 function board_vote(maxVote) {
     $('#board_vote .title').html(maxVote);
@@ -518,21 +536,12 @@ if(username !== null) {
                 }
 
                 html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
-                if(ws_data.card_add.author == username) {
-                    html += `<div class='info_content'>${ws_data.card_add.cardContent}</div>`;
-                } else {
-                    html += `<div class='info_content'>~~~</div>`;
-                }
-
+                html += `<div class='info_content'>${ws_data.card_add.cardContent}</div>`;
                 html += '</div></li>';
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
                 $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
             } else if (ws_data.type == 'card_edit') {
-                if(ws_data.card_edit.author == username) {
-                    $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
-                } else {
-                    $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html('~~~');
-                }
+                $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
                 ws.send(JSON.stringify({
                     type: 'board_info',
@@ -581,6 +590,12 @@ if(username !== null) {
                 sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
+            } else if (ws_data.type == 'force_reload') {
+                ws.send(JSON.stringify({
+                    type: 'board_info',
+                    board_id: board_id,
+                    username: username
+                }));
             } else {
                 log(`${ws_data.username} >>> ${ws_data.content}`, 'cyan');
             }                    

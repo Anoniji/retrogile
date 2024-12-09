@@ -256,7 +256,7 @@ async def handler(websocket):
                 utc_now = datetime.datetime.now()
                 delta = datetime.timedelta(seconds=int(timerInSeconds))
                 future_time_utc = utc_now + delta
-                users[client_id]['timer'] = future_time_utc
+                users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
                 updateTimerInBoard(board_id, future_time_utc)
                 for ws in clients:
                     await ws.send(json.dumps({
@@ -277,13 +277,20 @@ async def handler(websocket):
             elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
                 card_uuid, card_votes = boardManagerById(board_id, message_type, data)
                 for ws in clients:
-                    await ws.send(json.dumps({
+                    message_data = data.copy()
+                    if message_type in ('card_add', 'card_edit'):
+                        message_data['cardContent'] = data['cardContent']
+                        if websocket != ws:
+                            message_data['cardContent'] = '~~~'
+
+                    to_send = json.dumps({
                         'type': message_type,
                         'board_id': board_id,
                         'card_uuid': card_uuid,
                         'card_votes': card_votes,
-                        message_type: data
-                    }))
+                        message_type: message_data
+                    })
+                    await ws.send(to_send)
 
             elif message_type in ('col_add', 'col_order', 'col_delete'):
                 colManagerByBoardId(board_id, message_type, data)
@@ -296,16 +303,36 @@ async def handler(websocket):
 
             elif message_type == 'message':
                 message_content = data.get('content')
-                # websocket.send(message_content)
+                if "/see_all_cards" in message_content:
+                    board_info = getBoardInfoById(board_id)
+                    if not board_info:
+                        return False
 
-                for ws in clients:
-                    await ws.send(json.dumps({
-                        'type': 'message',
-                        'user_id': client_id,
-                        'username': users[client_id]['username'],
-                        'content': message_content,
-                        'board_id': board_id
-                    }))
+                    for col_name in board_info["data"]:
+                        for card_uuid, card_data in board_info["data"][col_name].items():
+                            board_info["data"][col_name][card_uuid]["hidden"] = False
+
+                    board_path = f'./board/{board_id}.json'
+                    with open(board_path, 'w') as f:
+                        json.dump(board_info, f, indent=4)
+
+                    for ws in clients:
+                        await ws.send(json.dumps({
+                            'type': 'force_reload',
+                            'user_id': client_id,
+                            'username': users[client_id]['username'],
+                            'board_id': board_id
+                        }))
+
+                else:
+                    for ws in clients:
+                        await ws.send(json.dumps({
+                            'type': 'message',
+                            'user_id': client_id,
+                            'username': users[client_id]['username'],
+                            'content': message_content,
+                            'board_id': board_id
+                        }))
 
             else:
                 print('unknow_type:', message_type, msg)
@@ -319,12 +346,13 @@ async def handler(websocket):
         clients.remove(websocket)
 
         for ws in clients:
-            await ws.send(json.dumps({
-                'type': 'user_remove',
-                'user_id': client_id,
-                'username': users[client_id]['username'],
-                'board_id': board_id
-            }))
+            if client_id in users:
+                await ws.send(json.dumps({
+                    'type': 'user_remove',
+                    'user_id': client_id,
+                    'username': users[client_id]['username'],
+                    'board_id': board_id
+                }))
 
         if client_id in users:
             del users[client_id]
