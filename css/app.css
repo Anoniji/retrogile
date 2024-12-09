@@ -267,7 +267,7 @@ nav div {
     font-size: 12px;
 }
 #board .col ul li .info .info_content {
-    word-break: break-all;
+    word-break: break-word;
     font-weight: 600;
 }
 
