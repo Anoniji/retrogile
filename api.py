@@ -90,7 +90,7 @@ def PNG(path):
 
 if __name__ == "__main__":
     try:
-        app.run(host="0.0.0.0", port=8008, debug=True)
+        app.run(host="0.0.0.0", port=8008, debug=False)
         
     except OSError as e:
         logging.error(f"Server error: {e}")
