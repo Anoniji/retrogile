@@ -218,6 +218,10 @@ footer {
     margin-right: 4px;
 }
 
+#board-params button[disabled]:hover {
+    opacity: 1 !important;
+}
+
 #board-params button i {
     display: inline-block;
     font-size: 16px;
