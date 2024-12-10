@@ -54,10 +54,13 @@ body {
 }
 
 nav {
+    box-shadow: 0 0 5px #212121;
     background-color: #212121;
     color: #f2f2f2;
     overflow: hidden;
-    padding: 10px 10px;
+    margin: 16px;
+    padding: 8px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: default;
     user-select: none;
@@ -164,18 +167,21 @@ footer {
 }
 
 #users {
-    position: absolute;
-    top: 12px;
-    right: 5px;
+    position: fixed;
+    top: 27px;
+    right: 10px;
+    left: 150px;
+    cursor: default;
 }
 
 #users .user {
     float: right;
     transition: opacity .3s linear;
-    border: 2px solid #000;
     border-radius: 50%;
     font-size: 12px;
     margin-left: 5px;
+    background: url(../img/wallpaper2.png) no-repeat center;
+    background-size: cover;
 }
 
 #users .user:hover {
@@ -185,12 +191,13 @@ footer {
 #board-params {
     background-color: #212121;
     color: #f2f2f2;
-    border-radius: 15px 0 0 15px;
     display: inline-block;
-    width: calc(100vw - 2.5vw - 32px);
-    margin: 1.5vw 0 0 2.5vw;
-    padding: 16px;
+    width: calc(100% - 64px);
+    margin: 0 16px;
+    padding: 11px 16px;
+    border-radius: 8px;
     user-select: none;
+    box-shadow: 0 0 5px #212121;
 }
 
 #board-params #board_name {
@@ -211,7 +218,7 @@ footer {
     color: #212121;
     background-color: #f2f2f2;
     border: none;
-    border-radius: 15px;
+    border-radius: 8px;
     font-size: 14px;
     padding: 4px 8px;
     cursor: pointer;
@@ -240,20 +247,22 @@ footer {
 
 #board_add_bloc {
     display: none;
-} 
+}
 
 #board {
     user-select: none;
+    margin: 0 16px;
 }
 
 #board .col {
     background-color: #212121;
     color: #f2f2f2;
-    border-radius: 15px;
+    border-radius: 8px;
     display: inline-block;
     width: 20%;
-    margin: 1.5vw 0 0 2.5vw;
+    margin: 32px 32px 0 0;
     vertical-align: top;
+    box-shadow: 0 0 5px #212121;
 }
 
 #board .col h1 {
@@ -339,10 +348,13 @@ footer {
 
 #console {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 2;
     background-color: #212121;
+    box-shadow: 0 0 5px #212121;
+    border-radius: 8px;
     color: #f2f2f2;
     overflow: hidden;
     padding: 5px 5px;
@@ -352,11 +364,14 @@ footer {
 }
 
 #console h3 {
-    padding: 0;
+    padding: 0 0 0 8px;
     margin: 0;
     font-size: 12px;
     border-bottom: 1px solid #f2f2f2;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #f2f2f2;
 }
 
 #console h3 i {
@@ -368,14 +383,15 @@ footer {
 #console #board_log {
     padding: 8px;
     font-size: 12px;
-    max-height: 80px;
+    max-height: calc(100vh - 107px);
+    border-top: 1px solid #f2f2f2;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
 }
 
 #console #chat_msg {
-    width: calc(100vw - 30px);
+    width: calc(100vw - 58px);
     padding: 6px;
     font-size: 12px;
 }
@@ -426,4 +442,16 @@ canvas {
     right: 0;
     bottom: 0;
     z-index: -1;
+}
+
+.ui-accordion .ui-accordion-content {
+    padding: 0;
+    border-top: 0;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+}
+
+.ui-accordion-header-icon {
+    display: none;
 }
