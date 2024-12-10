@@ -13,7 +13,7 @@ logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 
 # ///////////////////////////////////////////////////////////////////////
 
-app = Flask(__name__, template_folder="./")
+app = Flask(__name__, template_folder="./pages/")
 
 
 @app.route("/")
@@ -44,6 +44,10 @@ def create_board(board_name, author):
 
     return jsonify(["./board/" + board_id])
 
+
+@app.route("/board/")
+def home():
+    return render_template("home.html")
 
 @app.route("/board/<string:board_id>")
 def board(board_id):
@@ -91,6 +95,6 @@ def PNG(path):
 if __name__ == "__main__":
     try:
         app.run(host="0.0.0.0", port=8008, debug=False)
-        
+
     except OSError as e:
         logging.error(f"Server error: {e}")
