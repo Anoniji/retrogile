@@ -130,6 +130,8 @@ nav div {
     text-align: center;
     padding: 10px;
     width: calc(100% - 20px);
+    border-radius: 2px;
+    border: none !important;
 }
 
 #board_access div button {
@@ -138,6 +140,7 @@ nav div {
     border: none;
     cursor: pointer;
     padding: 8px 25px;
+    border-radius: 2px;
 }
 
 #board_access .label_button {
