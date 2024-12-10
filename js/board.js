@@ -331,7 +331,7 @@ if(username !== null) {
                 author: username,
                 board_id: board_id,
                 user_id: user_id,
-                colName: escapeHtml(colName);,
+                colName: escapeHtml(colName),
             }));
         }
     }
