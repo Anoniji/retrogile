@@ -187,7 +187,7 @@ function board_vote_order() {
         }).appendTo($sortableList);
     });
 }
-    
+
 if(username !== null) {
     let ws;
     let reconnectInterval = 1000;
@@ -220,7 +220,7 @@ if(username !== null) {
         if (board_author != username) return;
         let timerInSeconds = prompt('Timer in secondes');
 
-        timerInSeconds = removeNonNumeric(timerInSeconds);	
+        timerInSeconds = removeNonNumeric(timerInSeconds);
         if(timerInSeconds && timerInSeconds != "") {
             ws.send(JSON.stringify({
                 type: 'start_timer',
@@ -234,7 +234,7 @@ if(username !== null) {
         if (board_author != username) return;
         let maxVote = prompt('Max votes');
 
-        maxVote = removeNonNumeric(maxVote);	    
+        maxVote = removeNonNumeric(maxVote);
         if(maxVote && maxVote != "") {
             ws.send(JSON.stringify({
                 type: 'start_vote',
@@ -287,7 +287,7 @@ if(username !== null) {
                     col_id: col_id,
                     card_uuid: card_uuid,
                     cardContent: cardContent
-                })); 
+                }));
             }
         });
     }
@@ -306,9 +306,9 @@ if(username !== null) {
                     user_id: user_id,
                     col_id: col_id,
                     card_uuid: card_uuid
-                })); 
+                }));
             }
-        } 
+        }
     }
 
     function deleteCard(col_id, card_uuid) {
@@ -331,7 +331,7 @@ if(username !== null) {
                 author: username,
                 board_id: board_id,
                 user_id: user_id,
-                colName: colName,
+                colName: escapeHtml(colName);,
             }));
         }
     }
@@ -417,10 +417,10 @@ if(username !== null) {
         }
         ws = new WebSocket(ws_path);
 
-        $(document).on('mousemove', function (event) { 
+        $(document).on('mousemove', function (event) {
             pos_x = event.pageX;
-            pos_y = event.pageY; 
-        }); 
+            pos_y = event.pageY;
+        });
 
         function mouse_position() {
             ws.send(JSON.stringify({
@@ -442,10 +442,10 @@ if(username !== null) {
                 }
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
-                $.each(ws_data.users_list,function(index,value){ 
+                $.each(ws_data.users_list,function(index,value){
                     if(user_id && user_id != index && value.board_id == board_id) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor'><div class='username'>${value.username}</div></div>`)
-                    } 
+                    }
                     if(value.board_id == board_id) {
                         $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
                         $(document).tooltip({position: {my: "center top",at: "center bottom"}});
@@ -466,7 +466,7 @@ if(username !== null) {
                 if(user_id != ws_data.user_id) {
                     if(ws_data.pos_y && ws_data.pos_x) {
                         $(`#cursor_${ws_data.user_id}`).animate({ top: `${ws_data.pos_y}px`, left: `${ws_data.pos_x}px`}, 300);    
-                    }                            
+                    }
                 }
             } else if (ws_data.type == 'board_info') {
                 board_author = ws_data.board_info.author;
@@ -495,7 +495,7 @@ if(username !== null) {
                     $('#board_add_bloc').show();
                 }
 
-                $.each(board_data,function(index,value){ 
+                $.each(board_data,function(index,value){
                     html = `<div id='col_${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`
@@ -507,7 +507,7 @@ if(username !== null) {
                     entries.sort((a, b) => a[1].pos - b[1].pos);
                     const sortedData = Object.fromEntries(entries);
 
-                    $.each(sortedData,function(uuid,value){ 
+                    $.each(sortedData,function(uuid,value){
                         html = `<li class='ui-state-default user_${value.author} uuid_${uuid} pos_${value.pos}'>
                             <div class='votes' onclick='voteCard("${index}", "${uuid}");'>${value.votes}</div>
                             <div class='info'>`
@@ -571,7 +571,7 @@ if(username !== null) {
                     board_id: board_id,
                     username: username
                 }));
-            } else if (ws_data.type == 'card_vote') { 
+            } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
                 if (board_author == username) {
                     var elementsVotes = $(".votes");
@@ -621,7 +621,7 @@ if(username !== null) {
                 }));
             } else {
                 log(`${ws_data.username} >>> ${ws_data.content}`, 'cyan');
-            }                    
+            }
         });
 
         document.getElementById('form').onsubmit = ev => {
