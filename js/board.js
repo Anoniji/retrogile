@@ -1,8 +1,10 @@
 function removeNonAlphanumeric(str) {
+    if(!str) return false;
     return str.replace(/[^a-zA-Z0-9]/g, '');
 }
 
 function removeNonNumeric(str) {
+    if(!str) return false;
     return str.replace(/[^0-9]/g, '');
 }
 
