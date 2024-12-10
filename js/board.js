@@ -76,6 +76,16 @@ function play_confetti(duration = 5000) {
     draw();
 }
 
+function escapeHtml(unsafe)
+{
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
+
 function customPrompt(col_id, message, defaultValue) {
     $('.custom-prompt').remove();
     const dialog = document.createElement('li');
@@ -99,14 +109,14 @@ function customPrompt(col_id, message, defaultValue) {
     $(`#col_${col_id} ul`).scrollTop(0);
     return new Promise((resolve) => {
         button.addEventListener('click', () => {
-            const value = input.value;
+            const value = escapeHtml(input.value);
             dialog.remove();
             resolve(value);
         });
 
         input.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
-                const value = input.value;
+                const value = escapeHtml(input.value);
                 dialog.remove();
                 resolve(value);
             }
