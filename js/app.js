@@ -18,26 +18,26 @@ function start_board() {
 	if(username) {
 		username = removeNonAlphanumeric(username).trim();
 		if(username == "") {
-			$('#username').effect('highlight');
+			$('#username').effect('highlight', {color: '#f44336'});
 			return;
 		}
 		localStorage.setItem('username', username);
 	} else {
-		$('#username').effect('highlight');
+		$('#username').effect('highlight', {color: '#f44336'});
 		return;
 	}
 
 	if(boardname) {
 		boardname = removeNonAlphanumericSpace(boardname).trim();
 		if(boardname == "") {
-			$('#boardname').effect('highlight');
+			$('#boardname').effect('highlight', {color: '#f44336'});
 			return;
 		}
 		$.getJSON(`./create_board/${boardname}/${username}`).done(function(data) {
 			location.href = data;
 		});
 	} else {
-		$('#boardname').effect('highlight');
+		$('#boardname').effect('highlight', {color: '#f44336'});
 	}
 }
 
