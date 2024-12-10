@@ -630,7 +630,7 @@ if(username !== null) {
             ws.send(JSON.stringify({
                 type: 'message',
                 board_id: board_id,
-                content: textField.value
+                content: escapeHtml(textField.value)
             }));
             textField.value = '';
         };
