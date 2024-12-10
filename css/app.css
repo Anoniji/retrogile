@@ -160,6 +160,7 @@ footer {
     left: 8px;
     bottom: 2px;
     font-size: 8px;
+    user-select: none;
 }
 
 #users {
