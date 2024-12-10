@@ -479,6 +479,7 @@ if(username !== null) {
 
                 if (board_author != username) {
                     $('#board_add_bloc').remove();
+                    $('#board_timer, #board_vote').prop('disabled', true);
                 } else {
                     $('#board_add_bloc').show();
                 }
