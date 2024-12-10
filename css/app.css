@@ -35,6 +35,17 @@ body {
     background-size: cover;
 }
 
+#wallpaper2 {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: url(../img/wallpaper2.png) no-repeat center;
+    background-size: cover;
+}
+
 nav {
     background-color: #212121;
     color: #f2f2f2;
@@ -64,16 +75,36 @@ nav div {
     cursor: pointer;
 }
 
+#nav_logo {
+    font-weight: bold;
+    user-select: none;
+}
+
+#nav_logo i {
+    position: relative;
+    z-index: 2;
+}
+
+#nav_logo div {
+    display: inline-block;
+    position: relative;
+    left: -21px;
+    top: -3px;
+}
+
+
 #board_access {
     position: fixed;
-    width: 250px;
-    height: 260px;
-    left: calc(50vw - 135px);
-    top: calc(50vh - 140px);
+    width: 400px;
+    height: 240px;
+    left: calc(50vw - 210px);
+    top: calc(50vh - 130px);
     background-color: #212121;
+    box-shadow: 0 0 5px#212121;
     color: #f2f2f2;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 #board_icone {
@@ -84,7 +115,7 @@ nav div {
 }
 
 #board_access div {
-    text-align: center;
+    text-align: left;
     padding: 10px;
 }
 
@@ -98,9 +129,27 @@ nav div {
     color: #212121;
     background-color: #f2f2f2;
     border: none;
-    border-radius: 15px;
     cursor: pointer;
     padding: 8px 25px;
+}
+
+#board_access .label_button {
+    position: relative;
+    display: inline-block;
+    top: -5px;
+    right: 5px;
+    user-select: none;
+}
+
+#board_access .right {
+    text-align: right;
+}
+
+footer {
+    position: fixed;
+    left: 8px;
+    bottom: 2px;
+    font-size: 8px;
 }
 
 #users {
