@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <title>Retrogile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="./img/icone.png" />
+    <link rel="stylesheet" href="./css/materialicons.css">
+    <link rel="stylesheet" href="./css/jqueryui.css">
+    <link rel="stylesheet" href="./css/app.css">
+</head>
+
+<body>
+    <section id="wallpaper2"></section>
+    <div id="board_access">
+        <div id="nav_logo">
+            <i class="material-icons">dataset</i>
+            <div onclick="location.href = './';">Retrogile</div>
+        </div>
+        <div>
+            <input type="text" id="username" placeholder="Username (First name + 3rd letter of last name)" maxlength="32">
+        </div>
+        <div>
+            <input type="text" id="boardname" placeholder="Board name" maxlength="32">
+        </div>
+        <div class="right">
+            <div class="label_button">Create a new board</div>
+            <button onclick="start_board()"><i class="material-icons">east</i></button>
+        </div>
+    </div>
+    <footer>
+        Copyright © 2024 Retrogile, jQuery & jQuery UI © OpenJS Foundation and other contributors, Material icons under Apache License Version 2.0
+    </footer>
+
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/jquery-ui.min.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+
+</html>
