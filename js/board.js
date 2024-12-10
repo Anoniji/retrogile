@@ -8,6 +8,8 @@ function removeNonNumeric(str) {
     return str.replace(/[^0-9]/g, '');
 }
 
+$(function() { $( "#console" ).accordion({collapsible: true, active: false, heightStyle: "content"}); });
+
 var username = localStorage.getItem('username');
 if (username === null) {
     let username = prompt('Your username');
@@ -126,9 +128,6 @@ const log = (text, color) => {
     board_log.animate({ scrollTop: log_height }, 200);
 };
 
-$('#console h3').dblclick(function() {
-    $('#console').hide('slide', {direction: 'down'}, 300);
-});
 
 function searchKey(object, classes) {
     for (const key in object) {
