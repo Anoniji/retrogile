@@ -1,8 +1,10 @@
 function removeNonAlphanumeric(str) {
+	if(!str) return false;
     return str.replace(/[^a-zA-Z0-9]/g, '');
 }
 
 function removeNonAlphanumericSpace(str) {
+	if(!str) return false;
     return str.replace(/[^a-zA-Z0-9 ]/g, '');
 }
 
