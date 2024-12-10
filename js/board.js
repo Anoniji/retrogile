@@ -27,7 +27,7 @@ if (username === null) {
 	}
 }
 
-function play_confetti(duration = 5000) {
+function play_confetti(duration = 800) {
     $('#board_confetti').prop('disabled', true);
     const canvas = document.createElement('canvas');
     canvas.width = window.innerWidth;
@@ -35,16 +35,16 @@ function play_confetti(duration = 5000) {
     document.body.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    const confettiCount = 100;
+    const confettiCount = 500;
     const confetti = [];
     for (let i = 0; i < confettiCount; i++) {
         confetti.push({
             x: Math.random() * canvas.width,
             y: canvas.height,
-            width: Math.random() * 10 + 5,
-            height: Math.random() * 10 + 5,
+            width: Math.random() * 4 + 5,
+            height: Math.random() * 4 + 5,
             angle: Math.random() * 2 * Math.PI,
-            speed: Math.random() * 2 + 1,
+            speed: Math.random() * 8 + 1,
             color: '#' + Math.floor(Math.random() * 16777215).toString(16),
         });
     }
@@ -164,7 +164,7 @@ function board_timer(seconds) {
         if (distance < 0) {
             clearInterval($countdownElement.data('intervalId'));
             $countdownElement.text('Timer');
-            $('#wallpaper').effect('highlight');
+            $('#wallpaper2').effect('highlight');
         }
     };
     const intervalId = setInterval(updateCount, 1000);
@@ -277,7 +277,7 @@ if(username !== null) {
     }
 
     function editCard(col_id, card_uuid) {
-        customPrompt(col_id, 'Editing Card content', $(`#col_${col_id} .uuid_${card_uuid} .info .info_content`).text()).then(cardContent => {
+        customPrompt(col_id, 'Editing Card content', $(`#col_${col_id} .uuid_${card_uuid} .info_content`).text()).then(cardContent => {
             if(cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_edit',
@@ -496,11 +496,11 @@ if(username !== null) {
                 }
 
                 $.each(board_data,function(index,value){
-                    html = `<div id='col_${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`
+                    html = `<div id='col_${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
-                        html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`
+                        html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
                     }
-                    html += `</h1><ul class='sortable'></ul></div>`
+                    html += `</h1><ul class='sortable'></ul></div>`;
                     $('#board').append(html);
 
                     const entries = Object.entries(value);
@@ -508,20 +508,24 @@ if(username !== null) {
                     const sortedData = Object.fromEntries(entries);
 
                     $.each(sortedData,function(uuid,value){
-                        html = `<li class='ui-state-default user_${value.author} uuid_${uuid} pos_${value.pos}'>
-                            <div class='votes' onclick='voteCard("${index}", "${uuid}");'>${value.votes}</div>
-                            <div class='info'>`
-
+                        html = `<li class='ui-state-default user_${value.author} uuid_${uuid} pos_${value.pos}'>`;
+                        html += `<div class='card_icon'>`;
+                        html += `<div class='info_author'>by ${value.author}</div>`;
                         if(value.author == username) {
-                            html += `<div class='edit_icon material-icons' title='edit card' onclick='editCard("${index}", "${uuid}");'>edit</i></div>`;
-                            html += `<div class='delete_icon material-icons' title='delete card' onclick='deleteCard("${index}", "${uuid}");'>delete</i></div>`;
+                            html += `<div class='edit_icon' onclick='editCard("${index}", "${uuid}");'>
+                                <i class='material-icons'>edit</i>
+                                <div class='type'>Edit</div>
+                            </div>`;
+                            html += `<div class='delete_icon' onclick='deleteCard("${index}", "${uuid}");'>
+                                <i class='material-icons'>delete</i>
+                                <div class='type'>Delete</div>
+                            </div>`;
                         }
-
-                        html += `
-                                <div class='info_author'>by ${value.author}</div>
-                                <div class='info_content'>${value.content}</div>
-                            </div>
-                        </li>`;
+                        html += `</div>`;
+                        html += `<div class='votes' onclick='voteCard("${index}", "${uuid}");'>${value.votes}</div>
+                            <div class='info_content'>${value.content}</div>
+                            </div>`;
+                        html += `</li>`;
                         $(`#col_${index} .sortable`).append(html);
                     });
                     $(`#col_${index} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
@@ -543,18 +547,24 @@ if(username !== null) {
                 log('Vote Session >>> started', 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default user_${ws_data.card_add.author} uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}'>
-                    <div class='votes' onclick='voteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
-                    <div class='info'>`
-
-                if(ws_data.card_add.author == username) {
-                    html += `<div class='edit_icon material-icons' title='edit card' onclick='editCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>edit</i></div>`;
-                    html += `<div class='delete_icon material-icons' title='delete card' onclick='deleteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>delete</i></div>`;
-                }
-
+                html = `<li class='ui-state-default user_${ws_data.card_add.author} uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}'>`;
+                html += `<div class='card_icon'>`;
                 html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
-                html += `<div class='info_content'>${ws_data.card_add.cardContent}</div>`;
-                html += '</div></li>';
+                if(ws_data.card_add.author == username) {
+                    html += `<div class='edit_icon' onclick='editCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>
+                        <i class='material-icons'>edit</i>
+                        <div class='type'>Edit</div>
+                    </div>`;
+                    html += `<div class='delete_icon' onclick='deleteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>
+                        <i class='material-icons'>delete</i>
+                        <div class='type'>Delete</div>
+                    </div>`;
+                }
+                html += `</div>`;
+                html += `<div class='votes' onclick='voteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
+                    <div class='info_content'>${ws_data.card_add.cardContent}</div>
+                    </div>`;
+                html += `</li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
                 $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
 
@@ -589,9 +599,9 @@ if(username !== null) {
             } else if (ws_data.type == 'col_add') {
                 html = `<div id='col_${ws_data.col_add.colName}' class='col'><h1>${ws_data.col_add.colName}<i onclick='addCard("${ws_data.col_add.colName}");' class='add_icon material-icons'>add</i>`
                 if (board_author == username) {
-                    html += `<i onclick='deleteCol("${ws_data.col_add.colName}");' class='drop_icon material-icons'>delete</i>`
+                    html += `<i onclick='deleteCol("${ws_data.col_add.colName}");' class='drop_icon material-icons'>delete</i>`;
                 }
-                html += `</h1><ul class='sortable'></ul></div>`
+                html += `</h1><ul class='sortable'></ul></div>`;
                 $('#board').append(html);
             } else if (ws_data.type == 'col_order') {
                 const sortableList = document.querySelector(`#col_${ws_data.col_order.colName} .sortable`);
