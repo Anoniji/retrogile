@@ -149,13 +149,19 @@ nav div {
 #board_access .label_button {
     position: relative;
     display: inline-block;
-    top: -5px;
-    right: 5px;
-    user-select: none;
+    top: -7px;
+    left: -2px;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 #board_access .right {
     text-align: right;
+}
+
+#board_access .right .list_board_btn {
+    float: left;
 }
 
 footer {
@@ -274,7 +280,11 @@ footer {
     border-bottom: 1px solid #f2f2f2;
 }
 
-#board .col .drop_icon, #board .col .add_icon {
+#board .col .board_list {
+    border-bottom: none !important;
+}
+
+#board .col .drop_icon, #board .col .add_icon, #board .col .open_icon {
     float: right;
     margin: 2px 15px 0 0;
     cursor: pointer;

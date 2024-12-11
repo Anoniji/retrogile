@@ -662,18 +662,10 @@ if(username !== null) {
             setInterval(function() { mouse_position() }, 2000);
         };
 
-        // ws.onmessage = (event) => {
-        //     console.log('Message reçu:', event.data);
-        // };
-
-        // ws.onerror = (error) => {
-        //     console.error('Erreur de connexion:', error);
-        // };
-
         ws.onclose = () => {
             log(username + ' >>> Please Wait, your are disconnected!', 'red');
             setTimeout(connect, reconnectInterval);
-            reconnectInterval *= 2; // Double le délai à chaque tentative
+            reconnectInterval *= 2;
         };
     }
     connect();

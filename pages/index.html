@@ -24,8 +24,11 @@
             <input type="text" id="boardname" placeholder="Board name" maxlength="32">
         </div>
         <div class="right">
-            <div class="label_button">Create a new board</div>
-            <button onclick="start_board()"><i class="material-icons">east</i></button>
+            <button class="list_board_btn" onclick="list_board()" title="List of boards"><i class="material-icons">list</i></button>
+            <button onclick="start_board()">
+                <i class="material-icons">east</i>
+                <div class="label_button">Create a new board</div>
+            </button>
         </div>
     </div>
     <footer>

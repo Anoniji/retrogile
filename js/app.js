@@ -43,6 +43,23 @@ function start_board() {
 	}
 }
 
+function list_board() {
+	let username = $('#username').val().trim();
+
+	if(username) {
+		username = removeNonAlphanumeric(username).trim();
+		if(username == "") {
+			$('#username').effect('highlight', {color: '#f44336'});
+			return;
+		}
+		localStorage.setItem('username', username);
+		location.href = './board/';
+	} else {
+		$('#username').effect('highlight', {color: '#f44336'});
+		return;
+	}
+}
+
 $("#boardname").keypress(function(event) {
     if (event.which === 13) {
 		start_board()

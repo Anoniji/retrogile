@@ -20,6 +20,19 @@ def generate_color(_key):
     return color_hex
 
 
+def getBoardListByAuthor(author):
+    directory = './board/'
+    author_files = []
+    for file in os.listdir(directory):
+        if file.endswith(".json"):
+            file_path = os.path.join(directory, file)
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+                if data['author'] == author:
+                    author_files.append([data['board_name'], file_path])
+    return author_files
+
+
 def getBoardInfoById(board_id, username_filter=False):
     if board_id:
         board_path = f'./board/{board_id}.json'
@@ -201,7 +214,14 @@ async def handler(websocket):
             message_type = data.get('type')
             board_id = data.get('board_id')
 
-            if message_type == 'connect':
+            if message_type == 'board_list':
+                board_author = data.get('username')
+                await websocket.send(json.dumps({
+                    'type': 'board_list',
+                    'board_list': getBoardListByAuthor(board_author)
+                }))
+
+            elif message_type == 'connect':
                 message_username = data.get('username')
                 users[client_id] = {
                     'username': message_username,
