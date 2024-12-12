@@ -1,3 +1,6 @@
+const currentYear = new Date().getFullYear();
+$('#year').text(currentYear);
+
 function removeNonAlphanumeric(str) {
     if(!str) return false;
     return str.replace(/[^a-zA-Z0-9]/g, '');
@@ -8,24 +11,14 @@ function removeNonNumeric(str) {
     return str.replace(/[^0-9]/g, '');
 }
 
-$(function() { $( "#console" ).accordion({collapsible: true, active: false, heightStyle: "content"}); });
-
 var username = localStorage.getItem('username');
 if (username === null) {
-    let username = prompt('Your username');
-	if(username) {
-		username = removeNonAlphanumeric(username).trim();
-		if(username == "") {
-			location.href = '../';
-			username = null;
-		}
-        localStorage.setItem('username', removeNonAlphanumeric(username));
-        location.reload();
-	} else {
-		location.href = '../';
-		username = null;
-	}
+    const pathname = window.location.pathname;
+    const lastpart = pathname.split('/').pop();
+    location.href = `../#${lastpart}`;
 }
+
+$(function() { $( '#console' ).accordion({collapsible: true, active: false, heightStyle: 'content'}); });
 
 function play_confetti(duration = 800) {
     $('#board_confetti').prop('disabled', true);
@@ -79,11 +72,11 @@ function play_confetti(duration = 800) {
 function escapeHtml(unsafe)
 {
     return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+         .replace(/&/g, '&amp;')
+         .replace(/</g, '&lt;')
+         .replace(/>/g, '&gt;')
+         .replace(/"/g, '&quot;')
+         .replace(/'/g, '&#039;');
  }
 
 function customPrompt(col_id, message, defaultValue) {
@@ -92,11 +85,10 @@ function customPrompt(col_id, message, defaultValue) {
     dialog.classList.add('custom-prompt');
     dialog.classList.add('unsortable');
 
-    const input = document.createElement('input');
+    const input = document.createElement('textarea');
     input.type = 'text';
     input.value = defaultValue || '';
     input.placeholder = message;
-    input.autofocus = true;
     dialog.appendChild(input);
 
     const button = document.createElement('button');
@@ -107,11 +99,17 @@ function customPrompt(col_id, message, defaultValue) {
     el.prepend(dialog);
 
     $(`#col_${col_id} ul`).scrollTop(0);
+    $('.custom-prompt textarea').focus();
     return new Promise((resolve) => {
         button.addEventListener('click', () => {
             const value = escapeHtml(input.value);
             dialog.remove();
             resolve(value);
+        });
+
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = (input.scrollHeight - 20) + 'px';
         });
 
         input.addEventListener('keyup', (event) => {
@@ -178,11 +176,11 @@ function board_vote(maxVote) {
 }
 
 function board_vote_order() {
-    $(".sortable").each(function() {
+    $('.sortable').each(function() {
         const $sortableList = $(this);
-        $sortableList.find("li").sort(function(a, b) {
-            const aVotes = parseInt($(a).find(".votes").text());
-            const bVotes = parseInt($(b).find(".votes").text());
+        $sortableList.find('li').sort(function(a, b) {
+            const aVotes = parseInt($(a).find('.votes').text());
+            const bVotes = parseInt($(b).find('.votes').text());
             return bVotes - aVotes;
         }).appendTo($sortableList);
     });
@@ -203,8 +201,8 @@ if(username !== null) {
 
     function board_copy_link() {
         try {
-            navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
-                if (result.state == "granted" || result.state == "prompt") {
+            navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
+                if (result.state == 'granted' || result.state == 'prompt') {
                     navigator.clipboard.writeText(window.location.href);
                     log(username + ' >>> url copied!', 'yellow');
                 } else {
@@ -221,7 +219,7 @@ if(username !== null) {
         let timerInSeconds = prompt('Timer in secondes');
 
         timerInSeconds = removeNonNumeric(timerInSeconds);
-        if(timerInSeconds && timerInSeconds != "") {
+        if(timerInSeconds && timerInSeconds != '') {
             ws.send(JSON.stringify({
                 type: 'start_timer',
                 board_id: board_id,
@@ -235,7 +233,7 @@ if(username !== null) {
         let maxVote = prompt('Max votes');
 
         maxVote = removeNonNumeric(maxVote);
-        if(maxVote && maxVote != "") {
+        if(maxVote && maxVote != '') {
             ws.send(JSON.stringify({
                 type: 'start_vote',
                 board_id: board_id,
@@ -448,7 +446,7 @@ if(username !== null) {
                     }
                     if(value.board_id == board_id) {
                         $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
-                        $(document).tooltip({position: {my: "center top",at: "center bottom"}});
+                        $(document).tooltip({position: {my: 'center top',at: 'center bottom'}});
                     }
                 });
             } else if (ws_data.type == 'user_add') {
@@ -456,7 +454,7 @@ if(username !== null) {
                     log(ws_data.username + ' >>> connected', 'yellow');
                     $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`);
-                    $(document).tooltip({position: {my: "center top",at: "center bottom"}});
+                    $(document).tooltip({position: {my: 'center top',at: 'center bottom'}});
                 }
             } else if (ws_data.type == 'user_remove') {
                 log(ws_data.username + ' >>> disconnected', 'red');
@@ -528,7 +526,7 @@ if(username !== null) {
                         html += `</li>`;
                         $(`#col_${index} .sortable`).append(html);
                     });
-                    $(`#col_${index} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
+                    $(`#col_${index} .sortable`).sortable({items:'li:not(.unsortable)',connectWith:'.sortable',update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
                 });
 
                 $('#board_name').html(ws_data.board_info.board_name);
@@ -542,8 +540,8 @@ if(username !== null) {
             } else if (ws_data.type == 'start_confetti') {
                 play_confetti();
             } else if (ws_data.type == 'start_vote') {
-                maxVoteTotal = $("#users .user").length * ws_data.maxVote;
-                $(".votes").text("0");
+                maxVoteTotal = $('#users .user').length * ws_data.maxVote;
+                $('.votes').text('0');
                 log('Vote Session >>> started', 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
@@ -566,7 +564,7 @@ if(username !== null) {
                     </div>`;
                 html += `</li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
-                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({items:"li:not(.unsortable)",connectWith:".sortable",update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
+                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({items:'li:not(.unsortable)',connectWith:'.sortable',update:function(e,u){var l=[];$(this).children().each(function(i,e){l.push($(e).attr('class'))});orderCol($(this).parent().attr('id'),l)}});
 
                 if(curr_highlightUser) {
                     let tmps_highlightUser = curr_highlightUser;
@@ -584,7 +582,7 @@ if(username !== null) {
             } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
                 if (board_author == username) {
-                    var elementsVotes = $(".votes");
+                    var elementsVotes = $('.votes');
                     var totalVotes = 0;
                     elementsVotes.each(function() {
                         var valeurVote = parseInt($(this).text());

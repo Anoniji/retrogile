@@ -153,7 +153,7 @@ nav div {
     left: -2px;
     padding: 0;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: bold;
 }
 
 #board_access .right {
@@ -162,6 +162,20 @@ nav div {
 
 #board_access .right .list_board_btn {
     float: left;
+}
+
+#board_access #username_bloc {
+    position: relative;
+    clear: both;
+}
+
+#board_access #username_bloc #username_cleaner {
+    position: absolute;
+    z-index: 1;
+    top: 15px;
+    right: 18px;
+    color: #212121;
+    cursor: pointer;
 }
 
 footer {
@@ -204,6 +218,17 @@ footer {
     border-radius: 8px;
     user-select: none;
     box-shadow: 0 0 2px #212121;
+}
+
+.board-params-2 {
+    background-color: transparent !important;
+    color: #212121 !important;
+    width: calc(100% - 48px) !important;
+    padding: 11px 8px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border-bottom: 2px solid #212121;
+    font-weight: 600;
 }
 
 #board-params #board_name {
@@ -327,7 +352,7 @@ footer {
     list-style: none;
     padding: 0;
     margin: -6px 0 12px;
-    min-height: 70px;
+    min-height: 85px;
     max-height: calc(100vh - 163px - 114px);
     background-color: #f2f2f2;
     scrollbar-width: thin;
@@ -450,7 +475,8 @@ footer {
     margin: 0 !important;
 }
 
-.custom-prompt input {
+.custom-prompt textarea {
+    font-family: "Noto Sans", sans-serif;
     display: block;
     padding: 10px;
     border-radius: 0 0 15px 15px;

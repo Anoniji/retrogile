@@ -1,3 +1,6 @@
+const currentYear = new Date().getFullYear();
+$('#year').text(currentYear);
+
 var username = localStorage.getItem('username');
 if (username === null) {
 	location.href = '../';
@@ -19,6 +22,7 @@ if (username === null) {
             ws_path = `wss://wss-${location.hostname}`;
         }
         ws = new WebSocket(ws_path);
+        let isDisconnected = false;
 
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
@@ -31,6 +35,10 @@ if (username === null) {
                     </div>`;
                     $('#board').append(html);
                 });
+                if (!isDisconnected) {
+                    ws.close();
+                    isDisconnected = true;
+                }
             }
         });
 
@@ -42,8 +50,10 @@ if (username === null) {
         };
 
         ws.onclose = () => {
-            setTimeout(connect, reconnectInterval);
-            reconnectInterval *= 2;
+            if (!isDisconnected) {
+                setTimeout(connect, reconnectInterval);
+                reconnectInterval *= 2;
+            }
         };
     }
     connect();

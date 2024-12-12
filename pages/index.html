@@ -17,8 +17,9 @@
             <i class="material-icons">dataset</i>
             <div onclick="location.href = './';">Retrogile</div>
         </div>
-        <div>
+        <div id="username_bloc">
             <input type="text" id="username" placeholder="Username (First name + 3rd letter of last name)" maxlength="32">
+            <i id="username_cleaner" class="material-icons">cleaning_services</i>
         </div>
         <div>
             <input type="text" id="boardname" placeholder="Board name" maxlength="32">
@@ -32,7 +33,7 @@
         </div>
     </div>
     <footer>
-        Copyright © 2024 Retrogile, jQuery & jQuery UI © OpenJS Foundation and other contributors, Material icons under Apache License Version 2.0
+        Copyright © <span id="year">2024</span> Retrogile, jQuery & jQuery UI © OpenJS Foundation and other contributors, Material icons under Apache License Version 2.0
     </footer>
 
     <script src="./js/jquery.min.js"></script>
