@@ -100,6 +100,12 @@ function customPrompt(col_id, message, defaultValue) {
 
     $(`#col_${col_id} ul`).scrollTop(0);
     $('.custom-prompt textarea').focus();
+
+    if(defaultValue) {
+        input.style.height = 'auto';
+        input.style.height = (input.scrollHeight - 20) + 'px';
+    }
+
     return new Promise((resolve) => {
         button.addEventListener('click', () => {
             const value = escapeHtml(input.value);
