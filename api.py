@@ -21,6 +21,11 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/LICENSES")
+def licenses():
+    return render_template("licenses.html")
+
+
 @app.route("/create_board/<string:board_name>/<string:author>")
 def create_board(board_name, author):
     board_dir = './board/'

@@ -329,13 +329,14 @@ if(username !== null) {
     function addCol() {
         if (board_author != username) return;
         let colName = prompt('Zone name');
+        colName = removeNonAlphanumeric(colName);
         if(colName) {
             ws.send(JSON.stringify({
                 type: 'col_add',
                 author: username,
                 board_id: board_id,
                 user_id: user_id,
-                colName: escapeHtml(colName),
+                colName: colName,
             }));
         }
     }

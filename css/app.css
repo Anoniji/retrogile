@@ -178,12 +178,24 @@ nav div {
     cursor: pointer;
 }
 
+#licenses_list {
+    text-align: left;
+}
+
+#licenses_list li {
+    margin: 5px 0;
+}
+
 footer {
     position: fixed;
     left: 8px;
     bottom: 2px;
     font-size: 8px;
     user-select: none;
+}
+
+footer a {
+    color: #212121;
 }
 
 #users {
@@ -519,4 +531,33 @@ canvas {
 
 .ui-accordion-header-icon {
     display: none;
+}
+
+
+@media (max-width: 920px) {
+    #console, #board-params button div {
+        display: none;
+    }
+    .main_board {
+        text-align: left;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        height: calc(100vh - 148px);
+        scrollbar-width: thin;
+    }
+    .main_board .col {
+        margin: 16px 16px 8px 16px;
+        width: calc(100% - 34px);
+        flex: 0 0 auto;
+    }
+    .main_board .col ul {
+        min-height: initial;
+        height: calc(100vh - 163px - 75px);
+        max-height: initial;
+    }
+
+    .list_board .col {
+        width: calc(100% - 34px) !important;
+    }
 }
