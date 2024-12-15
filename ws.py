@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+"""
+Retrogile WS
+"""
+
 import os
 import sys
 import json
@@ -17,6 +22,15 @@ pos = 0
 
 
 def generate_color(_key):
+    """
+    Generates a unique hexadecimal color code based on the given key.
+
+    Args:
+        key (str): The input key string.
+
+    Returns:
+        str: The generated hexadecimal color code in the format "#XXXXXX".
+    """
     hash_object = hashlib.sha256(_key.encode('utf-8'))
     hex_dig = hash_object.hexdigest()
     color_hex = f"#{hex_dig[:6]}"
@@ -24,6 +38,17 @@ def generate_color(_key):
 
 
 def get_board_list_by_author(author):
+    """
+    Retrieves a list of board files authored by a specific user.
+
+    Args:
+        author (str): The name of the author to search for.
+
+    Returns:
+        List[List[str]]: A list of lists, where each inner list contains:
+            - The name of the board.
+            - The path to the board's JSON file.
+    """
     directory = './board/'
     author_files = []
     for file in os.listdir(directory):
@@ -37,6 +62,19 @@ def get_board_list_by_author(author):
 
 
 def get_board_info_by_id(board_id, username_filter=False):
+    """
+    Retrieves information about a specific board.
+
+    Args:
+        board_id (str): The ID of the board to retrieve.
+        username_filter (bool, optional): Whether to filter the board data based on the specified username. Defaults to False.
+
+    Returns:
+        Union[dict, bool]:
+            - If the board is found and the username filter is not applied, returns a dictionary containing the board data.
+            - If the board is found and the username filter is applied, returns a dictionary with filtered card content.
+            - If the board is not found, returns False.
+    """
     if board_id:
         board_path = f'./board/{board_id}.json'
         if os.path.isfile(board_path):
@@ -56,6 +94,20 @@ def get_board_info_by_id(board_id, username_filter=False):
 
 
 def update_timer_in_board(board_id, new_timer_value):
+    """
+    Updates the timer value in a specified board.
+
+    Args:
+        board_id (int): The unique identifier of the board to update.
+        new_timer_value (datetime.datetime): The new timer value.
+
+    Returns:
+        bool: True if the update was successful, False otherwise.
+
+    This function retrieves the board information based on the provided `board_id`.
+    If the board exists, it updates the `timer` field with the timestamp of the `new_timer_value` in milliseconds.
+    The updated board information is then written to a JSON file.
+    """
     board_info = get_board_info_by_id(board_id)
     if board_info:
         board_info['timer'] = int(new_timer_value.timestamp() * 1000)
@@ -68,6 +120,18 @@ def update_timer_in_board(board_id, new_timer_value):
 
 
 def reset_votes_in_nested_dict(my_dict):
+    """
+    Recursively resets the "votes" value to 0 in a nested dictionary.
+
+    This function iterates through a nested dictionary and sets the value of the "votes" key to 0 for all occurrences. 
+    It recursively traverses nested dictionaries to ensure that all "votes" values are reset.
+
+    Args:
+        my_dict (dict): The nested dictionary to be processed.
+
+    Returns:
+        dict: The modified nested dictionary with all "votes" values reset to 0.
+    """
     for key, value in my_dict.items():
         if isinstance(value, dict):
             reset_votes_in_nested_dict(value)
@@ -78,6 +142,15 @@ def reset_votes_in_nested_dict(my_dict):
 
 
 def board_votes_reset_by_id(board_id):
+    """
+    Resets the vote count for a specific board.
+
+    Args:
+        board_id (int): The ID of the board to reset.
+
+    Returns:
+        bool: True if the reset was successful, False otherwise.
+    """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
@@ -94,6 +167,28 @@ def board_votes_reset_by_id(board_id):
 
 
 def board_manager_by_id(board_id, mode, data):
+    """
+    Manages board operations based on the specified mode.
+
+    Args:
+        board_id (str): The unique identifier of the board.
+        mode (str): The operation mode, one of:
+            - 'card_add': Add a new card to the board.
+            - 'card_edit': Edit an existing card.
+            - 'card_view': Mark a card as visible to the author.
+            - 'card_vote': Increment the vote count of a card.
+            - 'card_delete': Delete a card from the board.
+        data (dict): A dictionary containing additional data for the specific operation, including:
+            - 'col_id': The ID of the column.
+            - 'card_uuid': The UUID of the card (for edit, view, vote, and delete).
+            - 'author': The author of the card.
+            - 'user_id': The user ID of the author.
+            - 'cardContent': The content of the card.
+            - 'pos': The position of the card within the column.
+
+    Returns:
+        tuple[str, int]: A tuple containing the card UUID and the number of votes, or (None, 0) if the operation fails.
+    """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
@@ -136,6 +231,20 @@ def board_manager_by_id(board_id, mode, data):
 
 
 def col_manager_by_board_id(board_id, mode, data):
+    """
+    Manages column operations for a specific board.
+
+    Args:
+        board_id (str): The unique identifier of the board.
+        mode (str): The operation mode, one of 'col_add', 'col_order', or 'col_delete'.
+        data (dict): A dictionary containing additional data for the specific operation.
+
+    Returns:
+        bool: True if the operation was successful, False otherwise.
+
+    Raises:
+        Exception: If an error occurs during the operation.
+    """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
@@ -188,6 +297,18 @@ def col_manager_by_board_id(board_id, mode, data):
     return True
 
 async def board_timer(clients, msg):
+    """
+    Manages a countdown timer for a specific board.
+
+    Args:
+        clients (list): A list of WebSocket client connections.
+        msg (dict): A dictionary containing the timer duration in seconds and the board ID.
+
+    Returns:
+        None
+
+    This function iterates over the provided list of WebSocket clients and sends a JSON message containing the current timer value and board ID. The timer decrements by one second every iteration until it reaches zero.
+    """
     timer_in_seconds = int(msg.get('timerInSeconds'))
     while timer_in_seconds:
         for ws in clients:
@@ -202,6 +323,18 @@ async def board_timer(clients, msg):
 
 
 async def handler(websocket):
+    """
+    Handles incoming WebSocket messages and dispatches them to appropriate functions based on message type.
+
+    This function manages the connection with a single websocket client. It receives messages, parses them as JSON, and then calls the appropriate functions based on the message type. 
+
+    Args:
+        websocket: A websocket object representing the connection to the client.
+
+    Raises:
+        websockets.exceptions.ConnectionClosedOK: Raised when the client closes the connection gracefully.
+        Exception: Raised for any other unexpected errors during communication.
+    """    
     global users, clients, pos
 
     print('new_client>')
@@ -385,8 +518,21 @@ async def handler(websocket):
             del users[client_id]
 
 async def main():
+    """
+    Starts a WebSocket server on port 8009, listening on all interfaces.
+
+    This function initiates an asynchronous WebSocket server
+    The `handler` function (not shown) is responsible for handling incoming
+    The server runs indefinitely until it's manually stopped.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     async with websockets.serve(handler, '0.0.0.0', 8009):
-        await asyncio.Future()  # Run forever
+        await asyncio.Future()
 
 if __name__ == '__main__':
     asyncio.run(main())
