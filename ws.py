@@ -67,12 +67,16 @@ def get_board_info_by_id(board_id, username_filter=False):
 
     Args:
         board_id (str): The ID of the board to retrieve.
-        username_filter (bool, optional): Whether to filter the board data based on the specified username. Defaults to False.
+        username_filter (bool, optional): Whether to filter the board data
+                                            based on the specified username.
+                                            Defaults to False.
 
     Returns:
         Union[dict, bool]:
-            - If the board is found and the username filter is not applied, returns a dictionary containing the board data.
-            - If the board is found and the username filter is applied, returns a dictionary with filtered card content.
+            - If the board is found and the username filter is not applied,
+                returns a dictionary containing the board data.
+            - If the board is found and the username filter is applied,
+                returns a dictionary with filtered card content.
             - If the board is not found, returns False.
     """
     if board_id:
@@ -104,8 +108,9 @@ def update_timer_in_board(board_id, new_timer_value):
     Returns:
         bool: True if the update was successful, False otherwise.
 
-    This function retrieves the board information based on the provided `board_id`.
-    If the board exists, it updates the `timer` field with the timestamp of the `new_timer_value` in milliseconds.
+    This function retrieves the board information based on the provided.
+    If the board exists, it updates the `timer` field with the timestamp
+    of the `new_timer_value` in milliseconds.
     The updated board information is then written to a JSON file.
     """
     board_info = get_board_info_by_id(board_id)
@@ -123,14 +128,16 @@ def reset_votes_in_nested_dict(my_dict):
     """
     Recursively resets the "votes" value to 0 in a nested dictionary.
 
-    This function iterates through a nested dictionary and sets the value of the "votes" key to 0 for all occurrences. 
-    It recursively traverses nested dictionaries to ensure that all "votes" values are reset.
+    This function iterates through a nested dictionary and sets the value of
+    the "votes" key to 0 for all occurrences. 
+    It recursively traverses nested dictionaries to ensure that all "votes"
+    values are reset.
 
     Args:
         my_dict (dict): The nested dictionary to be processed.
 
     Returns:
-        dict: The modified nested dictionary with all "votes" values reset to 0.
+        dict: The modified nested dictionary with all "votes" values reset.
     """
     for key, value in my_dict.items():
         if isinstance(value, dict):
@@ -178,16 +185,19 @@ def board_manager_by_id(board_id, mode, data):
             - 'card_view': Mark a card as visible to the author.
             - 'card_vote': Increment the vote count of a card.
             - 'card_delete': Delete a card from the board.
-        data (dict): A dictionary containing additional data for the specific operation, including:
+        data (dict): A dictionary containing additional data for the specific
+            operation, including:
             - 'col_id': The ID of the column.
-            - 'card_uuid': The UUID of the card (for edit, view, vote, and delete).
+            - 'card_uuid': The UUID of the card
+                (for edit, view, vote, and delete).
             - 'author': The author of the card.
             - 'user_id': The user ID of the author.
             - 'cardContent': The content of the card.
             - 'pos': The position of the card within the column.
 
     Returns:
-        tuple[str, int]: A tuple containing the card UUID and the number of votes, or (None, 0) if the operation fails.
+        tuple[str, int]: A tuple containing the card UUID and the number of
+                            votes, or (None, 0) if the operation fails.
     """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
@@ -236,8 +246,10 @@ def col_manager_by_board_id(board_id, mode, data):
 
     Args:
         board_id (str): The unique identifier of the board.
-        mode (str): The operation mode, one of 'col_add', 'col_order', or 'col_delete'.
-        data (dict): A dictionary containing additional data for the specific operation.
+        mode (str): The operation mode, one of 'col_add', 'col_order',
+                    or 'col_delete'.
+        data (dict): A dictionary containing additional data for
+                    the specific operation.
 
     Returns:
         bool: True if the operation was successful, False otherwise.
@@ -279,7 +291,7 @@ def col_manager_by_board_id(board_id, mode, data):
                     del board_info["tmps"][uuid]
                     board_info["data"][data.get("colName")][uuid]["pos"] = cnt
                     cnt += 1
-        
+
         except Exception as e:
             exc_type, _, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -302,12 +314,15 @@ async def board_timer(clients, msg):
 
     Args:
         clients (list): A list of WebSocket client connections.
-        msg (dict): A dictionary containing the timer duration in seconds and the board ID.
+        msg (dict): A dictionary containing the timer duration in seconds
+                    and the board ID.
 
     Returns:
         None
 
-    This function iterates over the provided list of WebSocket clients and sends a JSON message containing the current timer value and board ID. The timer decrements by one second every iteration until it reaches zero.
+    This function iterates over the provided list of WebSocket clients and
+    sends a JSON message containing the current timer value and board ID.
+    The timer decrements by one second every iteration until it reaches zero.
     """
     timer_in_seconds = int(msg.get('timerInSeconds'))
     while timer_in_seconds:
@@ -324,15 +339,20 @@ async def board_timer(clients, msg):
 
 async def handler(websocket):
     """
-    Handles incoming WebSocket messages and dispatches them to appropriate functions based on message type.
+    Handles incoming WebSocket messages and dispatches them to appropriate
+    functions based on message type.
 
-    This function manages the connection with a single websocket client. It receives messages, parses them as JSON, and then calls the appropriate functions based on the message type. 
+    This function manages the connection with a single websocket client.
+    It receives messages, parses them as JSON, and
+    then calls the appropriate functions based on the message type.
 
     Args:
-        websocket: A websocket object representing the connection to the client.
+        websocket: A websocket object representing the connection
+                    to the client.
 
     Raises:
-        websockets.exceptions.ConnectionClosedOK: Raised when the client closes the connection gracefully.
+        websockets.exceptions.ConnectionClosedOK:
+            Raised when the client closes the connection gracefully.
         Exception: Raised for any other unexpected errors during communication.
     """    
     global users, clients, pos
