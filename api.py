@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+"""
+Retrogile API
+"""
+
 import os
 import json
 import uuid
@@ -89,7 +94,7 @@ def create_board(board_name, author):
 
     board_id = str(uuid.uuid4().hex)
     board_filename = f'{board_id}.json'
-    with open(f'{board_dir}{board_filename}', 'w') as fichier:
+    with open(f'{board_dir}{board_filename}', 'w', encoding='utf-8') as file:
         json.dump({
             "board_name": board_name,
             "author": author,
@@ -100,7 +105,7 @@ def create_board(board_name, author):
                 "continue": {}
             },
             "tmps": {}
-        }, fichier, indent=4)
+        }, file, indent=4)
 
     return jsonify(["./board/" + board_id])
 
@@ -205,4 +210,4 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8008, debug=True)
 
     except OSError as e:
-        logging.error(f"Server error: {e}")
+        logging.error("Server error: %s" % e)
