@@ -63,8 +63,8 @@ def get_board_info_by_id(board_id, new_timer_value):
         with open(board_path, 'w', encoding='utf-8') as f:
             json.dump(board_info, f, indent=4)
         return True
-    else:
-        return False
+
+    return False
 
 
 def reset_votes_in_nested_dict(my_dict):
@@ -77,7 +77,7 @@ def reset_votes_in_nested_dict(my_dict):
     return my_dict
 
 
-def board_votes_reset_by_id(board_id, data):
+def board_votes_reset_by_id(board_id):
     board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
@@ -172,7 +172,7 @@ def col_manager_by_board_id(board_id, mode, data):
                     cnt += 1
         
         except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
+            exc_type, _, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(e, exc_type, fname, exc_tb.tb_lineno)
 
@@ -188,16 +188,16 @@ def col_manager_by_board_id(board_id, mode, data):
     return True
 
 async def board_timer(clients, msg):
-    timerInSeconds = int(msg.get('timerInSeconds'))
-    while timerInSeconds:
+    timer_in_seconds = int(msg.get('timerInSeconds'))
+    while timer_in_seconds:
         for ws in clients:
             await ws.send(json.dumps({
                 'type': 'timer',
-                'timer': timerInSeconds,
+                'timer': timer_in_seconds,
                 'board_id': msg.get('board_id')
             }))
 
-        timerInSeconds -= 1
+        timer_in_seconds -= 1
         time.sleep(1)
 
 
@@ -276,9 +276,9 @@ async def handler(websocket):
                 }))
 
             elif message_type == 'start_timer':
-                timerInSeconds = data.get('timerInSeconds')
+                timer_in_seconds = data.get('timer_in_seconds')
                 utc_now = datetime.datetime.now()
-                delta = datetime.timedelta(seconds=int(timerInSeconds))
+                delta = datetime.timedelta(seconds=int(timer_in_seconds))
                 future_time_utc = utc_now + delta
                 users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
                 get_board_info_by_id(board_id, future_time_utc)
@@ -286,11 +286,11 @@ async def handler(websocket):
                     await ws.send(json.dumps({
                         'type': 'start_timer',
                         'board_id': board_id,
-                        'timerInSeconds': timerInSeconds
+                        'timer_in_seconds': timer_in_seconds
                     }))
 
             elif message_type == 'start_vote':
-                board_votes_reset_by_id(board_id, data)
+                board_votes_reset_by_id(board_id)
                 for ws in clients:
                     await ws.send(json.dumps(data))
 
@@ -333,7 +333,7 @@ async def handler(websocket):
                         return False
 
                     for col_name in board_info["data"]:
-                        for card_uuid, card_data in board_info["data"][col_name].items():
+                        for card_uuid, _ in board_info["data"][col_name].items():
                             board_info["data"][col_name][card_uuid]["hidden"] = False
 
                     board_path = f'./board/{board_id}.json'
