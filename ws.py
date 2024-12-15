@@ -342,23 +342,22 @@ async def handler(websocket):
     print('new_client>')
     clients.add(websocket)
     client_id = POS
+    send_list = []
     POS += 1
 
     try:
         while True:
             msg = await websocket.recv()
-            # print(f'From Client: {msg}')
-
             data = json.loads(msg)
             message_type = data.get('type')
             board_id = data.get('board_id')
 
             if message_type == 'board_list':
                 board_author = data.get('username')
-                await websocket.send(json.dumps({
+                send_list.append([websocket, {
                     'type': 'board_list',
                     'board_list': get_board_list_by_author(board_author)
-                }))
+                }])
 
             elif message_type == 'connect':
                 message_username = data.get('username')
@@ -368,47 +367,47 @@ async def handler(websocket):
                     'board_id': board_id
                 }
 
-                await websocket.send(json.dumps({
+                send_list.append([websocket, {
                     'type': 'connect_status',
                     'user_id': client_id,
                     'error': False,
                     'board_id': board_id
-                }))
+                }])
 
-                await websocket.send(json.dumps({
+                send_list.append([websocket, {
                     'type': 'users_list',
                     'users_list': users,
                     'board_id': board_id
-                }))
+                }])
 
                 for ws in clients:
-                    await ws.send(json.dumps({
+                    send_list.append([ws, {
                         'type': 'user_add',
                         'user_id': client_id,
                         'username': message_username,
                         'board_id': board_id,
                         'color': generate_color(message_username)
-                    }))
+                    }])
 
             elif message_type == 'cursor_user':
                 message_content = data.get('content')
                 pos_x = data.get('pos_x')
                 pos_y = data.get('pos_y')
                 for ws in clients:
-                    await ws.send(json.dumps({
+                    send_list.append([ws, {
                         'type': 'cursor_user',
                         'user_id': client_id,
                         'pos_x': pos_x,
                         'pos_y': pos_y,
                         'board_id': board_id
-                    }))
+                    }])
 
             elif message_type == 'board_info':
-                await websocket.send(json.dumps({
+                send_list.append([websocket, {
                     'type': 'board_info',
                     'board_info': get_board_info_by_id(board_id, data.get('username', False)),
                     'board_id': board_id
-                }))
+                }])
 
             elif message_type == 'start_timer':
                 timer_in_seconds = data.get('timer_in_seconds')
@@ -418,20 +417,20 @@ async def handler(websocket):
                 users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
                 update_timer_in_board(board_id, future_time_utc)
                 for ws in clients:
-                    await ws.send(json.dumps({
+                    send_list.append([ws, {
                         'type': 'start_timer',
                         'board_id': board_id,
                         'timer_in_seconds': timer_in_seconds
-                    }))
+                    }])
 
             elif message_type == 'start_vote':
                 board_votes_reset_by_id(board_id)
                 for ws in clients:
-                    await ws.send(json.dumps(data))
+                    send_list.append([ws, data])
 
             elif message_type == 'start_confetti':
                 for ws in clients:
-                    await ws.send(json.dumps(data))
+                    send_list.append([ws, data])
 
             elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
                 card_uuid, card_votes = board_manager_by_id(board_id, message_type, data)
@@ -442,23 +441,22 @@ async def handler(websocket):
                         if websocket != ws:
                             message_data['cardContent'] = '~~~'
 
-                    to_send = json.dumps({
+                    send_list.append([ws, {
                         'type': message_type,
                         'board_id': board_id,
                         'card_uuid': card_uuid,
                         'card_votes': card_votes,
                         message_type: message_data
-                    })
-                    await ws.send(to_send)
+                    }])
 
             elif message_type in ('col_add', 'col_order', 'col_delete'):
                 col_manager_by_board_id(board_id, message_type, data)
                 for ws in clients:
-                    await ws.send(json.dumps({
+                    send_list.append([ws, {
                         'type': message_type,
                         'board_id': board_id,
                         message_type: data
-                    }))
+                    }])
 
             elif message_type == 'message':
                 message_content = data.get('content')
@@ -476,25 +474,28 @@ async def handler(websocket):
                         json.dump(board_info, f, indent=4)
 
                     for ws in clients:
-                        await ws.send(json.dumps({
+                        send_list.append([ws, {
                             'type': 'force_reload',
                             'user_id': client_id,
                             'username': users[client_id]['username'],
                             'board_id': board_id
-                        }))
+                        }])
 
                 else:
                     for ws in clients:
-                        await ws.send(json.dumps({
+                        send_list.append([ws, {
                             'type': 'message',
                             'user_id': client_id,
                             'username': users[client_id]['username'],
                             'content': message_content,
                             'board_id': board_id
-                        }))
+                        }])
 
-            else:
-                print('unknow_type:', message_type, msg)
+            if len(send_list) > 0:
+                for ws_client, message in send_list:
+                    await ws_client.send(json.dumps(message))
+
+            send_list = []
 
     except websockets.exceptions.ConnectionClosedOK:
         print('close_client>')
@@ -521,12 +522,6 @@ async def main():
     This function initiates an asynchronous WebSocket server
     The `handler` function (not shown) is responsible for handling incoming
     The server runs indefinitely until it's manually stopped.
-
-    Args:
-        None
-
-    Returns:
-        None
     """
     async with websockets.serve(handler, '0.0.0.0', 8009):
         await asyncio.Future()
