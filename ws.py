@@ -318,6 +318,23 @@ def col_manager_by_board_id(board_id, mode, data):
     return True
 
 
+def send_list_multi(send_list, clients, msg_data):
+    """
+    Appends a tuple of clients and message data to a send list.
+
+    Args:
+        send_list: A list to store tuples of clients and message data.
+        clients: A list of clients to send the message to.
+        msg_data: The message data to be sent.
+
+    Returns:
+        list: send_list
+    """
+    for client in clients:
+        send_list.append([client, msg_data])
+    return send_list
+
+
 async def handler(websocket):
     """
     Handles incoming WebSocket messages and dispatches them to appropriate
@@ -347,8 +364,7 @@ async def handler(websocket):
 
     try:
         while True:
-            msg = await websocket.recv()
-            data = json.loads(msg)
+            data = json.loads(await websocket.recv())
             message_type = data.get('type')
             board_id = data.get('board_id')
 
@@ -380,27 +396,26 @@ async def handler(websocket):
                     'board_id': board_id
                 }])
 
-                for ws in clients:
-                    send_list.append([ws, {
-                        'type': 'user_add',
-                        'user_id': client_id,
-                        'username': message_username,
-                        'board_id': board_id,
-                        'color': generate_color(message_username)
-                    }])
+                send_list = send_list_multi(send_list, clients, {
+                    'type': 'user_add',
+                    'user_id': client_id,
+                    'username': message_username,
+                    'board_id': board_id,
+                    'color': generate_color(message_username)
+                })
 
             elif message_type == 'cursor_user':
                 message_content = data.get('content')
                 pos_x = data.get('pos_x')
                 pos_y = data.get('pos_y')
-                for ws in clients:
-                    send_list.append([ws, {
-                        'type': 'cursor_user',
-                        'user_id': client_id,
-                        'pos_x': pos_x,
-                        'pos_y': pos_y,
-                        'board_id': board_id
-                    }])
+
+                send_list = send_list_multi(send_list, clients, {
+                    'type': 'cursor_user',
+                    'user_id': client_id,
+                    'pos_x': pos_x,
+                    'pos_y': pos_y,
+                    'board_id': board_id
+                })
 
             elif message_type == 'board_info':
                 send_list.append([websocket, {
@@ -416,21 +431,18 @@ async def handler(websocket):
                 future_time_utc = utc_now + delta
                 users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
                 update_timer_in_board(board_id, future_time_utc)
-                for ws in clients:
-                    send_list.append([ws, {
-                        'type': 'start_timer',
-                        'board_id': board_id,
-                        'timer_in_seconds': timer_in_seconds
-                    }])
+                send_list = send_list_multi(send_list, clients, {
+                    'type': 'start_timer',
+                    'board_id': board_id,
+                    'timer_in_seconds': timer_in_seconds
+                })
 
             elif message_type == 'start_vote':
                 board_votes_reset_by_id(board_id)
-                for ws in clients:
-                    send_list.append([ws, data])
+                send_list = send_list_multi(send_list, clients, data)
 
             elif message_type == 'start_confetti':
-                for ws in clients:
-                    send_list.append([ws, data])
+                send_list = send_list_multi(send_list, clients, data)
 
             elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
                 card_uuid, card_votes = board_manager_by_id(board_id, message_type, data)
@@ -451,12 +463,11 @@ async def handler(websocket):
 
             elif message_type in ('col_add', 'col_order', 'col_delete'):
                 col_manager_by_board_id(board_id, message_type, data)
-                for ws in clients:
-                    send_list.append([ws, {
-                        'type': message_type,
-                        'board_id': board_id,
-                        message_type: data
-                    }])
+                send_list = send_list_multi(send_list, clients, {
+                    'type': message_type,
+                    'board_id': board_id,
+                    message_type: data
+                })
 
             elif message_type == 'message':
                 message_content = data.get('content')
@@ -473,23 +484,21 @@ async def handler(websocket):
                     with open(board_path, 'w', encoding='utf-8') as f:
                         json.dump(board_info, f, indent=4)
 
-                    for ws in clients:
-                        send_list.append([ws, {
-                            'type': 'force_reload',
-                            'user_id': client_id,
-                            'username': users[client_id]['username'],
-                            'board_id': board_id
-                        }])
+                    send_list = send_list_multi(send_list, clients, {
+                        'type': 'force_reload',
+                        'user_id': client_id,
+                        'username': users[client_id]['username'],
+                        'board_id': board_id
+                    })
 
                 else:
-                    for ws in clients:
-                        send_list.append([ws, {
-                            'type': 'message',
-                            'user_id': client_id,
-                            'username': users[client_id]['username'],
-                            'content': message_content,
-                            'board_id': board_id
-                        }])
+                    send_list = send_list_multi(send_list, clients, {
+                        'type': 'message',
+                        'user_id': client_id,
+                        'username': users[client_id]['username'],
+                        'content': message_content,
+                        'board_id': board_id
+                    })
 
             if len(send_list) > 0:
                 for ws_client, message in send_list:
