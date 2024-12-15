@@ -285,26 +285,26 @@ def col_manager_by_board_id(board_id, mode, data):
     elif mode == 'col_order':
         try:
             cnt = 0
-            for uuid in data.get('uuidList'):
-                uuid = uuid[5:]
-                if uuid in board_info['data'][data.get('colName')]:
-                    board_info['data'][data.get('colName')][uuid]["pos"] = cnt
+            for uuidl in data.get('uuidList'):
+                uuidl = uuidl[5:]
+                if uuidl in board_info['data'][data.get('colName')]:
+                    board_info['data'][data.get('colName')][uuidl]["pos"] = cnt
                     cnt += 1
 
                 else:
                     for col_name, col_data in board_info["data"].items():
-                        if uuid in col_data:
-                            board_info["tmps"][uuid] = board_info["data"][col_name][
-                                uuid
+                        if uuidl in col_data:
+                            board_info["tmps"][uuidl] = board_info["data"][col_name][
+                                uuidl
                             ]
-                            del board_info["data"][col_name][uuid]
+                            del board_info["data"][col_name][uuidl]
 
-                if uuid in board_info["tmps"]:
-                    board_info["data"][data.get("colName")][uuid] = board_info["tmps"][
-                        uuid
+                if uuidl in board_info["tmps"]:
+                    board_info["data"][data.get("colName")][uuidl] = board_info["tmps"][
+                        uuidl
                     ]
-                    del board_info["tmps"][uuid]
-                    board_info["data"][data.get("colName")][uuid]["pos"] = cnt
+                    del board_info["tmps"][uuidl]
+                    board_info["data"][data.get("colName")][uuidl]["pos"] = cnt
                     cnt += 1
 
         except Exception as e:
@@ -369,7 +369,7 @@ async def handler(websocket):
         websockets.exceptions.ConnectionClosedOK:
             Raised when the client closes the connection gracefully.
         Exception: Raised for any other unexpected errors during communication.
-    """    
+    """
     global users, clients, pos
 
     print('new_client>')
@@ -531,11 +531,6 @@ async def handler(websocket):
 
     except websockets.exceptions.ConnectionClosedOK:
         print('close_client>')
-
-    except Exception as e:
-        exc_type, _, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(e, exc_type, fname, exc_tb.tb_lineno)
 
     finally:
         clients.remove(websocket)
