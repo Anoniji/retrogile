@@ -216,7 +216,10 @@ def board_manager_by_id(board_id, mode, data):
         }
 
     elif mode == 'card_edit':
-        if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
+        if (
+            data.get('col_id') in board_info['data']
+            and data.get('card_uuid') in board_info['data'][data.get('col_id')]
+        ):
             board_info['data'][data.get('col_id')][data.get('card_uuid')]['content'] = data.get('cardContent')
 
     elif mode == 'card_view':
@@ -226,7 +229,10 @@ def board_manager_by_id(board_id, mode, data):
                     board_info["data"][col_name][card_uuid]["hidden"] = False
 
     elif mode == 'card_vote':
-        if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
+        if(
+            data.get('col_id') in board_info['data']
+            and data.get('card_uuid') in board_info['data'][data.get('col_id')]
+        ):
             board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes'] += 1
             card_votes = board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes']
 
