@@ -6,9 +6,7 @@ Retrogile WS
 """
 
 import os
-import sys
 import json
-import time
 import uuid
 import hashlib
 import asyncio
@@ -18,7 +16,7 @@ import websockets
 
 users = {}
 clients = set()
-pos = 0
+POS = 0
 
 
 def generate_color(_key):
@@ -285,34 +283,28 @@ def col_manager_by_board_id(board_id, mode, data):
         board_info['data'][data.get('colName')] = {}
 
     elif mode == 'col_order':
-        try:
-            cnt = 0
-            for uuidl in data.get('uuidList'):
-                uuidl = uuidl[5:]
-                if uuidl in board_info['data'][data.get('colName')]:
-                    board_info['data'][data.get('colName')][uuidl]["pos"] = cnt
-                    cnt += 1
+        cnt = 0
+        for uuidl in data.get('uuidList'):
+            uuidl = uuidl[5:]
+            if uuidl in board_info['data'][data.get('colName')]:
+                board_info['data'][data.get('colName')][uuidl]["pos"] = cnt
+                cnt += 1
 
-                else:
-                    for col_name, col_data in board_info["data"].items():
-                        if uuidl in col_data:
-                            board_info["tmps"][uuidl] = board_info["data"][col_name][
-                                uuidl
-                            ]
-                            del board_info["data"][col_name][uuidl]
+            else:
+                for col_name, col_data in board_info["data"].items():
+                    if uuidl in col_data:
+                        board_info["tmps"][uuidl] = board_info["data"][col_name][
+                            uuidl
+                        ]
+                        del board_info["data"][col_name][uuidl]
 
-                if uuidl in board_info["tmps"]:
-                    board_info["data"][data.get("colName")][uuidl] = board_info["tmps"][
-                        uuidl
-                    ]
-                    del board_info["tmps"][uuidl]
-                    board_info["data"][data.get("colName")][uuidl]["pos"] = cnt
-                    cnt += 1
-
-        except Exception as e:
-            exc_type, _, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(e, exc_type, fname, exc_tb.tb_lineno)
+            if uuidl in board_info["tmps"]:
+                board_info["data"][data.get("colName")][uuidl] = board_info["tmps"][
+                    uuidl
+                ]
+                del board_info["tmps"][uuidl]
+                board_info["data"][data.get("colName")][uuidl]["pos"] = cnt
+                cnt += 1
 
     elif mode == 'col_delete':
         if data.get('colName') not in board_info['data']:
@@ -344,12 +336,12 @@ async def handler(websocket):
             Raised when the client closes the connection gracefully.
         Exception: Raised for any other unexpected errors during communication.
     """
-    global users, clients, pos
+    global users, clients, POS
 
     print('new_client>')
     clients.add(websocket)
-    client_id = pos
-    pos += 1
+    client_id = POS
+    POS += 1
 
     try:
         while True:
