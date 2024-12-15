@@ -318,19 +318,19 @@ def col_manager_by_board_id(board_id, mode, data):
     return True
 
 
-def send_list_multi(send_list, clients, msg_data):
+def send_list_multi(send_list, clients_lst, msg_data):
     """
     Appends a tuple of clients and message data to a send list.
 
     Args:
         send_list: A list to store tuples of clients and message data.
-        clients: A list of clients to send the message to.
+        clients_lst: A list of clients to send the message to.
         msg_data: The message data to be sent.
 
     Returns:
         list: send_list
     """
-    for client in clients:
+    for client in clients_lst:
         send_list.append([client, msg_data])
     return send_list
 
