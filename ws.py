@@ -1,14 +1,15 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import asyncio
-import datetime
-import websockets
 import os
 import sys
 import json
 import time
 import uuid
 import hashlib
+import asyncio
+import datetime
+import websockets
+
 
 users = {}
 clients = set()
@@ -22,24 +23,24 @@ def generate_color(_key):
     return color_hex
 
 
-def getBoardListByAuthor(author):
+def get_board_list_by_author(author):
     directory = './board/'
     author_files = []
     for file in os.listdir(directory):
         if file.endswith(".json"):
             file_path = os.path.join(directory, file)
-            with open(file_path, 'r') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 if data['author'] == author:
                     author_files.append([data['board_name'], file_path])
     return author_files
 
 
-def getBoardInfoById(board_id, username_filter=False):
+def get_board_info_by_id(board_id, username_filter=False):
     if board_id:
         board_path = f'./board/{board_id}.json'
         if os.path.isfile(board_path):
-            with open(board_path) as f:
+            with open(board_path, encoding='utf-8') as f:
                 _tmps = json.load(f)
                 if not username_filter:
                     return _tmps
@@ -54,16 +55,17 @@ def getBoardInfoById(board_id, username_filter=False):
     return False
 
 
-def updateTimerInBoard(board_id, new_timer_value):
-    board_info = getBoardInfoById(board_id)
+def get_board_info_by_id(board_id, new_timer_value):
+    board_info = get_board_info_by_id(board_id)
     if board_info:
         board_info['timer'] = int(new_timer_value.timestamp() * 1000)
         board_path = f'./board/{board_id}.json'
-        with open(board_path, 'w') as f:
+        with open(board_path, 'w', encoding='utf-8') as f:
             json.dump(board_info, f, indent=4)
         return True
     else:
         return False
+
 
 def reset_votes_in_nested_dict(my_dict):
     for key, value in my_dict.items():
@@ -75,8 +77,8 @@ def reset_votes_in_nested_dict(my_dict):
     return my_dict
 
 
-def boardVotesResetById(board_id, data):
-    board_info = getBoardInfoById(board_id)
+def board_votes_reset_by_id(board_id, data):
+    board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
 
@@ -87,12 +89,12 @@ def boardVotesResetById(board_id, data):
             board_info['data'][key] = 0
 
     board_path = f'./board/{board_id}.json'
-    with open(board_path, 'w') as f:
+    with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(board_info, f, indent=4)
 
 
-def boardManagerById(board_id, mode, data):
-    board_info = getBoardInfoById(board_id)
+def board_manager_by_id(board_id, mode, data):
+    board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
 
@@ -128,13 +130,13 @@ def boardManagerById(board_id, mode, data):
             del board_info['data'][data.get('col_id')][data.get('card_uuid')]
 
     board_path = f'./board/{board_id}.json'
-    with open(board_path, 'w') as f:
+    with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(board_info, f, indent=4)
     return card_uuid, card_votes
 
 
-def colManagerByBoardId(board_id, mode, data):
-    board_info = getBoardInfoById(board_id)
+def col_manager_by_board_id(board_id, mode, data):
+    board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
 
@@ -181,7 +183,7 @@ def colManagerByBoardId(board_id, mode, data):
         del board_info['data'][data.get('colName')]
 
     board_path = f'./board/{board_id}.json'
-    with open(board_path, 'w') as f:
+    with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(board_info, f, indent=4)
     return True
 
@@ -220,7 +222,7 @@ async def handler(websocket):
                 board_author = data.get('username')
                 await websocket.send(json.dumps({
                     'type': 'board_list',
-                    'board_list': getBoardListByAuthor(board_author)
+                    'board_list': get_board_list_by_author(board_author)
                 }))
 
             elif message_type == 'connect':
@@ -269,7 +271,7 @@ async def handler(websocket):
             elif message_type == 'board_info':
                 await websocket.send(json.dumps({
                     'type': 'board_info',
-                    'board_info': getBoardInfoById(board_id, data.get('username', False)),
+                    'board_info': get_board_info_by_id(board_id, data.get('username', False)),
                     'board_id': board_id
                 }))
 
@@ -279,7 +281,7 @@ async def handler(websocket):
                 delta = datetime.timedelta(seconds=int(timerInSeconds))
                 future_time_utc = utc_now + delta
                 users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
-                updateTimerInBoard(board_id, future_time_utc)
+                get_board_info_by_id(board_id, future_time_utc)
                 for ws in clients:
                     await ws.send(json.dumps({
                         'type': 'start_timer',
@@ -288,7 +290,7 @@ async def handler(websocket):
                     }))
 
             elif message_type == 'start_vote':
-                boardVotesResetById(board_id, data)
+                board_votes_reset_by_id(board_id, data)
                 for ws in clients:
                     await ws.send(json.dumps(data))
 
@@ -297,7 +299,7 @@ async def handler(websocket):
                     await ws.send(json.dumps(data))
 
             elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
-                card_uuid, card_votes = boardManagerById(board_id, message_type, data)
+                card_uuid, card_votes = board_manager_by_id(board_id, message_type, data)
                 for ws in clients:
                     message_data = data.copy()
                     if message_type in ('card_add', 'card_edit'):
@@ -315,7 +317,7 @@ async def handler(websocket):
                     await ws.send(to_send)
 
             elif message_type in ('col_add', 'col_order', 'col_delete'):
-                colManagerByBoardId(board_id, message_type, data)
+                col_manager_by_board_id(board_id, message_type, data)
                 for ws in clients:
                     await ws.send(json.dumps({
                         'type': message_type,
@@ -326,7 +328,7 @@ async def handler(websocket):
             elif message_type == 'message':
                 message_content = data.get('content')
                 if "/see_all_cards" in message_content:
-                    board_info = getBoardInfoById(board_id)
+                    board_info = get_board_info_by_id(board_id)
                     if not board_info:
                         return False
 
@@ -335,7 +337,7 @@ async def handler(websocket):
                             board_info["data"][col_name][card_uuid]["hidden"] = False
 
                     board_path = f'./board/{board_id}.json'
-                    with open(board_path, 'w') as f:
+                    with open(board_path, 'w', encoding='utf-8') as f:
                         json.dump(board_info, f, indent=4)
 
                     for ws in clients:
@@ -363,7 +365,7 @@ async def handler(websocket):
         print('close_client>')
 
     except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
+        exc_type, _, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print(e, exc_type, fname, exc_tb.tb_lineno)
 
