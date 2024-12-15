@@ -172,6 +172,8 @@ def board_votes_reset_by_id(board_id):
     with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(board_info, f, indent=4)
 
+    return True
+
 
 def board_manager_by_id(board_id, mode, data):
     """
@@ -322,34 +324,6 @@ def col_manager_by_board_id(board_id, mode, data):
     with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(board_info, f, indent=4)
     return True
-
-async def board_timer(clients, msg):
-    """
-    Manages a countdown timer for a specific board.
-
-    Args:
-        clients (list): A list of WebSocket client connections.
-        msg (dict): A dictionary containing the timer duration in seconds
-                    and the board ID.
-
-    Returns:
-        None
-
-    This function iterates over the provided list of WebSocket clients and
-    sends a JSON message containing the current timer value and board ID.
-    The timer decrements by one second every iteration until it reaches zero.
-    """
-    timer_in_seconds = int(msg.get('timerInSeconds'))
-    while timer_in_seconds:
-        for ws in clients:
-            await ws.send(json.dumps({
-                'type': 'timer',
-                'timer': timer_in_seconds,
-                'board_id': msg.get('board_id')
-            }))
-
-        timer_in_seconds -= 1
-        time.sleep(1)
 
 
 async def handler(websocket):
