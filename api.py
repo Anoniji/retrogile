@@ -33,7 +33,7 @@ def index():
         - If "index.html" exists: Renders the template.
         - Otherwise: Returns a JSON response
     """
-    if os.path.isfile("index.html"):
+    if os.path.isfile("./pages/index.html"):
         return render_template("index.html")
 
     return jsonify(["index_not_found"])
@@ -48,7 +48,7 @@ def licenses():
         - If "licenses.html" exists: Renders the template.
         - Otherwise: Returns a JSON response
     """
-    if os.path.isfile("licenses.html"):
+    if os.path.isfile("./pages/licenses.html"):
         return render_template("licenses.html")
 
     return jsonify(["licenses_not_found"])
@@ -119,7 +119,7 @@ def home():
         - If 'home.html' exists: Renders the 'home.html' template.
         - Otherwise: Returns a JSON response
     """
-    if os.path.isfile("home.html"):
+    if os.path.isfile("./pages/home.html"):
         return render_template("home.html")
 
     return jsonify(["board_not_found"])
@@ -137,7 +137,7 @@ def board(board_id):
         str: The rendered HTML template for the board if found,
              otherwise a JSON response indicating the board is not found.
     """
-    if os.path.isfile("board.html"):
+    if os.path.isfile("./pages/board.html"):
         return render_template("board.html", board_id=board_id)
 
     return jsonify(["board_not_found"])
