@@ -210,5 +210,5 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8008, debug=True)
 
     except OSError as e:
-        # pylint: disable=W1201
+        # pylint: disable=W1201,W1203
         logging.error(f"Server error: {e}")
