@@ -220,7 +220,9 @@ def board_manager_by_id(board_id, mode, data):
             data.get('col_id') in board_info['data']
             and data.get('card_uuid') in board_info['data'][data.get('col_id')]
         ):
-            board_info['data'][data.get('col_id')][data.get('card_uuid')]['content'] = data.get('cardContent')
+            board_info['data'][
+                data.get('col_id')][
+                data.get('card_uuid')]['content'] = data.get('cardContent')
 
     elif mode == 'card_view':
         for col_name in board_info["data"]:
@@ -233,11 +235,18 @@ def board_manager_by_id(board_id, mode, data):
             data.get('col_id') in board_info['data']
             and data.get('card_uuid') in board_info['data'][data.get('col_id')]
         ):
-            board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes'] += 1
-            card_votes = board_info['data'][data.get('col_id')][data.get('card_uuid')]['votes']
+            board_info['data'][
+                data.get('col_id')][
+                data.get('card_uuid')]['votes'] += 1
+            card_votes = board_info['data'][
+                data.get('col_id')][
+                data.get('card_uuid')]['votes']
 
     elif mode == 'card_delete':
-        if(data.get('col_id') in board_info['data'] and data.get('card_uuid') in board_info['data'][data.get('col_id')]):
+        if(
+            data.get('col_id') in board_info['data']
+            and data.get('card_uuid') in board_info['data'][data.get('col_id')]
+        ):
             del board_info['data'][data.get('col_id')][data.get('card_uuid')]
 
     board_path = f'./board/{board_id}.json'
