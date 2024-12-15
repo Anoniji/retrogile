@@ -138,7 +138,7 @@ def board(board_id):
              otherwise a JSON response indicating the board is not found.
     """
     if os.path.isfile("board.html"):
-        return render_template("board.html")
+        return render_template("board.html", board_id=board_id)
 
     return jsonify(["board_not_found"])
 
@@ -210,4 +210,5 @@ if __name__ == "__main__":
         app.run(host="0.0.0.0", port=8008, debug=True)
 
     except OSError as e:
-        logging.error("Server error: %s" % e)
+        # pylint: disable=W1201
+        logging.error(f"Server error: {e}")
