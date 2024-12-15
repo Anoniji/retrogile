@@ -336,6 +336,7 @@ async def handler(websocket):
             Raised when the client closes the connection gracefully.
         Exception: Raised for any other unexpected errors during communication.
     """
+    # pylint: disable=W0602
     global users, clients, POS
 
     print('new_client>')
