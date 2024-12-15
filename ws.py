@@ -55,7 +55,7 @@ def get_board_info_by_id(board_id, username_filter=False):
     return False
 
 
-def get_board_info_by_id(board_id, new_timer_value):
+def update_timer_in_board(board_id, new_timer_value):
     board_info = get_board_info_by_id(board_id)
     if board_info:
         board_info['timer'] = int(new_timer_value.timestamp() * 1000)
@@ -281,7 +281,7 @@ async def handler(websocket):
                 delta = datetime.timedelta(seconds=int(timer_in_seconds))
                 future_time_utc = utc_now + delta
                 users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
-                get_board_info_by_id(board_id, future_time_utc)
+                update_timer_in_board(board_id, future_time_utc)
                 for ws in clients:
                     await ws.send(json.dumps({
                         'type': 'start_timer',
