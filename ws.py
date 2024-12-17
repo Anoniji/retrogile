@@ -434,7 +434,7 @@ async def handler(websocket):
                 send_list = send_list_multi(send_list, clients, {
                     'type': 'start_timer',
                     'board_id': board_id,
-                    'timer_in_seconds': timer_in_seconds
+                    'timerInSeconds': timer_in_seconds
                 })
 
             elif message_type == 'start_vote':
