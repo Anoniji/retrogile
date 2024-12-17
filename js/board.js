@@ -1,5 +1,10 @@
-const currentYear = new Date().getFullYear();
-$('#year').text(currentYear);
+/**
+ * GNU GENERAL PUBLIC LICENSE
+ * Version 3, 29 June 2007
+ *
+ * @author Anoniji <contact@anoniji.dev>
+ *
+ */
 
 function removeNonAlphanumeric(str) {
     if(!str) return false;
@@ -196,14 +201,12 @@ if(username !== null) {
     let ws;
     let reconnectInterval = 1000;
     let board_author;
-    let board_id = window.location.pathname.split('/').pop();
     let user_id = false;
     var pos_x;
     var pos_y;
     var curr_highlightUser;
     var maxVoteTotal;
     var stockList = {};
-
 
     function board_copy_link() {
         try {
@@ -274,14 +277,15 @@ if(username !== null) {
                     user_id: user_id,
                     col_id: col_id,
                     votes: 0,
-                    cardContent: cardContent,
+                    cardContent: cardContent.trim(),
                 }));
             }
         });
     }
 
-    function editCard(col_id, card_uuid) {
-        customPrompt(col_id, 'Editing Card content', $(`#col_${col_id} .uuid_${card_uuid} .info_content`).text()).then(cardContent => {
+    function editCard(card_uuid) {
+        col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
+        customPrompt(col_id, 'Editing Card content', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
             if(cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_edit',
@@ -290,13 +294,14 @@ if(username !== null) {
                     user_id: user_id,
                     col_id: col_id,
                     card_uuid: card_uuid,
-                    cardContent: cardContent
+                    cardContent: cardContent.trim(),
                 }));
             }
         });
     }
 
-    function voteCard(col_id, card_uuid) {
+    function voteCard(card_uuid) {
+        col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
         var maxVote = $('#board_vote .title').text();
         if (!isNaN(maxVote)) {
             maxVote = parseInt(maxVote);
@@ -309,13 +314,14 @@ if(username !== null) {
                     board_id: board_id,
                     user_id: user_id,
                     col_id: col_id,
-                    card_uuid: card_uuid
+                    card_uuid: card_uuid,
                 }));
             }
         }
     }
 
-    function deleteCard(col_id, card_uuid) {
+    function deleteCard(card_uuid) {
+        col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
         ws.send(JSON.stringify({
             type: 'card_delete',
             author: username,
@@ -366,7 +372,7 @@ if(username !== null) {
             board_id: board_id,
             user_id: user_id,
             colName: name.slice(4),
-            uuidList: uuid_list
+            uuidList: uuid_list,
         }));
     }
 
@@ -396,7 +402,7 @@ if(username !== null) {
 
             $('.col li').each(function() {
                 const $li = $(this);
-                if ($li.hasClass(`user_${Husername}`)) {
+                if ($li.attr('data-username') == Husername) {
                     $li.css('display', 'block');
                 } else {
                     $li.css('display', 'none');
@@ -432,7 +438,7 @@ if(username !== null) {
                 type: 'cursor_user',
                 board_id: board_id,
                 pos_x: pos_x,
-                pos_y: pos_y
+                pos_y: pos_y,
             }));
         }
 
@@ -501,7 +507,7 @@ if(username !== null) {
                 }
 
                 $.each(board_data,function(index,value){
-                    html = `<div id='col_${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
+                    html = `<div id='col_${index}' data-col='${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
                     }
@@ -513,21 +519,21 @@ if(username !== null) {
                     const sortedData = Object.fromEntries(entries);
 
                     $.each(sortedData,function(uuid,value){
-                        html = `<li class='ui-state-default user_${value.author} uuid_${uuid} pos_${value.pos}'>`;
+                        html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}' data-username="${value.author}">`;
                         html += `<div class='card_icon'>`;
                         html += `<div class='info_author'>by ${value.author}</div>`;
                         if(value.author == username) {
-                            html += `<div class='edit_icon' onclick='editCard("${index}", "${uuid}");'>
+                            html += `<div class='edit_icon' onclick='editCard("${uuid}");'>
                                 <i class='material-icons'>edit</i>
                                 <div class='type'>Edit</div>
                             </div>`;
-                            html += `<div class='delete_icon' onclick='deleteCard("${index}", "${uuid}");'>
+                            html += `<div class='delete_icon' onclick='deleteCard("${uuid}");'>
                                 <i class='material-icons'>delete</i>
                                 <div class='type'>Delete</div>
                             </div>`;
                         }
                         html += `</div>`;
-                        html += `<div class='votes' onclick='voteCard("${index}", "${uuid}");'>${value.votes}</div>
+                        html += `<div class='votes' onclick='voteCard("${uuid}");'>${value.votes}</div>
                             <div class='info_content'>${value.content}</div>
                             </div>`;
                         html += `</li>`;
@@ -552,21 +558,21 @@ if(username !== null) {
                 log('Vote Session >>> started', 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default user_${ws_data.card_add.author} uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}'>`;
+                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}">`;
                 html += `<div class='card_icon'>`;
                 html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
                 if(ws_data.card_add.author == username) {
-                    html += `<div class='edit_icon' onclick='editCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>
+                    html += `<div class='edit_icon' onclick='editCard("${ws_data.card_uuid}");'>
                         <i class='material-icons'>edit</i>
                         <div class='type'>Edit</div>
                     </div>`;
-                    html += `<div class='delete_icon' onclick='deleteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>
+                    html += `<div class='delete_icon' onclick='deleteCard("${ws_data.card_uuid}");'>
                         <i class='material-icons'>delete</i>
                         <div class='type'>Delete</div>
                     </div>`;
                 }
                 html += `</div>`;
-                html += `<div class='votes' onclick='voteCard("${ws_data.card_add.col_id}", "${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
+                html += `<div class='votes' onclick='voteCard("${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
                     <div class='info_content'>${ws_data.card_add.cardContent}</div>
                     </div>`;
                 html += `</li>`;
@@ -584,7 +590,7 @@ if(username !== null) {
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
-                    username: username
+                    username: username,
                 }));
             } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
@@ -602,7 +608,7 @@ if(username !== null) {
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
             } else if (ws_data.type == 'col_add') {
-                html = `<div id='col_${ws_data.col_add.colName}' class='col'><h1>${ws_data.col_add.colName}<i onclick='addCard("${ws_data.col_add.colName}");' class='add_icon material-icons'>add</i>`
+                html = `<div id='col_${ws_data.col_add.colName}' data-col='${ws_data.col_add.colName}' class='col'><h1>${ws_data.col_add.colName}<i onclick='addCard("${ws_data.col_add.colName}");' class='add_icon material-icons'>add</i>`
                 if (board_author == username) {
                     html += `<i onclick='deleteCol("${ws_data.col_add.colName}");' class='drop_icon material-icons'>delete</i>`;
                 }
@@ -619,7 +625,7 @@ if(username !== null) {
                         ws.send(JSON.stringify({
                             type: 'board_info',
                             board_id: board_id,
-                            username: username
+                            username: username,
                         }));
                     }
                 });
@@ -632,7 +638,7 @@ if(username !== null) {
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
-                    username: username
+                    username: username,
                 }));
             } else {
                 log(`${ws_data.username} >>> ${ws_data.content}`, 'cyan');
@@ -645,7 +651,7 @@ if(username !== null) {
             ws.send(JSON.stringify({
                 type: 'message',
                 board_id: board_id,
-                content: escapeHtml(textField.value)
+                content: escapeHtml(textField.value),
             }));
             textField.value = '';
         };
@@ -655,13 +661,13 @@ if(username !== null) {
             ws.send(JSON.stringify({
                 type: 'connect',
                 board_id: board_id,
-                username: localStorage.getItem('username')
+                username: localStorage.getItem('username'),
             }));
 
             ws.send(JSON.stringify({
                 type: 'board_info',
                 board_id: board_id,
-                username: username
+                username: username,
             }));
 
             setInterval(function() { mouse_position() }, 2000);
@@ -674,4 +680,9 @@ if(username !== null) {
         };
     }
     connect();
+    $(document).ready(function(){
+        setTimeout(() => {
+            $('#loader').hide('fade', 300);    
+        }, 300);
+    });
 }

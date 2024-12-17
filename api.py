@@ -8,6 +8,7 @@ Retrogile API
 import os
 import json
 import uuid
+import datetime
 import logging
 
 from flask import Flask, render_template, send_from_directory
@@ -22,6 +23,7 @@ logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 # ///////////////////////////////////////////////////////////////////////
 
 app = Flask(__name__, template_folder="./pages/")
+current_year = datetime.datetime.now().year
 
 
 @app.route("/")
@@ -34,7 +36,7 @@ def index():
         - Otherwise: Returns a JSON response
     """
     if os.path.isfile("./pages/index.html"):
-        return render_template("index.html")
+        return render_template("index.html", current_year=current_year)
 
     return jsonify(["index_not_found"])
 
@@ -49,7 +51,7 @@ def licenses():
         - Otherwise: Returns a JSON response
     """
     if os.path.isfile("./pages/licenses.html"):
-        return render_template("licenses.html")
+        return render_template("licenses.html", current_year=current_year)
 
     return jsonify(["licenses_not_found"])
 
@@ -120,7 +122,7 @@ def home():
         - Otherwise: Returns a JSON response
     """
     if os.path.isfile("./pages/home.html"):
-        return render_template("home.html")
+        return render_template("home.html", current_year=current_year)
 
     return jsonify(["board_not_found"])
 
@@ -138,7 +140,7 @@ def board(board_id):
              otherwise a JSON response indicating the board is not found.
     """
     if os.path.isfile("./pages/board.html"):
-        return render_template("board.html", board_id=board_id)
+        return render_template("board.html", current_year=current_year, board_id=board_id)
 
     return jsonify(["board_not_found"])
 

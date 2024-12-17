@@ -1,5 +1,10 @@
-const currentYear = new Date().getFullYear();
-$('#year').text(currentYear);
+/**
+ * GNU GENERAL PUBLIC LICENSE
+ * Version 3, 29 June 2007
+ *
+ * @author Anoniji <contact@anoniji.dev>
+ *
+ */
 
 var username = localStorage.getItem('username');
 if (username === null) {
@@ -57,4 +62,9 @@ if (username === null) {
         };
     }
     connect();
+    $(document).ready(function(){
+        setTimeout(() => {
+            $('#loader').hide('fade', 300);    
+        }, 300);
+    });
 }

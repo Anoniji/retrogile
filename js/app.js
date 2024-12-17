@@ -1,5 +1,10 @@
-const currentYear = new Date().getFullYear();
-$('#year').text(currentYear);
+/**
+ * GNU GENERAL PUBLIC LICENSE
+ * Version 3, 29 June 2007
+ *
+ * @author Anoniji <contact@anoniji.dev>
+ *
+ */
 
 const hash = window.location.hash;
 
