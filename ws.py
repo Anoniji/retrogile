@@ -425,7 +425,7 @@ async def handler(websocket):
                 }])
 
             elif message_type == 'start_timer':
-                timer_in_seconds = data.get('timer_in_seconds')
+                timer_in_seconds = data.get('timerInSeconds')
                 utc_now = datetime.datetime.now()
                 delta = datetime.timedelta(seconds=int(timer_in_seconds))
                 future_time_utc = utc_now + delta
