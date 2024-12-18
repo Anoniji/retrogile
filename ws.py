@@ -362,7 +362,6 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             'type': 'board_list',
             'board_list': get_board_list_by_author(board_author)
         }])
-        send_list = send_list
 
     elif message_type == 'connect':
         message_username = data.get('username')
@@ -412,7 +411,6 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             'board_info': get_board_info_by_id(board_id, data.get('username', False)),
             'board_id': board_id
         }])
-        send_list = send_list
 
     elif message_type == 'start_timer':
         timer_in_seconds = data.get('timerInSeconds')
@@ -450,8 +448,6 @@ def message_responce(send_list, websocket, board_id, client_id, data):
                 'card_votes': card_votes,
                 message_type: message_data
             }])
-
-        send_list = send_list
 
     elif message_type in ('col_add', 'col_order', 'col_delete'):
         col_manager_by_board_id(board_id, message_type, data)
