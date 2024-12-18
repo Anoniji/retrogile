@@ -1,2 +1,5 @@
 [main]
 max-branches=15
+
+[MESSAGES CONTROL]
+disable=W1201,W1203
