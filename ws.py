@@ -366,10 +366,9 @@ def message_responce(send_list, websocket, board_id, client_id, data):
 
     message_type = data.get('type')
     if message_type == 'board_list':
-        board_author = data.get('username')
         send_list.append([websocket, {
             'type': 'board_list',
-            'board_list': get_board_list_by_author(board_author)
+            'board_list': get_board_list_by_author(data.get('username'))
         }])
 
     elif message_type == 'connect':
