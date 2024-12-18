@@ -173,31 +173,24 @@ def board_votes_reset_by_id(board_id):
     return True
 
 
-def board_manager_by_id(board_id, mode, data):
+def board_manager_by_id(send_list, board_id, mode, websocket, data):
     """
     Manages board operations based on the specified mode.
 
     Args:
-        board_id (str): The unique identifier of the board.
-        mode (str): The operation mode, one of:
+        send_list: A list to store messages for sending to clients.
+        board_id: The unique identifier of the board.
+        mode: The operation mode:
             - 'card_add': Add a new card to the board.
             - 'card_edit': Edit an existing card.
             - 'card_view': Mark a card as visible to the author.
             - 'card_vote': Increment the vote count of a card.
             - 'card_delete': Delete a card from the board.
-        data (dict): A dictionary containing additional data for the specific
-            operation, including:
-            - 'col_id': The ID of the column.
-            - 'card_uuid': The UUID of the card
-                (for edit, view, vote, and delete).
-            - 'author': The author of the card.
-            - 'user_id': The user ID of the author.
-            - 'cardContent': The content of the card.
-            - 'pos': The position of the card within the column.
+        websocket: The WebSocket connection of the current user.
+        data: A dictionary containing additional data for the specific operation.
 
     Returns:
-        tuple[str, int]: A tuple containing the card UUID and the number of
-                            votes, or (None, 0) if the operation fails.
+        The updated send_list with messages for each client.
     """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
@@ -252,7 +245,23 @@ def board_manager_by_id(board_id, mode, data):
     board_path = f'./board/{board_id}.json'
     with open(board_path, 'w', encoding='utf-8') as f:
         json.dump(board_info, f, indent=4)
-    return card_uuid, card_votes
+
+    for ws in clients:
+        message_data = data.copy()
+        if mode in ('card_add', 'card_edit'):
+            message_data['cardContent'] = data['cardContent']
+            if websocket != ws:
+                message_data['cardContent'] = '~~~'
+
+        send_list.append([ws, {
+            'type': mode,
+            'board_id': board_id,
+            'card_uuid': card_uuid,
+            'card_votes': card_votes,
+            mode: message_data
+        }])
+
+    return send_list
 
 
 def col_manager_by_board_id(board_id, mode, data):
@@ -393,15 +402,11 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         })
 
     elif message_type == 'cursor_user':
-        message_content = data.get('content')
-        pos_x = data.get('pos_x')
-        pos_y = data.get('pos_y')
-
         send_list = send_list_multi(send_list, clients, {
             'type': 'cursor_user',
             'user_id': client_id,
-            'pos_x': pos_x,
-            'pos_y': pos_y,
+            'pos_x': data.get('pos_x'),
+            'pos_y': data.get('pos_y'),
             'board_id': board_id
         })
 
@@ -433,21 +438,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         send_list = send_list_multi(send_list, clients, data)
 
     elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
-        card_uuid, card_votes = board_manager_by_id(board_id, message_type, data)
-        for ws in clients:
-            message_data = data.copy()
-            if message_type in ('card_add', 'card_edit'):
-                message_data['cardContent'] = data['cardContent']
-                if websocket != ws:
-                    message_data['cardContent'] = '~~~'
-
-            send_list.append([ws, {
-                'type': message_type,
-                'board_id': board_id,
-                'card_uuid': card_uuid,
-                'card_votes': card_votes,
-                message_type: message_data
-            }])
+        send_list = board_manager_by_id(send_list, board_id, message_type, websocket, data)
 
     elif message_type in ('col_add', 'col_order', 'col_delete'):
         col_manager_by_board_id(board_id, message_type, data)
@@ -468,8 +459,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
                 for card_uuid, _ in board_info["data"][col_name].items():
                     board_info["data"][col_name][card_uuid]["hidden"] = False
 
-            board_path = f'./board/{board_id}.json'
-            with open(board_path, 'w', encoding='utf-8') as f:
+            with open(f'./board/{board_id}.json', 'w', encoding='utf-8') as f:
                 json.dump(board_info, f, indent=4)
 
             return send_list_multi(send_list, clients, {
