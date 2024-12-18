@@ -528,7 +528,7 @@ async def handler(websocket):
             board_id = data.get('board_id')
             send_list = message_responce(
                 send_list, websocket,
-                client_id, data)
+                board_id, client_id, data)
             if len(send_list) > 0:
                 for ws_client, message in send_list:
                     await ws_client.send(json.dumps(message))
