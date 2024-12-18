@@ -335,7 +335,7 @@ def send_list_multi(send_list, clients_lst, msg_data):
     return send_list
 
 
-def message_responce(send_list, websocket, client_id, data):
+def message_responce(send_list, websocket, board_id, client_id, data):
     """
     Processes a received message and builds a list of messages to send.
 
@@ -347,6 +347,7 @@ def message_responce(send_list, websocket, client_id, data):
     Args:
         send_list: A list to store tuples of target websockets and message.
         websocket: The websocket that sent the original message.
+        board_id: The ID of the board the message is related to.
         client_id: The ID of the client who sent the message.
         data: The data payload of the received message.
 
@@ -355,7 +356,6 @@ def message_responce(send_list, websocket, client_id, data):
     """
 
     message_type = data.get('type')
-    board_id = data.get('board_id')
     if message_type == 'board_list':
         board_author = data.get('username')
         send_list.append([websocket, {
@@ -521,6 +521,7 @@ async def handler(websocket):
     try:
         while True:
             data = json.loads(await websocket.recv())
+            board_id = data.get('board_id')
             send_list = message_responce(
                 send_list, websocket,
                 client_id, data)
