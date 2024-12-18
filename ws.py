@@ -418,9 +418,8 @@ def message_responce(send_list, websocket, board_id, client_id, data):
 
     elif message_type == 'start_timer':
         timer_in_seconds = data.get('timerInSeconds')
-        utc_now = datetime.datetime.now()
         delta = datetime.timedelta(seconds=int(timer_in_seconds))
-        future_time_utc = utc_now + delta
+        future_time_utc = datetime.datetime.now() + delta
         users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
         update_timer_in_board(board_id, future_time_utc)
         send_list = send_list_multi(send_list, clients, {
