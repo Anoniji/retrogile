@@ -335,19 +335,18 @@ def send_list_multi(send_list, clients_lst, msg_data):
     return send_list
 
 
-def message_responce(send_list, websocket, message_type, board_id, client_id, data):
+def message_responce(send_list, websocket, client_id, data):
     """
-    Processes a received message and builds a list of messages to send to clients.
+    Processes a received message and builds a list of messages to send.
 
-    This function takes a message received from a websocket client, analyzes its type,
-    and creates appropriate responses. The responses are added to a `send_list` which
-    is a list of tuples containing the target websocket and the message data to be sent.
+    This function takes a message received from a websocket client,
+    analyzes its type, and creates appropriate responses.
+    The responses are added to a `send_list` which is a list of tuples
+    containing the target websocket and the message data to be sent.
 
     Args:
-        send_list: A list to store tuples of target websockets and message data.
+        send_list: A list to store tuples of target websockets and message.
         websocket: The websocket that sent the original message.
-        message_type: The type of message received (e.g., 'board_list', 'connect').
-        board_id: The ID of the board the message is related to.
         client_id: The ID of the client who sent the message.
         data: The data payload of the received message.
 
@@ -355,6 +354,8 @@ def message_responce(send_list, websocket, message_type, board_id, client_id, da
         The updated `send_list` containing messages to be sent to clients.
     """
 
+    message_type = data.get('type')
+    board_id = data.get('board_id')
     if message_type == 'board_list':
         board_author = data.get('username')
         send_list.append([websocket, {
@@ -520,12 +521,9 @@ async def handler(websocket):
     try:
         while True:
             data = json.loads(await websocket.recv())
-            message_type = data.get('type')
-            board_id = data.get('board_id')
-
             send_list = message_responce(
-                send_list, websocket, message_type,
-                board_id, client_id, data)
+                send_list, websocket,
+                client_id, data)
             if len(send_list) > 0:
                 for ws_client, message in send_list:
                     await ws_client.send(json.dumps(message))
