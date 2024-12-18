@@ -518,6 +518,7 @@ async def handler(websocket):
     print('new_client>')
     clients.add(websocket)
     client_id = POS
+    board_id = False
     send_list = []
     POS += 1
 
