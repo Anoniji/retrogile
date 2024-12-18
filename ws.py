@@ -362,8 +362,9 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             'type': 'board_list',
             'board_list': get_board_list_by_author(board_author)
         }])
+        return send_list
 
-    elif message_type == 'connect':
+    if message_type == 'connect':
         message_username = data.get('username')
         users[client_id] = {
             'username': message_username,
@@ -384,7 +385,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             'board_id': board_id
         }])
 
-        send_list = send_list_multi(send_list, clients, {
+        return send_list_multi(send_list, clients, {
             'type': 'user_add',
             'user_id': client_id,
             'username': message_username,
@@ -392,12 +393,12 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             'color': generate_color(message_username)
         })
 
-    elif message_type == 'cursor_user':
+    if message_type == 'cursor_user':
         message_content = data.get('content')
         pos_x = data.get('pos_x')
         pos_y = data.get('pos_y')
 
-        send_list = send_list_multi(send_list, clients, {
+        return send_list_multi(send_list, clients, {
             'type': 'cursor_user',
             'user_id': client_id,
             'pos_x': pos_x,
@@ -405,34 +406,35 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             'board_id': board_id
         })
 
-    elif message_type == 'board_info':
+    if message_type == 'board_info':
         send_list.append([websocket, {
             'type': 'board_info',
             'board_info': get_board_info_by_id(board_id, data.get('username', False)),
             'board_id': board_id
         }])
+        return send_list
 
-    elif message_type == 'start_timer':
+    if message_type == 'start_timer':
         timer_in_seconds = data.get('timerInSeconds')
         utc_now = datetime.datetime.now()
         delta = datetime.timedelta(seconds=int(timer_in_seconds))
         future_time_utc = utc_now + delta
         users[client_id]['timer'] = int(future_time_utc.timestamp() * 1000)
         update_timer_in_board(board_id, future_time_utc)
-        send_list = send_list_multi(send_list, clients, {
+        return send_list_multi(send_list, clients, {
             'type': 'start_timer',
             'board_id': board_id,
             'timerInSeconds': timer_in_seconds
         })
 
-    elif message_type == 'start_vote':
+    if message_type == 'start_vote':
         board_votes_reset_by_id(board_id)
-        send_list = send_list_multi(send_list, clients, data)
+        return send_list_multi(send_list, clients, data)
 
-    elif message_type == 'start_confetti':
-        send_list = send_list_multi(send_list, clients, data)
+    if message_type == 'start_confetti':
+        return send_list_multi(send_list, clients, data)
 
-    elif message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
+    if message_type in ('card_add', 'card_edit', 'card_view', 'card_vote', 'card_delete'):
         card_uuid, card_votes = board_manager_by_id(board_id, message_type, data)
         for ws in clients:
             message_data = data.copy()
@@ -449,15 +451,17 @@ def message_responce(send_list, websocket, board_id, client_id, data):
                 message_type: message_data
             }])
 
-    elif message_type in ('col_add', 'col_order', 'col_delete'):
+        return send_list
+
+    if message_type in ('col_add', 'col_order', 'col_delete'):
         col_manager_by_board_id(board_id, message_type, data)
-        send_list = send_list_multi(send_list, clients, {
+        return send_list_multi(send_list, clients, {
             'type': message_type,
             'board_id': board_id,
             message_type: data
         })
 
-    elif message_type == 'message':
+    if message_type == 'message':
         message_content = data.get('content')
         if "/see_all_cards" in message_content:
             board_info = get_board_info_by_id(board_id)
@@ -472,21 +476,20 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             with open(board_path, 'w', encoding='utf-8') as f:
                 json.dump(board_info, f, indent=4)
 
-            send_list = send_list_multi(send_list, clients, {
+            return send_list_multi(send_list, clients, {
                 'type': 'force_reload',
                 'user_id': client_id,
                 'username': users[client_id]['username'],
                 'board_id': board_id
             })
 
-        else:
-            send_list = send_list_multi(send_list, clients, {
-                'type': 'message',
-                'user_id': client_id,
-                'username': users[client_id]['username'],
-                'content': message_content,
-                'board_id': board_id
-            })
+        return send_list_multi(send_list, clients, {
+            'type': 'message',
+            'user_id': client_id,
+            'username': users[client_id]['username'],
+            'content': message_content,
+            'board_id': board_id
+        })
 
     return send_list
 
