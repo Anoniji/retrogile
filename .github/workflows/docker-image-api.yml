@@ -23,7 +23,7 @@ jobs:
         name: Build the Docker image
         uses: actions/checkout@v4
         with:
-          run: docker build --tag retrogile-ws:$(date +%s) ./podman/ws/.
+          run: docker build --tag retrogile-api:$(date +%s) ./podman/ws/.
       -
         name: Push the Docker image 
         run: |
