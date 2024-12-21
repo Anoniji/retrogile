@@ -26,5 +26,5 @@ jobs:
         name: Push the Docker image 
         run: |
           ls -alh
-          docker build --tag anoniji/retrogile_api-api:$(date +%s) ./podman/api/.
+          docker build --tag anoniji/retrogile_api:$(date +%s) ./podman/api/.
           docker push anoniji/retrogile_api:latest
