@@ -20,10 +20,10 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - 
-        name: Build the Docker image
+        name: Checkout Repository
         uses: actions/checkout@v4
       -
-        name: Push the Docker image 
+        name: Build and Push the Docker image
         run: |
           ls -alh
           docker build --tag anoniji/retrogile_api:latest ./podman/api/.
