@@ -17,5 +17,7 @@ The version provided is currently in development and may have missing features o
 - [WS Image Page](https://hub.docker.com/repository/docker/anoniji/retrogile_ws/general)
 
 ## Podman Launch Example
+```
 podman run -d --restart=always -p "0.0.0.0:8008:8008" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 --name retrogile_api retrogile_api
 podman run -d --restart=always -p "0.0.0.0:8009:8009" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 --name retrogile_ws retrogile_ws
+```
