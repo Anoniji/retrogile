@@ -22,5 +22,5 @@ jobs:
           PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERFILE: "./podman/api/Dockerfile"
           IMAGE_NAME: "anoniji/retrogile_api"
-          TAG_NAME: "v$(date +%s)"
+          TAG_NAME: "latest "
           LATEST: "true"
