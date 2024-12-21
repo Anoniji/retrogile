@@ -25,6 +25,7 @@ jobs:
       -
         name: Build and Push the Docker image 
         run: |
-          ls -alh
+          docker build --tag anoniji/retrogile_ws:$(date +%s) ./podman/ws/.
+          docker push anoniji/retrogile_ws:$(date +%s)
           docker build --tag anoniji/retrogile_ws:latest ./podman/ws/.
           docker push anoniji/retrogile_ws:latest
