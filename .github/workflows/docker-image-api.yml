@@ -13,17 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Docker Build & Push to Docker Hub
+        uses: timzu/github-actions-docker@master
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: ./podman/api/.
-          push: true
-          tags: anoniji/retrogile_api:latest
-          
+          args: --docker
+        env:
+          USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERFILE: "./podman/api/Dockerfile"
+          IMAGE_NAME: "anoniji/retrogile_api"
+          TAG_NAME: "v$(date +%s)"
+          LATEST: "true"
