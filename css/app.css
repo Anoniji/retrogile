@@ -49,9 +49,8 @@ body {
     right: 0;
     bottom: 0;
     z-index: -1;
-    opacity: 0.2;
-    background: url(../img/wallpaper.png) no-repeat center;
-    background-size: cover;
+    opacity: 0.05;
+    background: url(../img/hexa_grid.png) repeat;
 }
 
 #wallpaper2 {
@@ -60,7 +59,7 @@ body {
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: -1;
+    z-index: -2;
     background-color: #d9d9d9;
     background: url(../img/wallpaper2.png) no-repeat center;
     background-size: cover;
