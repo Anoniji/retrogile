@@ -458,21 +458,41 @@ if(username !== null) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor'><div class='username'>${value.username}</div></div>`)
                     }
                     if(value.board_id == board_id) {
-                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
-                        $(document).tooltip({position: {my: 'center top',at: 'center bottom'}});
+                        var $div_username = $(`#users div[data-username=${value.username}]`);
+                        if ($($div_username).length > 0) {
+                            var currentCount = parseInt($div_username.attr('data-count'));
+                            $div_username.attr('data-count', currentCount + 1);
+                        } else {
+                            $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
+                            $(document).tooltip({position: {my: 'center top',at: 'center bottom'}});
+                        }
                     }
                 });
             } else if (ws_data.type == 'user_add') {
                 if(user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(ws_data.username + ' >>> connected', 'yellow');
-                    $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`);
-                    $(document).tooltip({position: {my: 'center top',at: 'center bottom'}});
+
+                    var $div_username = $(`#users div[data-username=${ws_data.username}]`);
+                    if ($($div_username).length > 0) {
+                        var currentCount = parseInt($div_username.attr('data-count'));
+                        $div_username.attr('data-count', currentCount + 1);
+                    } else {
+                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
+                        $(document).tooltip({position: {my: 'center top',at: 'center bottom'}});
+                    }
                 }
             } else if (ws_data.type == 'user_remove') {
                 log(ws_data.username + ' >>> disconnected', 'red');
-                $(`#user_${ws_data.user_id}`).hide('fade', 300).remove();
                 $(`#cursor_${ws_data.user_id}`).hide('fade', 300).remove();
+
+                var $div_username = $(`#users div[data-username=${ws_data.username}]`);
+                var currentCount = parseInt($div_username.attr('data-count'));
+                if (currentCount == 1) {
+                    $(`#user_${ws_data.user_id}`).hide('fade', 300).remove();
+                } else {
+                    $div_username.attr('data-count', currentCount - 1);
+                }
             } else if (ws_data.type == 'cursor_user') {
                 if(user_id != ws_data.user_id) {
                     if(ws_data.pos_y && ws_data.pos_x) {
