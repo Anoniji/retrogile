@@ -12,6 +12,7 @@ import hashlib
 import asyncio
 import datetime
 import websockets
+from collections import OrderedDict
 
 
 users = {}
@@ -90,7 +91,7 @@ def get_board_info_by_id(board_id, username_filter=False):
                         if card_data["author"] != username_filter and card_data['hidden']:
                             _tmps['data'][col_name][card_uuid]['content'] = '~~~'
 
-                return _tmps
+                return OrderedDict(_tmps.items())
 
     return False
 
@@ -146,12 +147,13 @@ def reset_votes_in_nested_dict(my_dict):
     return my_dict
 
 
-def board_votes_reset_by_id(board_id):
+def board_votes_reset_by_id(board_id, maxVote):
     """
     Resets the vote count for a specific board.
 
     Args:
         board_id (int): The ID of the board to reset.
+        maxVote (int): Board max Votes.
 
     Returns:
         bool: True if the reset was successful, False otherwise.
@@ -160,6 +162,8 @@ def board_votes_reset_by_id(board_id):
     if not board_info:
         return False
 
+    board_info['votes'] = int(maxVote)
+    board_info['votes_list'] = {}
     for key, value in board_info['data'].items():
         if isinstance(value, dict):
             reset_votes_in_nested_dict(value)
@@ -228,6 +232,13 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             data.get('col_id') in board_info['data']
             and data.get('card_uuid') in board_info['data'][data.get('col_id')]
         ):
+            if data.get('author') not in board_info['votes_list']:
+                board_info['votes_list'][data.get('author')] = board_info['votes'] - 1
+            elif not board_info['votes_list'][data.get('author')]:
+                return False
+            else:
+                board_info['votes_list'][data.get('author')] -= 1
+
             board_info['data'][
                 data.get('col_id')][
                 data.get('card_uuid')]['votes'] += 1
@@ -429,7 +440,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         })
 
     elif message_type == 'start_vote':
-        board_votes_reset_by_id(board_id)
+        board_votes_reset_by_id(board_id, data.get('maxVote'))
         send_list = send_list_multi(send_list, clients, data)
 
     elif message_type == 'start_confetti':

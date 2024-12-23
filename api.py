@@ -69,21 +69,7 @@ def create_board(board_name, author):
         str: A JSON string containing the path to the newly created board.
 
     This function creates a new directory for the board if it doesn't exist,
-    generates a unique ID for the board, and creates a JSON file with the
-    following structure:
-
-    ```json
-    {
-        "board_name": "board_name",
-        "author": "author",
-        "timer": false,
-        "data": {
-            "start": {},
-            "stop": {},
-            "continue": {}
-        },
-        "tmps": {}
-    }
+    generates a unique ID for the board, and creates a JSON file
     ```
 
     The function then returns a JSON string containing the path to the newly
@@ -98,9 +84,12 @@ def create_board(board_name, author):
     board_filename = f'{board_id}.json'
     with open(f'{board_dir}{board_filename}', 'w', encoding='utf-8') as file:
         json.dump({
+            "version": 1,
             "board_name": board_name,
             "author": author,
             "timer": False,
+            "votes": False,
+            "votes_list": {},
             "data": {
                 "start": {},
                 "stop": {},

@@ -503,6 +503,8 @@ if(username !== null) {
                 board_author = ws_data.board_info.author;
                 board_data = ws_data.board_info.data;
                 check_timer = ws_data.board_info.timer;
+                check_votes = ws_data.board_info.votes;
+                list_votes = ws_data.board_info.votes_list;
 
                 if(check_timer) {
                     const now = new Date();
@@ -510,6 +512,12 @@ if(username !== null) {
                     if(difSecs > 0) {
                         board_timer(difSecs);
                     }
+                }
+
+                if(check_votes) {
+                    if (username in list_votes) {
+                        $('#board_vote .title').html(list_votes[username]);  
+                    }             
                 }
 
                 $('#board').html('');
