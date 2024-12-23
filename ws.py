@@ -11,8 +11,8 @@ import uuid
 import hashlib
 import asyncio
 import datetime
-import websockets
 from collections import OrderedDict
+import websockets
 
 
 users = {}
@@ -147,13 +147,13 @@ def reset_votes_in_nested_dict(my_dict):
     return my_dict
 
 
-def board_votes_reset_by_id(board_id, maxVote):
+def board_votes_reset_by_id(board_id, max_vote):
     """
     Resets the vote count for a specific board.
 
     Args:
         board_id (int): The ID of the board to reset.
-        maxVote (int): Board max Votes.
+        max_vote (int): Board max Votes.
 
     Returns:
         bool: True if the reset was successful, False otherwise.
@@ -162,7 +162,7 @@ def board_votes_reset_by_id(board_id, maxVote):
     if not board_info:
         return False
 
-    board_info['votes'] = int(maxVote)
+    board_info['votes'] = int(max_vote)
     board_info['votes_list'] = {}
     for key, value in board_info['data'].items():
         if isinstance(value, dict):
