@@ -28,5 +28,5 @@ jobs:
           docker build --tag anoniji/retrogile_api:latest ./podman/api/.
           docker tag anoniji/retrogile_api:latest anoniji/retrogile_api:$(date +%s)
           docker push anoniji/retrogile_api:$(date +%s)
-          docker push anoniji/retrogile_api:0.2.0
+          docker push anoniji/retrogile_api:0.2.6
           docker push anoniji/retrogile_api:latest
