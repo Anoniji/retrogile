@@ -23,16 +23,10 @@ jobs:
         name: Checkout Repository
         uses: actions/checkout@v4
       -
-        name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          fallback: 1.0.0
-      -
         name: Build and Push the Docker image
         run: |
           docker build --tag anoniji/retrogile_api:latest ./podman/api/.
-          docker tag anoniji/retrogile_api:latest anoniji/retrogile_api:${{ steps.previoustag.outputs.tag }} anoniji/retrogile_api:$(date +%s)
+          docker tag anoniji/retrogile_api:latest anoniji/retrogile_api:$(git describe --abbrev=0 --tags) anoniji/retrogile_api:$(date +%s)
           docker push anoniji/retrogile_api:$(date +%s)
-          docker push anoniji/retrogile_api:${{ steps.previoustag.outputs.tag }}
+          docker push anoniji/retrogile_api:$(git describe --abbrev=0 --tags)
           docker push anoniji/retrogile_api:latest
