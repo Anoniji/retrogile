@@ -15,7 +15,7 @@ from collections import OrderedDict
 import websockets
 
 
-board_version = 2
+BOARD_VERSION = 2
 users = {}
 clients = set()
 POS = 0
@@ -85,7 +85,7 @@ def get_board_info_by_id(board_id, username_filter=False):
             with open(board_path, encoding="utf-8") as f:
                 _tmps = json.load(f)
 
-                if "version" not in _tmps or _tmps["version"] != board_version:
+                if "version" not in _tmps or _tmps["version"] != BOARD_VERSION:
                     return False
 
                 if not username_filter:
