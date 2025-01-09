@@ -15,6 +15,7 @@ from flask import Flask, render_template, send_from_directory
 from flask_jsonpify import jsonify
 
 from gevent import monkey
+
 monkey.patch_all()
 
 logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
@@ -76,27 +77,28 @@ def create_board(board_name, author):
     created board.
     """
 
-    board_dir = './board/'
+    board_dir = "./board/"
     if not os.path.isdir(board_dir):
         os.mkdir(board_dir)
 
     board_id = str(uuid.uuid4().hex)
-    board_filename = f'{board_id}.json'
-    with open(f'{board_dir}{board_filename}', 'w', encoding='utf-8') as file:
-        json.dump({
-            "version": 1,
-            "board_name": board_name,
-            "author": author,
-            "timer": False,
-            "votes": False,
-            "votes_list": {},
-            "data": {
-                "start": {},
-                "stop": {},
-                "continue": {}
+    board_filename = f"{board_id}.json"
+    with open(f"{board_dir}{board_filename}", "w", encoding="utf-8") as file:
+        json.dump(
+            {
+                "version": 2,
+                "board_name": board_name,
+                "author": author,
+                "users_list": [],
+                "timer": False,
+                "votes": False,
+                "votes_list": {},
+                "data": {"start": {}, "stop": {}, "continue": {}},
+                "tmps": {},
             },
-            "tmps": {}
-        }, file, indent=4)
+            file,
+            indent=4,
+        )
 
     return jsonify(["./board/" + board_id])
 
@@ -129,7 +131,9 @@ def board(board_id):
              otherwise a JSON response indicating the board is not found.
     """
     if os.path.isfile("./pages/board.html"):
-        return render_template("board.html", current_year=current_year, board_id=board_id)
+        return render_template(
+            "board.html", current_year=current_year, board_id=board_id
+        )
 
     return jsonify(["board_not_found"])
 
@@ -148,9 +152,7 @@ def js(path):
             - If the file doesn't exist, returns a JSON response
     """
     if os.path.isfile("js/" + path):
-        return send_from_directory(
-            "js", path, mimetype="application/javascript"
-        )
+        return send_from_directory("js", path, mimetype="application/javascript")
 
     return jsonify(["js_not_found"])
 
