@@ -186,6 +186,16 @@ def board_votes_reset_by_id(board_id, max_vote):
 
 
 def board_votes_init(board_id, max_vote):
+    """
+    Initializes the votes for all users in a given board.
+
+    Args:
+        board_id (str): The ID of the board.
+        max_vote (int): The maximum number of votes allowed per user.
+
+    Returns:
+        bool: True if the initialization was successful, False otherwise.
+    """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
         return False
