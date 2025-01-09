@@ -25,11 +25,11 @@ logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 
 app = Flask(__name__, template_folder="./pages/")
 current_year = datetime.datetime.now().year
-current_version = "1.0dev"
+CURRENT_VERSION = "1.0dev"
 
 if os.path.isfile("version"):
-    with open("version", "r", encoding="utf-8") as file:
-        current_version = file.read().strip()
+    with open("version", "r", encoding="utf-8") as file_version:
+        CURRENT_VERSION = file_version.read().strip()
 
 
 @app.route("/")
@@ -44,7 +44,7 @@ def index():
     if os.path.isfile("./pages/index.html"):
         return render_template(
             "index.html", current_year=current_year,
-            current_version=current_version
+            CURRENT_VERSION=CURRENT_VERSION
         )
 
     return jsonify(["index_not_found"])
@@ -62,7 +62,7 @@ def licenses():
     if os.path.isfile("./pages/licenses.html"):
         return render_template(
             "licenses.html", current_year=current_year,
-            current_version=current_version
+            CURRENT_VERSION=CURRENT_VERSION
         )
 
     return jsonify(["licenses_not_found"])
@@ -126,7 +126,7 @@ def home():
     if os.path.isfile("./pages/home.html"):
         return render_template(
             "home.html", current_year=current_year,
-            current_version=current_version
+            CURRENT_VERSION=CURRENT_VERSION
         )
 
     return jsonify(["board_not_found"])
@@ -147,7 +147,7 @@ def board(board_id):
     if os.path.isfile("./pages/board.html"):
         return render_template(
             "board.html", current_year=current_year,
-            current_version=current_version, board_id=board_id
+            CURRENT_VERSION=CURRENT_VERSION, board_id=board_id
         )
 
     return jsonify(["board_not_found"])
