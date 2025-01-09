@@ -9,7 +9,7 @@ Agile Retrospective Management Tool
 
 The version provided is currently in development and may have missing features or even operational issues.
 
-## Demo (v0.2.7)
+## Demo (v0.2.8)
 [Test server](https://retrogile.anoniji.dev)
 
 ## Dockerhub
