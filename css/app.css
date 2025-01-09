@@ -11,6 +11,15 @@ body {
     overflow: hidden;
 }
 
+input, textarea {
+    background-color: #dce8f7;
+}
+
+button {
+    color: #333333;
+    background-color: #dce8f7;
+}
+
 #loader {
     position: fixed;
     background-color: #e1e1e1;
@@ -65,12 +74,20 @@ body {
     background-size: cover;
 }
 
+#nav_main_logo {
+    position: fixed;
+    top: 21px;
+    left: 24px;
+    width: 164px;
+    cursor: pointer;
+}
+
 nav {
-    box-shadow: 0 0 2px #212121;
-    background-color: #212121;
+box-shadow: 0 0 2px #333333;
+    background-color: #333333;
     color: #f2f2f2;
     overflow: hidden;
-    margin: 16px;
+    margin: 34px 16px 20px 206px;
     padding: 8px;
     border-radius: 8px;
     font-weight: bold;
@@ -98,22 +115,14 @@ nav div {
 }
 
 #nav_logo {
-    font-weight: bold;
-    user-select: none;
+    padding: 10px 10px 5px !important;
+    background-color: #333333;
+    box-shadow: 0 0 2px #333333;
+    border-radius: 4px 8px 0 0;
+    float: right;
+    height: 21px;
+    width: calc(100% - 163px);
 }
-
-#nav_logo i {
-    position: relative;
-    z-index: 2;
-}
-
-#nav_logo div {
-    display: inline-block;
-    position: relative;
-    left: -21px;
-    top: -3px;
-}
-
 
 #board_access {
     position: fixed;
@@ -121,12 +130,23 @@ nav div {
     height: 240px;
     left: calc(50vw - 210px);
     top: calc(50vh - 130px);
-    background-color: #212121;
-    box-shadow: 0 0 2px #212121;
     color: #f2f2f2;
     padding: 10px;
-    border-radius: 8px;
     overflow: hidden;
+}
+
+#board_access img {
+    position: relative;
+    left: 8px;
+    top: 2px;
+    width: 128px;
+    z-index: 2;
+}
+
+#board_access_bloc {
+    background-color: #333333;
+    box-shadow: 0 0 2px #333333;
+    border-radius: 8px 0 8px 8px;
 }
 
 #board_icone {
@@ -147,11 +167,10 @@ nav div {
     width: calc(100% - 20px);
     border-radius: 2px;
     border: none !important;
+    background-color: #dce8f7;
 }
 
 #board_access div button {
-    color: #212121;
-    background-color: #f2f2f2;
     border: none;
     cursor: pointer;
     padding: 8px 25px;
@@ -186,7 +205,7 @@ nav div {
     z-index: 1;
     top: 15px;
     right: 18px;
-    color: #212121;
+    color: #333333;
     cursor: pointer;
 }
 
@@ -207,7 +226,7 @@ footer {
 }
 
 footer a {
-    color: #212121;
+    color: #333333;
 }
 
 #users {
@@ -226,6 +245,7 @@ footer a {
     margin-left: 5px;
     background: url(../img/wallpaper.png) no-repeat center;
     background-size: cover;
+    border: 1px solid #333333;
 }
 
 #users .user:hover {
@@ -233,7 +253,7 @@ footer a {
 }
 
 #board-params {
-    background-color: #212121;
+    background-color: #333333;
     color: #f2f2f2;
     display: inline-block;
     width: calc(100% - 64px);
@@ -241,17 +261,17 @@ footer a {
     padding: 11px 16px;
     border-radius: 8px;
     user-select: none;
-    box-shadow: 0 0 2px #212121;
+    box-shadow: 0 0 2px #333333;
 }
 
 .board-params-2 {
     background-color: transparent !important;
-    color: #212121 !important;
+    color: #333333 !important;
     width: calc(100% - 48px) !important;
     padding: 11px 8px !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    border-bottom: 2px solid #212121;
+    border-bottom: 2px solid #333333;
     font-weight: 600;
 }
 
@@ -270,8 +290,6 @@ footer a {
 
 #board-params button {
     transition: opacity .3s linear;
-    color: #212121;
-    background-color: #f2f2f2;
     border: none;
     border-radius: 8px;
     font-size: 14px;
@@ -311,14 +329,14 @@ footer a {
 }
 
 #board .col {
-    background-color: #212121;
+    background-color: #333333;
     color: #f2f2f2;
     border-radius: 8px;
     display: inline-block;
     width: 20%;
     margin: 32px 16px 0 16px;
     vertical-align: top;
-    box-shadow: 0 0 2px #212121;
+    box-shadow: 0 0 2px #333333;
 }
 
 #board .col h1 {
@@ -349,7 +367,7 @@ footer a {
     width: calc(100% + 10px);
     height: 18px;
     top: -5px;
-    background-color: #212121;
+    background-color: #333333;
     color: #f2f2f2;
     text-align: right !important;
 }
@@ -388,12 +406,12 @@ footer a {
     position: relative;
     clear: both;
     text-align: left;
-    color: #212121;
+    color: #333333;
     background-color: #f2f2f2;
     cursor: pointer;
     padding: 4px;
-    border-top: 1px solid #212121;
-    border-bottom: 1px solid #212121;
+    border-top: 1px solid #333333;
+    border-bottom: 1px solid #333333;
     margin: 4px 0;
 }
 
@@ -401,9 +419,9 @@ footer a {
     display: inline-block;
     width: 32px;
     height: 32px;
-    background-color: #212121;
+    background-color: #333333;
     color: #f2f2f2;
-    border: 1px solid #212121;
+    border: 1px solid #333333;
     border-radius: 10px;
     text-align: center;
     font-size: 20px;
@@ -437,8 +455,8 @@ footer a {
     left: 16px;
     right: 16px;
     z-index: 2;
-    background-color: #212121;
-    box-shadow: 0 0 2px #212121;
+    background-color: #333333;
+    box-shadow: 0 0 2px #333333;
     border-radius: 8px;
     color: #f2f2f2;
     overflow: hidden;
@@ -482,7 +500,7 @@ footer a {
 }
 
 .ui-tooltip {
-    background-color: #212121;
+    background-color: #333333;
     color: #f2f2f2;
     box-shadow: none;
     font-size: 12px;
@@ -490,11 +508,11 @@ footer a {
 }
 
 .custom-prompt {
-    color: #212121;
+    color: #333333;
     background-color: #f2f2f2;
     padding: 4px;
-    border-top: 1px solid #212121;
-    border-bottom: 1px solid #212121;
+    border-top: 1px solid #333333;
+    border-bottom: 1px solid #333333;
     text-align: center !important;
     margin: 0 !important;
 }
@@ -506,16 +524,14 @@ footer a {
     border-radius: 0 0 15px 15px;
     width: calc(100% - 25px);
     margin-top: -4px;
-    border-left: 2px solid #212121;
-    border-bottom: 2px solid #212121;
-    border-right: 2px solid #212121;
+    border-left: 2px solid #333333;
+    border-bottom: 2px solid #333333;
+    border-right: 2px solid #333333;
     border-top: none;
     resize: none;
 }
 
 .custom-prompt button {
-    color: #212121;
-    background-color: #f2f2f2;
     border: none;
     border-radius: 15px;
     cursor: pointer;

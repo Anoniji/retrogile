@@ -4,21 +4,18 @@
 <head>
     <title>Retrogile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="./img/icone.png" />
+    <link rel="icon" type="image/png" href="./img/favicon.png" />
     <link rel="stylesheet" href="./css/materialicons.css">
     <link rel="stylesheet" href="./css/jqueryui.css">
     <link rel="stylesheet" href="./css/app.css">
 </head>
 
 <body>
-    <nav>
-        <i class="material-icons">dataset</i>
-        <div id="app_title" onclick="location.href = './';">Retrogile</div>
-        <div id="users"></div>
-    </nav>
+    <img alt="logo" src="../img/logo.png" id="nav_main_logo" onclick="location.href = '../';" />
+    <nav></nav>
     <section id="wallpaper"></section>
     <section id="wallpaper2"></section>
-    <section id="board-params" class="board-params-2">
+    <section id="board-params">
         <div id="board_name">List of external libraries and their licenses</div>
     </section>
     <section id="board">
@@ -31,7 +28,7 @@
     </section>
 
     <footer>
-        Copyright © {{ current_year }} Retrogile - <a href="./LICENSES">Show list of external libraries and their licenses</a>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="./LICENSES">Show list of external libraries and their licenses</a>
     </footer>
 
     <script src="./js/jquery.min.js"></script>
