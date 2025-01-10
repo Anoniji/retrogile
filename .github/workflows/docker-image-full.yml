@@ -25,7 +25,7 @@ jobs:
         run: |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo ${latest_tag} > ./version
-          docker build --tag anoniji/retrogile:latest -f ./api.Dockerfile .
+          docker build --tag anoniji/retrogile:latest -f ./full.Dockerfile .
           docker tag anoniji/retrogile:latest anoniji/retrogile:${latest_tag}
           docker tag anoniji/retrogile:latest anoniji/retrogile:$(date +%s)
           docker push anoniji/retrogile:$(date +%s)
