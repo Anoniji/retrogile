@@ -395,6 +395,11 @@ def col_manager_by_board_id(board_id, mode, data):
                 board_info["data"][data.get("colName")][uuidl]["pos"] = cnt
                 cnt += 1
 
+    elif mode == "col_reorder":
+        board_info["data"] = OrderedDict(
+            (k, board_info["data"][k]) for k in data.get("colName")
+        )
+
     elif mode == "col_delete":
         if data.get("colName") not in board_info["data"]:
             return False
@@ -585,7 +590,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             send_list, board_id, message_type, websocket, data
         )
 
-    elif message_type in ("col_add", "col_order", "col_delete"):
+    elif message_type in ("col_add", "col_order", "col_reorder", "col_delete"):
         col_manager_by_board_id(board_id, message_type, data)
         send_list = send_list_multi(
             send_list,
