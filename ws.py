@@ -37,6 +37,27 @@ def generate_color(_key):
     return color_hex
 
 
+def update_board(board_data_old):
+    """
+    Updates the given board data.
+
+    This function checks the current version of the board data.
+    If the version is 1, it updates the version to 2 and
+    clears the users_list.
+
+    Args:
+        board_data_old: A dictionary containing the old board data.
+
+    Returns:
+        The updated board data.
+    """
+    if board_data_old["version"] == 1:
+        board_data_old["version"] = 2
+        board_data_old["users_list"] = []
+
+    return board_data_old
+
+
 def get_board_list_by_author(author):
     """
     Retrieves a list of board files authored by a specific user.
@@ -57,7 +78,16 @@ def get_board_list_by_author(author):
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if data["author"] == author:
-                    author_files.append([data["board_name"], file_path])
+                    curr_version = data.get("version", False)
+                    if curr_version:
+                        author_files.append(
+                            [
+                                data["board_name"],
+                                BOARD_VERSION,
+                                curr_version,
+                                file_path,
+                            ]
+                        )
     return author_files
 
 
@@ -85,8 +115,13 @@ def get_board_info_by_id(board_id, username_filter=False):
             with open(board_path, encoding="utf-8") as f:
                 _tmps = json.load(f)
 
-                if "version" not in _tmps or _tmps["version"] != BOARD_VERSION:
+                if "version" not in _tmps:
                     return False
+
+                if _tmps["version"] != BOARD_VERSION:
+                    _tmps = update_board(_tmps)
+                    with open(board_path, "w", encoding="utf-8") as f:
+                        json.dump(_tmps, f, indent=4)
 
                 if not username_filter:
                     return _tmps
