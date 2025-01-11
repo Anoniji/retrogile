@@ -340,6 +340,8 @@ footer a {
 }
 
 #board .col h1 {
+    position: relative;
+    clear: both;
     text-align: left;
     font-size: 24px;
     padding: 8px 0 12px 16px;
@@ -359,6 +361,20 @@ footer a {
 
 #board .col .drop_icon {
     margin: 2px 5px 0 0;
+}
+
+#board .col .left_icon, #board .col .right_icon {
+    position: absolute;
+    cursor: pointer;
+    top: -6px;
+}
+
+#board .col .left_icon {
+    left: -7px;
+}
+
+#board .col .right_icon {
+    right: -7px;
 }
 
 #board .col .card_icon {
@@ -562,7 +578,7 @@ canvas {
 }
 
 
-@media (max-width: 920px) {
+@media (max-width: 1020px) {
     #console, #board-params button div {
         display: none;
     }
