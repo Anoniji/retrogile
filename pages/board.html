@@ -37,9 +37,15 @@
             <div class="title">Confetti</div>
         </button>
         <div id="r_menu">
+            <button onclick="cardTextSize('info_content', -1, true);">
+                <i class="material-icons">text_decrease</i>
+            </button>
+            <button onclick="cardTextSize('info_content', 1, true);">
+                <i class="material-icons">text_increase</i>
+            </button>
             <button id="board_add_bloc" onclick="addCol()">
-                <i class="material-icons">space_dashboard</i>
-                <div class="title">Add Zone</div>
+                <i class="material-icons">post_add</i>
+                <div class="title">Add Column</div>
             </button>
             <button id="board_vote_order" onclick="viewCard()">
                 <i class="material-icons">visibility</i>
