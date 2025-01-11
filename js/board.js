@@ -25,6 +25,30 @@ if (username === null) {
 
 $(function() { $( '#console' ).accordion({collapsible: true, active: false, heightStyle: 'content'}); });
 
+function cardTextSize(className, action, save = false) {
+    const elements = document.querySelectorAll(`.${className}`);
+    elements.forEach(element => {
+        const currentSize = parseInt(window.getComputedStyle(element).fontSize);
+        let newSize = currentSize + action;
+
+        newSize = Math.max(8, Math.min(newSize, 32));
+        element.style.fontSize = `${newSize}px`;
+        if (save) {
+            localStorage.setItem(`${className}-fontSize`, newSize);
+        }
+    });
+}
+
+function applySavedSize(className) {
+    const savedSize = localStorage.getItem(`${className}-fontSize`);
+    if (savedSize) {
+        const elements = document.querySelectorAll(`.${className}`);
+        elements.forEach(element => {
+            element.style.fontSize = `${savedSize}px`;
+        });
+    }
+}
+
 function play_confetti(duration = 800) {
     $('#board_confetti').prop('disabled', true);
     const canvas = document.createElement('canvas');
@@ -347,6 +371,36 @@ if(username !== null) {
         }
     }
 
+    function moveCol(move, col_index) {
+        if (board_author != username) return;
+        const elements = $('[data-col]');
+        const valeursDataCol = [];
+        elements.each(function() {
+            valeursDataCol.push($(this).data('col'));
+        });
+
+        const index = valeursDataCol.indexOf(col_index);
+        const newOrder = [...valeursDataCol]; 
+
+        if (move == "left") {
+            if (index > 0) {
+                [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
+            }
+        } else {
+            if (index < newOrder.length - 1) {
+                [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+            }
+        }
+        ws.send(JSON.stringify({
+            type: 'col_reorder',
+            author: username,
+            board_id: board_id,
+            user_id: user_id,
+            colName: newOrder,
+            uuidList: false,
+        }));
+    }
+
     function viewCard() {
         ws.send(JSON.stringify({
             type: 'card_view',
@@ -538,6 +592,8 @@ if(username !== null) {
                     html = `<div id='col_${index}' data-col='${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
+                        html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>arrow_left</i>`;
+                        html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>arrow_right</i>`;
                     }
                     html += `</h1><ul class='sortable'></ul></div>`;
                     $('#board').append(html);
@@ -576,6 +632,7 @@ if(username !== null) {
                     curr_highlightUser = false;
                     highlightUser(tmps_highlightUser);
                 }
+                applySavedSize("info_content");
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
             } else if (ws_data.type == 'start_confetti') {
@@ -662,7 +719,7 @@ if(username !== null) {
                 sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
-            } else if (ws_data.type == 'force_reload') {
+            } else if (ws_data.type == 'force_reload' || ws_data.type == 'col_reorder') {
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
@@ -714,3 +771,7 @@ if(username !== null) {
         }, 300);
     });
 }
+
+window.onload = () => {
+    applySavedSize("info_content");
+};
