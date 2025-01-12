@@ -15,7 +15,7 @@ from collections import OrderedDict
 import websockets
 
 
-BOARD_VERSION = 2
+BOARD_VERSION = 3
 users = {}
 clients = set()
 POS = 0
@@ -51,8 +51,16 @@ def update_board(board_data_old):
     Returns:
         The updated board data.
     """
-    if board_data_old["version"] == 1:
+    if board_data_old["version"] <= 1:
         board_data_old["version"] = 2
+        board_data_old["users_list"] = []
+
+    if board_data_old["version"] <= 2:
+        board_data_old["version"] = 3
+        for category in board_data_old["data"]:
+            for child_id, child_data in board_data_old["data"][category].items():
+                child_data["children"] = []
+
         board_data_old["users_list"] = []
 
     return board_data_old
@@ -278,6 +286,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             "content": data.get("cardContent"),
             "hidden": True,
             "votes": 0,
+            "children": [],
         }
 
     elif mode == "card_edit":

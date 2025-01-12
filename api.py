@@ -97,15 +97,15 @@ def create_board(board_name, author):
     with open(f"{board_dir}{board_filename}", "w", encoding="utf-8") as file:
         json.dump(
             {
-                "version": 2,
+                "version": 3,
                 "board_name": board_name,
                 "author": author,
-                "users_list": [],
                 "timer": False,
                 "votes": False,
                 "votes_list": {},
                 "data": {"start": {}, "stop": {}, "continue": {}},
                 "tmps": {},
+                "users_list": [],
             },
             file,
             indent=4,
