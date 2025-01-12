@@ -58,7 +58,7 @@ def update_board(board_data_old):
     if board_data_old["version"] <= 2:
         board_data_old["version"] = 3
         for category in board_data_old["data"]:
-            for child_id, child_data in board_data_old["data"][category].items():
+            for _, child_data in board_data_old["data"][category].items():
                 child_data["children"] = []
 
         board_data_old["users_list"] = []
