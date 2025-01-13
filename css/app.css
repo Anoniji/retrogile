@@ -115,13 +115,14 @@ nav div {
 }
 
 #nav_logo {
-    padding: 10px 10px 5px !important;
+    position: absolute;
+    top: 24px;
+    right: 10px;
     background-color: #333333;
     box-shadow: 0 0 2px #333333;
     border-radius: 4px 8px 0 0;
-    float: right;
-    height: 21px;
-    width: calc(100% - 163px);
+    height: 4px;
+    width: calc(100% - 184px);
 }
 
 #board_access {
