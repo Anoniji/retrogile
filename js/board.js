@@ -306,6 +306,10 @@ if (username !== null) {
         });
     }
 
+    function mergeCard() {
+        $('.child_drop').show();
+    }
+
     function editCard(card_uuid) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
         customPrompt(col_id, 'Editing Card content', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
@@ -618,11 +622,12 @@ if (username !== null) {
                         html += `</div>`;
                         html += `<div class='votes' onclick='voteCard("${uuid}");'>${value.votes}</div>
                             <div class='info_content'>${value.content}</div>
+                            <div class='child_drop'></div>
                             </div>`;
                         html += `</li>`;
                         $(`#col_${index} .sortable`).append(html);
                     });
-                    $(`#col_${index} .sortable`).sortable({ items: 'li:not(.unsortable)', connectWith: '.sortable', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                    $(`#col_${index} .sortable, #col_${index} .child_drop`).sortable({ items: 'li:not(.unsortable)', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
                 });
 
                 $('#board_name').html(ws_data.board_info.board_name);
@@ -658,10 +663,11 @@ if (username !== null) {
                 html += `</div>`;
                 html += `<div class='votes' onclick='voteCard("${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
                     <div class='info_content'>${ws_data.card_add.cardContent}</div>
+                    <div class='child_drop'></div>
                     </div>`;
                 html += `</li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
-                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({ items: 'li:not(.unsortable)', connectWith: '.sortable', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                $(`#col_${ws_data.card_add.col_id} .sortable, #col_${ws_data.card_add.col_id} .child_drop`).sortable({ items: 'li:not(.unsortable)', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
 
                 if (curr_highlightUser) {
                     let tmps_highlightUser = curr_highlightUser;

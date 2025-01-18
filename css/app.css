@@ -301,6 +301,7 @@ footer a {
 
 #board-params button[disabled]:hover {
     opacity: 1 !important;
+    cursor: not-allowed;
 }
 
 #board-params button i {
@@ -578,6 +579,31 @@ canvas {
     display: none;
 }
 
+.child_drop {
+    display: none;
+    position: absolute;
+    top: 24px;
+    right: 8px;
+    bottom: 8px;
+    width: calc(100% - 52px);
+}
+
+.child_drop .child_drop,
+.child_drop .votes, 
+.child_drop .info_content,
+.child_drop .card_icon .info_author ,
+.child_drop .card_icon .edit_icon,
+.child_drop .card_icon .delete_icon {
+    display: none !important;
+}
+
+.child_drop li {
+    border: none !important;
+}
+
+.child_drop .card_icon {
+    width: 8px !important;
+}
 
 @media (max-width: 1020px) {
     #console, #board-params button div {

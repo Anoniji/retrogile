@@ -42,7 +42,7 @@ if (username === null) {
                     if (value[1] != value[2]) {
                         html += `sync_problem`;
                     } else {
-                        html += `meeting_room`;
+                        html += `open_in_new`;
                     }
 
                     html += `       </i>`;
