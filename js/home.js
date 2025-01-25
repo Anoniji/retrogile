@@ -36,10 +36,10 @@ if (username === null) {
                 board_list = ws_data.board_list;
                 $.each(board_list,function(index,value){
                     html = `<div id='col_${index}' class='col'>`;
-                    html += `   <h1 class="board_list">${value[0]}`;
-                    html += `       <i onclick='openBoard("${value[3]}");' class='open_icon material-icons'>`;
+                    html += `   <h1 class="board_list">${value['board_name']}`;
+                    html += `       <i onclick='openBoard("${value['path']}");' class='open_icon material-icons' title='Open board'>`;
 
-                    if (value[1] != value[2]) {
+                    if (value['board_version'] != value['current_version']) {
                         html += `sync_problem`;
                     } else {
                         html += `open_in_new`;
@@ -47,6 +47,7 @@ if (username === null) {
 
                     html += `       </i>`;
                     html += `   </h1>`;
+                    html += `   <div class='board_last_edit'>last edit: ${value['last_edit']}</div>`;
                     html += `</div>`;
                     $('#board').append(html);
                 });

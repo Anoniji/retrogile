@@ -83,7 +83,7 @@ button {
 }
 
 nav {
-box-shadow: 0 0 2px #333333;
+    box-shadow: 0 0 2px #333333;
     background-color: #333333;
     color: #f2f2f2;
     overflow: hidden;
@@ -355,6 +355,17 @@ footer a {
     border-bottom: none !important;
 }
 
+#board .col .board_list i:hover{
+    opacity: .6;
+}
+
+#board .col .board_last_edit {
+    font-size: 12px;
+    margin: 0 0 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, .6);
+}
+
 #board .col .drop_icon, #board .col .add_icon, #board .col .open_icon {
     float: right;
     margin: 2px 15px 0 0;
@@ -365,10 +376,47 @@ footer a {
     margin: 2px 5px 0 0;
 }
 
+#board .col .hide_content {
+    background-color: #333333;
+    width: 64px;
+    height: 5px;
+    border-radius: 3px;
+    position: relative;
+    top: 5px;
+    left: 18px;
+}
+
+#board .col .hide_content::before,
+#board .col .hide_content::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 5px;
+    border-radius: 3px;
+    background-color: inherit;
+}
+
+#board .col .hide_content::before {
+    left: -15px;
+    width: 10px;
+}
+
+#board .col .hide_content::after {
+right: -37px;
+    width: 32px;
+}
+
 #board .col .left_icon, #board .col .right_icon {
     position: absolute;
     cursor: pointer;
-    top: -6px;
+    top: -12px;
+    background-color: #333333;
+    border-radius: 8px;
+    border: 1px solid rgba(242, 242, 242, .2);
+}
+
+#board .col .left_icon:hover, #board .col .right_icon:hover {
+    opacity: .8 !important;
 }
 
 #board .col .left_icon {
@@ -388,6 +436,20 @@ footer a {
     background-color: #333333;
     color: #f2f2f2;
     text-align: right !important;
+}
+
+#board .col .card_child {
+    font-size: 10px;
+    padding: 5px;
+    margin: 5px -5px -3px;
+    background-color: #333333;
+    color: #f2f2f2;
+}
+
+#board .col .card_child i {
+    font-size: 12px;
+    position: relative;
+    top: 2px;
 }
 
 #board .col .card_icon div {
@@ -581,20 +643,19 @@ canvas {
 
 .child_drop {
     display: none;
-    position: absolute;
-    top: 24px;
-    right: 8px;
-    bottom: 8px;
-    width: calc(100% - 52px);
+    margin: 5px -3px -2px;
+    height: 24px;
+    border: 2px dotted rgba(0, 0, 0, .3);
 }
 
-.child_drop .child_drop,
-.child_drop .votes, 
-.child_drop .info_content,
-.child_drop .card_icon .info_author ,
-.child_drop .card_icon .edit_icon,
-.child_drop .card_icon .delete_icon {
+.ui-sortable-helper .child_drop {
     display: none !important;
+}
+
+.ui-state-highlight {
+    background-color: #333333 !important;
+    margin-left: -1px !important;
+    margin-right: -1px !important;
 }
 
 .child_drop li {
@@ -603,6 +664,39 @@ canvas {
 
 .child_drop .card_icon {
     width: 8px !important;
+}
+
+#notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+#notifications {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: -1;
+    border: 1px solid #ccc;
+    border-radius: 0 0 0 3px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.notification {
+    display: none;
+    padding: 6px;
+    font-size: 12px;
+    background-color: #dce8f7;
+    border-color: #dce8f7;
+}
+
+.notification .material-icons {
+    margin-right: 10px;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
 }
 
 @media (max-width: 1020px) {
@@ -630,5 +724,11 @@ canvas {
 
     .list_board .col {
         width: calc(100% - 34px) !important;
+    }
+}
+
+@media (max-width: 512px) {
+    #board_confetti, #board_text_decrease, #board_text_increase {
+        display: none;
     }
 }

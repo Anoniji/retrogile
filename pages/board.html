@@ -37,16 +37,16 @@
             <div class="title">Confetti</div>
         </button>
         <div id="r_menu">
-            <button onclick="cardTextSize('info_content', -1, true);" title="Text Decrease">
+            <button id="board_text_decrease" onclick="cardTextSize('info_content', -1, true);" title="Text Decrease">
                 <i class="material-icons">text_decrease</i>
             </button>
-            <button onclick="cardTextSize('info_content', 1, true);" title="Text Increase">
+            <button id="board_text_increase" onclick="cardTextSize('info_content', 1, true);" title="Text Increase">
                 <i class="material-icons">text_increase</i>
             </button>
             <button id="board_add_bloc" onclick="addCol()" title="Add Column">
                 <i class="material-icons">post_add</i>
             </button>
-            <button id="board_merge_bloc" onclick="mergeCard()" title="Active Merge Card" disabled>
+            <button id="board_merge_bloc" onclick="mergeCard()" title="Toggle Merge Card">
                 <i class="material-icons">call_merge</i>
             </button>
             <button id="board_vote_order" onclick="viewCard()">
@@ -64,6 +64,7 @@
         </div>
     </section>
     <section id="board" class="main_board"></section>
+    <section id="notifications"></section>
     <section id="console">
         <h3><i class="material-icons">terminal</i> Console</h3>
         <div>

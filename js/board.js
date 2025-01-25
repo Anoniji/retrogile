@@ -25,6 +25,15 @@ if (username === null) {
 
 $(function () { $('#console').accordion({ collapsible: true, active: false, heightStyle: 'content' }); });
 
+function showNotification(user, message) {
+    var notification = $('<div class="notification">');
+    notification.append(`<b>${user}</b> ${message}`);
+    $('body #notifications').append(notification);
+    notification.slideDown(300).delay(2000).slideUp(300, function() {
+        // $(this).remove();
+    });
+}
+
 function cardTextSize(className, action, save = false) {
     const elements = document.querySelectorAll(`.${className}`);
     elements.forEach(element => {
@@ -307,7 +316,14 @@ if (username !== null) {
     }
 
     function mergeCard() {
-        $('.child_drop').show();
+        if (board_author != username) return;
+        if ($('#board_merge_bloc i').text() == 'call_merge') {
+            $('#board_merge_bloc i').text('merge')
+            $('.child_drop').show();
+        } else {
+            $('#board_merge_bloc i').text('call_merge')
+            $('.child_drop').hide();
+        }        
     }
 
     function editCard(card_uuid) {
@@ -410,6 +426,19 @@ if (username !== null) {
             author: username,
             board_id: board_id,
             user_id: user_id,
+        }));
+    }
+
+    function moveToChild(parentId, childId) {
+        console.log(`mode ${childId} to ${parentId} parent`);
+        ws.send(JSON.stringify({
+            type: 'card_parent',
+            author: username,
+            board_id: board_id,
+            user_id: user_id,
+            col_id: false,
+            card_uuid: parentId,
+            cardContent: childId,
         }));
     }
 
@@ -595,8 +624,8 @@ if (username !== null) {
                     html = `<div id='col_${index}' data-col='${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
-                        html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>arrow_left</i>`;
-                        html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>arrow_right</i>`;
+                        html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
+                        html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
                     }
                     html += `</h1><ul class='sortable'></ul></div>`;
                     $('#board').append(html);
@@ -606,7 +635,7 @@ if (username !== null) {
                     const sortedData = Object.fromEntries(entries);
 
                     $.each(sortedData, function (uuid, value) {
-                        html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}' data-username="${value.author}">`;
+                        html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}' data-username="${value.author}" data-uuid="${uuid}">`;
                         html += `<div class='card_icon'>`;
                         html += `<div class='info_author'>by ${value.author}</div>`;
                         if (value.author == username) {
@@ -621,13 +650,25 @@ if (username !== null) {
                         }
                         html += `</div>`;
                         html += `<div class='votes' onclick='voteCard("${uuid}");'>${value.votes}</div>
-                            <div class='info_content'>${value.content}</div>
-                            <div class='child_drop'></div>
+                            <div class='info_content'>${value.content}</div>`
+
+                        $.each(value.children, function (_, child) {
+                            html += `<div class="card_child"><i class='material-icons'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
+                        });
+
+                        html += `    <div class='child_drop' data-parentId='${uuid}'>
+                                    </div>
                             </div>`;
                         html += `</li>`;
                         $(`#col_${index} .sortable`).append(html);
                     });
-                    $(`#col_${index} .sortable, #col_${index} .child_drop`).sortable({ items: 'li:not(.unsortable)', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                    $(`#col_${index} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                    $(`#col_${index} .child_drop`).sortable({ 
+                        items: 'li:not(.unsortable)',
+                        placeholder: 'ui-state-highlight',
+                        connectWith: '.sortable, .child_drop',
+                        update: function (e, u) { $('.child_drop').each(function (_, e) { if($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
+                    });
                 });
 
                 $('#board_name').html(ws_data.board_info.board_name);
@@ -636,6 +677,11 @@ if (username !== null) {
                     curr_highlightUser = false;
                     highlightUser(tmps_highlightUser);
                 }
+
+                if (board_author == username && $('#board_merge_bloc i').text() == 'merge') {
+                    $('.child_drop').show();
+                }
+
                 applySavedSize("info_content");
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
@@ -663,11 +709,17 @@ if (username !== null) {
                 html += `</div>`;
                 html += `<div class='votes' onclick='voteCard("${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
                     <div class='info_content'>${ws_data.card_add.cardContent}</div>
-                    <div class='child_drop'></div>
+                    <div class='child_drop' data-parentId='${ws_data.card_uuid}'></div>
                     </div>`;
                 html += `</li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
-                $(`#col_${ws_data.card_add.col_id} .sortable, #col_${ws_data.card_add.col_id} .child_drop`).sortable({ items: 'li:not(.unsortable)', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                $(`#col_${ws_data.card_add.col_id} .child_drop`).sortable({ 
+                        items: 'li:not(.unsortable)',
+                        placeholder: 'ui-state-highlight',
+                        connectWith: '.sortable, .child_drop',
+                        update: function (e, u) { $('.child_drop').each(function (_, e) { if($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
+                });
 
                 if (curr_highlightUser) {
                     let tmps_highlightUser = curr_highlightUser;
@@ -678,6 +730,11 @@ if (username !== null) {
             } else if (ws_data.type == 'card_edit') {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
+
+                if (ws_data.card_view.author != username) {
+                    showNotification(ws_data.card_view.author, 'displays these hidden cards');
+                }
+
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
@@ -702,6 +759,8 @@ if (username !== null) {
                 html = `<div id='col_${ws_data.col_add.colName}' data-col='${ws_data.col_add.colName}' class='col'><h1>${ws_data.col_add.colName}<i onclick='addCard("${ws_data.col_add.colName}");' class='add_icon material-icons'>add</i>`
                 if (board_author == username) {
                     html += `<i onclick='deleteCol("${ws_data.col_add.colName}");' class='drop_icon material-icons'>delete</i>`;
+                    html += `<i onclick='moveCol("left", "${ws_data.col_add.colName}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
+                    html += `<i onclick='moveCol("right", "${ws_data.col_add.colName}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
                 }
                 html += `</h1><ul class='sortable'></ul></div>`;
                 $('#board').append(html);
@@ -725,7 +784,7 @@ if (username !== null) {
                 sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
-            } else if (ws_data.type == 'force_reload' || ws_data.type == 'col_reorder') {
+            } else if (ws_data.type == 'force_reload' || ws_data.type == 'col_reorder' || (ws_data.type == 'card_parent')) {
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,

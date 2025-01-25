@@ -88,13 +88,19 @@ def get_board_list_by_author(author):
                 if data["author"] == author:
                     curr_version = data.get("version", False)
                     if curr_version:
+                        temps_modification = os.path.getmtime(file_path)
+                        date_modification = datetime.datetime.fromtimestamp(temps_modification)
+                        date_format = "%Y-%m-%d %H:%M:%S"
+                        date_format = date_modification.strftime(date_format)
+
                         author_files.append(
-                            [
-                                data["board_name"],
-                                BOARD_VERSION,
-                                curr_version,
-                                file_path,
-                            ]
+                            {
+                                'board_name': data["board_name"],
+                                'board_version': BOARD_VERSION,
+                                'current_version': curr_version,
+                                'path': file_path,
+                                'last_edit': date_format,
+                            }
                         )
     return author_files
 
@@ -140,7 +146,10 @@ def get_board_info_by_id(board_id, username_filter=False):
                             card_data["author"] != username_filter
                             and card_data["hidden"]
                         ):
-                            _tmps["data"][col_name][card_uuid]["content"] = "~~~"
+                            _tmps["data"][
+                                col_name][
+                                card_uuid][
+                                "content"] = "<div class='hide_content'></div>"
 
                 return OrderedDict(_tmps.items())
 
@@ -253,6 +262,38 @@ def board_votes_init(board_id, max_vote):
     return True
 
 
+def find_content_by_id(data, id_to_find, parent=False):
+    """
+    Searches for the given ID within the nested dictionary structure and
+    returns its associated content and the path to the ID.
+
+    Args:
+        data: The dictionary to search.
+        id_to_find: The ID to search for.
+        parent: The name of the parent key (optional, default: False).
+             Used for tracking the path to the ID.
+
+    Returns:
+        A tuple containing:
+          - The content associated with the given ID if found, otherwise None.
+          - A list representing the path to the ID, starting from the root.
+            If the ID is not found, the list is empty.
+    """
+    if not data or not id_to_find:
+        return None, []
+
+    result = False
+    for key, value in data.items():
+        if key == id_to_find:
+            return value, parent
+        elif isinstance(value, dict):
+            result, path = find_content_by_id(value, id_to_find, key)
+        if result:
+            return result, path if parent else path
+
+    return None, []
+
+
 def board_manager_by_id(send_list, board_id, mode, websocket, data):
     """
     Manages board operations based on the specified mode.
@@ -298,6 +339,24 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                 data.get("cardContent")
             )
 
+    elif mode == "card_parent":
+        parentId = data.get("card_uuid")
+        childId = data.get("cardContent")
+
+        parentCard, parentCol = find_content_by_id(
+            board_info["data"], parentId)
+        childCard, childCol = find_content_by_id(
+            board_info["data"], childId)
+
+        if parentCard and childCard:
+            del childCard['pos']
+            del childCard['votes']
+            del childCard['hidden']
+            del childCard['children']
+            board_info["data"][parentCol][parentId]["children"].append(
+                childCard)
+            del board_info["data"][childCol][childId]
+
     elif mode == "card_view":
         for col_name in board_info["data"]:
             for card_uuid, card_data in board_info["data"][col_name].items():
@@ -337,7 +396,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         if mode in ("card_add", "card_edit"):
             message_data["cardContent"] = data["cardContent"]
             if websocket != ws:
-                message_data["cardContent"] = "~~~"
+                message_data["cardContent"] = "<div class='hide_content'></div>"
 
         send_list.append(
             [
@@ -591,6 +650,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
     elif message_type in (
         "card_add",
         "card_edit",
+        "card_parent",
         "card_view",
         "card_vote",
         "card_delete",
