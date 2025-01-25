@@ -286,10 +286,10 @@ def find_content_by_id(data, id_to_find, parent=False):
     for key, value in data.items():
         if key == id_to_find:
             return value, parent
-        elif isinstance(value, dict):
-            result, path = find_content_by_id(value, id_to_find, key)
+        if isinstance(value, dict):
+            result, dic_path = find_content_by_id(value, id_to_find, key)
         if result:
-            return result, path if parent else path
+            return result, dic_path if parent else dic_path
 
     return None, []
 
@@ -340,22 +340,22 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             )
 
     elif mode == "card_parent":
-        parentId = data.get("card_uuid")
-        childId = data.get("cardContent")
+        parent_id = data.get("card_uuid")
+        child_id = data.get("cardContent")
 
-        parentCard, parentCol = find_content_by_id(
-            board_info["data"], parentId)
-        childCard, childCol = find_content_by_id(
-            board_info["data"], childId)
+        parent_card, parent_col = find_content_by_id(
+            board_info["data"], parent_id)
+        child_card, child_col = find_content_by_id(
+            board_info["data"], child_id)
 
-        if parentCard and childCard:
-            del childCard['pos']
-            del childCard['votes']
-            del childCard['hidden']
-            del childCard['children']
-            board_info["data"][parentCol][parentId]["children"].append(
-                childCard)
-            del board_info["data"][childCol][childId]
+        if parent_card and child_card:
+            del child_card['pos']
+            del child_card['votes']
+            del child_card['hidden']
+            del child_card['children']
+            board_info["data"][parent_col][parent_id]["children"].append(
+                child_card)
+            del board_info["data"][child_col][child_id]
 
     elif mode == "card_view":
         for col_name in board_info["data"]:
