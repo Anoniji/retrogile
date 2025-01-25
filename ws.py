@@ -282,7 +282,7 @@ def find_content_by_id(data, id_to_find, parent=False):
     if not data or not id_to_find:
         return None, []
 
-    result = False
+    result, dic_path = (False, False)
     for key, value in data.items():
         if key == id_to_find:
             return value, parent
