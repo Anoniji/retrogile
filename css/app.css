@@ -478,7 +478,7 @@ right: -37px;
     margin: -6px 0 12px;
     min-height: 85px;
     max-height: calc(100vh - 163px - 114px);
-    background-color: #82c3f7;
+    background-color: #d3d3d3;
     scrollbar-width: thin;
     overflow-y: auto;
     overflow-x: hidden;
