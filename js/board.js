@@ -693,7 +693,7 @@ if (username !== null) {
                 log('Vote Session >>> started', 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}">`;
+                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}">`;
                 html += `<div class='card_icon'>`;
                 html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
                 if (ws_data.card_add.author == username) {
