@@ -30,7 +30,7 @@ function showNotification(user, message) {
     notification.append(`<b>${user}</b> ${message}`);
     $('body #notifications').append(notification);
     notification.slideDown(300).delay(2000).slideUp(300, function() {
-        // $(this).remove();
+        $(this).remove();
     });
 }
 
@@ -430,7 +430,6 @@ if (username !== null) {
     }
 
     function moveToChild(parentId, childId) {
-        console.log(`mode ${childId} to ${parentId} parent`);
         ws.send(JSON.stringify({
             type: 'card_parent',
             author: username,
