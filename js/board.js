@@ -613,10 +613,10 @@ if (username !== null) {
                 }
 
                 if (board_author != username) {
-                    $('#board_add_bloc').remove();
+                    $('#board_add_bloc, #board_merge_bloc').remove();
                     $('#board_timer, #board_vote').prop('disabled', true);
                 } else {
-                    $('#board_add_bloc').show();
+                    $('#board_add_bloc, #board_merge_bloc').show();
                 }
 
                 $.each(board_data, function (index, value) {
