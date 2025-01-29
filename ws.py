@@ -157,10 +157,12 @@ def get_board_info_by_id(board_id, username_filter=False):
 
                 for col_name in _tmps["data"]:
                     for card_uuid, card_data in _tmps["data"][col_name].items():
-                        if (
-                            card_data["author"] != username_filter
-                            and not _tmps["users_list"].get(card_data["author"])['card_visibility']
-                        ):
+                        card_visibility = False
+                        user_param = _tmps["users_list"].get(card_data["author"])
+                        if user_param:
+                            card_visibility = user_param['card_visibility']
+
+                        if card_data["author"] != username_filter and not card_visibility:
                             _tmps["data"][
                                 col_name][
                                 card_uuid][
