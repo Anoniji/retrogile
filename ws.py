@@ -367,9 +367,15 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         if parent_card and child_card:
             del child_card['pos']
             del child_card['votes']
-            del child_card['children']
+
             board_info["data"][parent_col][parent_id]["children"].append(
                 child_card)
+
+            if len(child_card['children']) > 0:
+                board_info["data"][parent_col][parent_id]["children"].extend(
+                    child_card['children'])
+
+            del child_card['children']
             del board_info["data"][child_col][child_id]
 
     elif mode == "card_view":
