@@ -311,6 +311,44 @@ def find_content_by_id(data, id_to_find, parent=False):
     return None, []
 
 
+def board_manager_response(ws_lst, data, board_info, card_data):
+    """
+    Constructs and returns a message to be sent to clients regarding board updates.
+
+    Args:
+        ws_lst: A list containing the websocket and a secondary websocket (likely for comparison).
+        data: A dictionary containing the original data received from the client.
+        board_info: A dictionary containing information about the board, including user details.
+        card_data: A tuple containing the mode of the update, board ID, card UUID, and card votes.
+
+    Returns:
+        A list containing the websocket to send the message to and the message itself.
+        The message is a dictionary with the update type, board ID, card UUID, card votes,
+        and the updated card data.
+    """
+    websocket, ws = ws_lst
+    mode, board_id, card_uuid, card_votes = card_data
+    message_data = data.copy()
+    if mode in ("card_add", "card_edit"):
+        message_data["cardContent"] = data["cardContent"]
+        if (
+            websocket != ws
+            and not board_info["users_list"].get(message_data["author"])['card_visibility']
+        ):
+            message_data["cardContent"] = "<div class='hide_content'></div>"
+
+    return [
+        ws,
+        {
+            "type": mode,
+            "board_id": board_id,
+            "card_uuid": card_uuid,
+            "card_votes": card_votes,
+            mode: message_data,
+        },
+    ]
+
+
 def board_manager_by_id(send_list, board_id, mode, websocket, data):
     """
     Manages board operations based on the specified mode.
@@ -426,6 +464,10 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                 message_data["cardContent"] = "<div class='hide_content'></div>"
 
         send_list.append(
+            board_manager_response(
+                (websocket, ws),
+                data, board_info,
+                (mode, board_id, card_uuid, card_votes))
             [
                 ws,
                 {
