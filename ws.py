@@ -454,30 +454,11 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         json.dump(board_info, f, indent=4)
 
     for ws in clients:
-        message_data = data.copy()
-        if mode in ("card_add", "card_edit"):
-            message_data["cardContent"] = data["cardContent"]
-            if (
-                websocket != ws
-                and not board_info["users_list"].get(message_data["author"])['card_visibility']
-            ):
-                message_data["cardContent"] = "<div class='hide_content'></div>"
-
         send_list.append(
             board_manager_response(
                 (websocket, ws),
                 data, board_info,
                 (mode, board_id, card_uuid, card_votes))
-            [
-                ws,
-                {
-                    "type": mode,
-                    "board_id": board_id,
-                    "card_uuid": card_uuid,
-                    "card_votes": card_votes,
-                    mode: message_data,
-                },
-            ]
         )
 
     return send_list
