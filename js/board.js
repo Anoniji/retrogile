@@ -420,7 +420,7 @@ if (username !== null) {
         }));
     }
 
-    function viewCard() {
+    function viewCardToggle() {
         ws.send(JSON.stringify({
             type: 'card_view',
             author: username,
@@ -590,6 +590,7 @@ if (username !== null) {
                 check_timer = ws_data.board_info.timer;
                 check_votes = ws_data.board_info.votes;
                 list_votes = ws_data.board_info.votes_list;
+                list_users = ws_data.board_info.users_list;
 
                 if (check_timer) {
                     const now = new Date();
@@ -617,6 +618,13 @@ if (username !== null) {
                     $('#board_timer, #board_vote').prop('disabled', true);
                 } else {
                     $('#board_add_bloc, #board_merge_bloc').show();
+                }
+
+                if (list_users.hasOwnProperty(username)) {
+                    if (list_users[username]['card_visibility']) {
+                        $('#board_cards_visibility .material-icons').html('visibility_off');
+                        $('#board_cards_visibility .title').html('Hide my cards');
+                    }
                 }
 
                 $.each(board_data, function (index, value) {
@@ -730,8 +738,21 @@ if (username !== null) {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
 
+                notif_txt = 'hide these cards';
+                if(ws_data.card_view.visibility) {
+                    notif_txt = 'show these cards';
+                }
+
                 if (ws_data.card_view.author != username) {
-                    showNotification(ws_data.card_view.author, 'displays these hidden cards');
+                    showNotification(ws_data.card_view.author, notif_txt);
+                } else {
+                    if (ws_data.card_view.hidden) {
+                        $('#board_cards_visibility .material-icons').html('visibility_off');
+                        $('#board_cards_visibility .title').html('Hide my cards');
+                    } else {
+                        $('#board_cards_visibility .material-icons').html('visibility');
+                        $('#board_cards_visibility .title').html('Show my cards');
+                    }
                 }
 
                 ws.send(JSON.stringify({

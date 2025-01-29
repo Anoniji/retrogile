@@ -240,7 +240,7 @@ footer a {
 
 #users .user {
     float: right;
-    transition: opacity .3s linear;
+    transition: opacity .1s linear;
     border-radius: 50%;
     font-size: 12px;
     margin-left: 5px;

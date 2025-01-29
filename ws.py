@@ -15,7 +15,7 @@ from collections import OrderedDict
 import websockets
 
 
-BOARD_VERSION = 3
+BOARD_VERSION = 4
 users = {}
 clients = set()
 POS = 0
@@ -62,6 +62,21 @@ def update_board(board_data_old):
                 child_data["children"] = []
 
         board_data_old["users_list"] = []
+
+    if board_data_old["version"] <= 3:
+        board_data_old["version"] = 4
+
+        new_users_list = {}
+        for user in board_data_old["users_list"]:
+            new_users_list['user'] = {
+                "custom_color": False,
+                "card_visibility": False,
+            }
+        board_data_old["users_list"] = new_users_list
+
+        for category in board_data_old["data"]:
+            for _, child_data in board_data_old["data"][category].items():
+                del child_data["hidden"]
 
     return board_data_old
 
@@ -144,7 +159,7 @@ def get_board_info_by_id(board_id, username_filter=False):
                     for card_uuid, card_data in _tmps["data"][col_name].items():
                         if (
                             card_data["author"] != username_filter
-                            and card_data["hidden"]
+                            and not _tmps["users_list"].get(card_data["author"])['card_visibility']
                         ):
                             _tmps["data"][
                                 col_name][
@@ -252,7 +267,7 @@ def board_votes_init(board_id, max_vote):
     if not board_info:
         return False
 
-    for user in board_info["users_list"]:
+    for user in board_info["users_list"].keys():
         board_info["votes_list"][user] = int(max_vote)
 
     board_path = f"./board/{board_id}.json"
@@ -325,7 +340,6 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             "author": data.get("author"),
             "author_id": data.get("user_id"),
             "content": data.get("cardContent"),
-            "hidden": True,
             "votes": 0,
             "children": [],
         }
@@ -351,17 +365,19 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         if parent_card and child_card:
             del child_card['pos']
             del child_card['votes']
-            del child_card['hidden']
             del child_card['children']
             board_info["data"][parent_col][parent_id]["children"].append(
                 child_card)
             del board_info["data"][child_col][child_id]
 
     elif mode == "card_view":
-        for col_name in board_info["data"]:
-            for card_uuid, card_data in board_info["data"][col_name].items():
-                if card_data["author"] == data.get("author"):
-                    board_info["data"][col_name][card_uuid]["hidden"] = False
+        if data.get("author") in board_info["users_list"].keys():
+            if board_info["users_list"][data.get("author")]["card_visibility"]:
+                data["visibility"] = False
+            else:
+                data["visibility"] = True
+
+            board_info["users_list"][data.get("author")]["card_visibility"] = data["visibility"]
 
     elif mode == "card_vote":
         if (
@@ -395,7 +411,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         message_data = data.copy()
         if mode in ("card_add", "card_edit"):
             message_data["cardContent"] = data["cardContent"]
-            if websocket != ws:
+            if websocket != ws and not board_info["users_list"].get(message_data["author"])['card_visibility']:
                 message_data["cardContent"] = "<div class='hide_content'></div>"
 
         send_list.append(
@@ -496,8 +512,11 @@ def add_user_to_board(board_id, username):
         return False
 
     board_users_list = board_info.get("users_list")
-    if username not in board_users_list:
-        board_info["users_list"].append(username)
+    if username not in board_users_list.keys():
+        board_info["users_list"][username] = {
+            "custom_color": False,
+            "card_visibility": False,
+        }
 
     board_path = f"./board/{board_id}.json"
     with open(board_path, "w", encoding="utf-8") as f:
