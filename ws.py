@@ -68,7 +68,7 @@ def update_board(board_data_old):
 
         new_users_list = {}
         for user in board_data_old["users_list"]:
-            new_users_list['user'] = {
+            new_users_list[user] = {
                 "custom_color": False,
                 "card_visibility": False,
             }
@@ -411,7 +411,10 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         message_data = data.copy()
         if mode in ("card_add", "card_edit"):
             message_data["cardContent"] = data["cardContent"]
-            if websocket != ws and not board_info["users_list"].get(message_data["author"])['card_visibility']:
+            if (
+                websocket != ws
+                and not board_info["users_list"].get(message_data["author"])['card_visibility']
+            ):
                 message_data["cardContent"] = "<div class='hide_content'></div>"
 
         send_list.append(
