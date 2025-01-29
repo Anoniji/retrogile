@@ -27,7 +27,5 @@ jobs:
           echo ${latest_tag} > ./version
           docker build --tag anoniji/retrogile_api:latest -f ./api.Dockerfile .
           docker tag anoniji/retrogile_api:latest anoniji/retrogile_api:${latest_tag}
-          docker tag anoniji/retrogile_api:latest anoniji/retrogile_api:$(date +%s)
-          docker push anoniji/retrogile_api:$(date +%s)
           docker push anoniji/retrogile_api:${latest_tag}
           docker push anoniji/retrogile_api:latest
