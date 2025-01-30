@@ -27,7 +27,9 @@ jobs:
     - name: PyLint with dynamic badge
       uses: Silleellie/pylint-github-action@v1
       with:
-        lint-path: $(git ls-files '*.py')
+        lint-path:  |
+          api.py
+          ws.py
         python-version: ${{ matrix.python-version }}
         requirements-path: requirements.txt
         readme-path: README.md
