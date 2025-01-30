@@ -722,29 +722,6 @@ def message_responce(send_list, websocket, board_id, client_id, data):
 
     elif message_type == "message":
         message_content = data.get("content")
-        if "/see_all_cards" in message_content:
-            board_info = get_board_info_by_id(board_id)
-            if not board_info:
-                return False
-
-            for col_name in board_info["data"]:
-                for card_uuid, _ in board_info["data"][col_name].items():
-                    board_info["data"][col_name][card_uuid]["hidden"] = False
-
-            with open(f"./board/{board_id}.json", "w", encoding="utf-8") as f:
-                json.dump(board_info, f, indent=4)
-
-            return send_list_multi(
-                send_list,
-                clients,
-                {
-                    "type": "force_reload",
-                    "user_id": client_id,
-                    "username": users[client_id]["username"],
-                    "board_id": board_id,
-                },
-            )
-
         send_list = send_list_multi(
             send_list,
             clients,
