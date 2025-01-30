@@ -24,3 +24,9 @@ jobs:
       if: always()
       run: |
         pylint $(git ls-files '*.py')
+    - name: PyLint with dynamic badge
+      uses: Silleellie/pylint-github-action@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        requirements-path: requirements.txt
+        readme-path: README.md
