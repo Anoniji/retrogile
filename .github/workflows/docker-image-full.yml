@@ -26,8 +26,6 @@ jobs:
 
       - name: Auto minify the files
         uses: nizarmah/auto-minify@v3
-        with:
-          overwrite: true
 
       - name: Build and Push the Docker image
         run: |
