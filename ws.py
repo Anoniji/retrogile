@@ -577,6 +577,9 @@ def col_manager_by_board_id(board_id, mode, data):
                 cnt += 1
 
     elif mode == "col_reorder":
+
+        print(type(data.get("colName")), data.get("colName"))
+
         board_info["data"] = OrderedDict(
             (k, board_info["data"][k]) for k in data.get("colName")
         )

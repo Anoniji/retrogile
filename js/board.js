@@ -16,6 +16,14 @@ function removeNonNumeric(str) {
     return str.replace(/[^0-9]/g, '');
 }
 
+function generateColumnBoundaries(numColumns, sectionWidth) {
+    const boundaries = [];
+    for (let i = 0; i < numColumns; i++) {
+        boundaries.push(Math.round(sectionWidth * i));
+    }
+    return boundaries;
+}
+
 function rgbToHex(rgbValue) {
     const match = rgbValue.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
     if (!match) {
@@ -259,6 +267,36 @@ if (username !== null) {
     var curr_highlightUser;
     var maxVoteTotal;
     var stockList = {};
+    let timeout;
+    var colLst;
+
+    $('#board').scroll(function() {
+        $board = $('#board');
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            let scrollPosition = $board.scrollLeft();
+            if (!colLst.includes(scrollPosition)) {
+                adjustScrollbar(scrollPosition);
+            }
+            }, 200);
+        });
+
+        function adjustScrollbar(position) {
+            let closestPosition = colLst[0];
+            let minDifference = Math.abs(position - closestPosition);
+
+            for (let i = 1; i < colLst.length; i++) {
+            let difference = Math.abs(position - colLst[i]);
+            if (difference < minDifference) {
+                minDifference = difference;
+                closestPosition = colLst[i];
+            }
+        }
+
+        $board.animate({
+            scrollLeft: closestPosition
+        }, 500);
+    }
 
     function board_copy_link() {
         try {
@@ -406,7 +444,7 @@ if (username !== null) {
     }
 
     function deleteCard(card_uuid) {
-        col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
+        col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col').toString();
         ws.send(JSON.stringify({
             type: 'card_delete',
             author: username,
@@ -437,7 +475,7 @@ if (username !== null) {
         const elements = $('[data-col]');
         const valeursDataCol = [];
         elements.each(function () {
-            valeursDataCol.push($(this).data('col'));
+            valeursDataCol.push($(this).data('col').toString());
         });
 
         const index = valeursDataCol.indexOf(col_index);
@@ -723,6 +761,7 @@ if (username !== null) {
                     });
                 });
 
+                colLst = generateColumnBoundaries(Object.keys(board_data).length, $('.col').width() + 32);
                 $('#board_name').html(ws_data.board_info.board_name);
                 if (curr_highlightUser) {
                     let tmps_highlightUser = curr_highlightUser;
@@ -820,15 +859,6 @@ if (username !== null) {
                 }
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
-            } else if (ws_data.type == 'col_add') {
-                html = `<div id='col_${ws_data.col_add.colName}' data-col='${ws_data.col_add.colName}' class='col'><h1>${ws_data.col_add.colName}<i onclick='addCard("${ws_data.col_add.colName}");' class='add_icon material-icons'>add</i>`
-                if (board_author == username) {
-                    html += `<i onclick='deleteCol("${ws_data.col_add.colName}");' class='drop_icon material-icons'>delete</i>`;
-                    html += `<i onclick='moveCol("left", "${ws_data.col_add.colName}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
-                    html += `<i onclick='moveCol("right", "${ws_data.col_add.colName}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
-                }
-                html += `</h1><ul class='sortable'></ul></div>`;
-                $('#board').append(html);
             } else if (ws_data.type == 'col_order') {
                 const sortableList = document.querySelector(`#col_${ws_data.col_order.colName} .sortable`);
                 const fragment = document.createDocumentFragment();
@@ -849,7 +879,7 @@ if (username !== null) {
                 sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
-            } else if (ws_data.type == 'force_reload' || ws_data.type == 'col_reorder' || (ws_data.type == 'card_parent')) {
+            } else if (['force_reload', 'col_reorder', 'card_parent', 'col_add'].includes(ws_data.type)) {
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
