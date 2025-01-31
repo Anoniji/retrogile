@@ -233,7 +233,7 @@ footer a {
 #users {
     position: fixed;
     top: 27px;
-    right: 10px;
+    right: 45px;
     left: 150px;
     cursor: default;
 }
@@ -251,6 +251,29 @@ footer a {
 
 #users .user:hover {
     opacity: .6 !important;
+}
+
+#users_custom_color {
+    box-shadow: 0 0 2px #333333;
+    background-color: #333333;
+    padding: 8px 8px 4px;
+    border-radius: 8px;
+    position: fixed;
+    top: 24px;
+    right: 16px;
+    cursor: pointer;
+}
+
+#users_custom_color i {
+    font-size: 20px;
+    color: #f2f2f2;
+}
+
+#custom_color {
+    border: none;
+    position: relative;
+    top: -6px;
+    width: 64px;
 }
 
 #board-params {

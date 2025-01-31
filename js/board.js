@@ -16,6 +16,26 @@ function removeNonNumeric(str) {
     return str.replace(/[^0-9]/g, '');
 }
 
+function rgbToHex(rgbValue) {
+    const match = rgbValue.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if (!match) {
+        throw new Error('Format RGB invalide');
+    }
+    let r = parseInt(match[1], 10);
+    let g = parseInt(match[2], 10);
+    let b = parseInt(match[3], 10);
+
+    r = r.toString(16);
+    g = g.toString(16);
+    b = b.toString(16);
+
+    r = r.length === 1 ? '0' + r : r;
+    g = g.length === 1 ? '0' + g : g;
+    b = b.length === 1 ? '0' + b : b;
+
+    return '#' + r + g + b;
+}
+
 var username = localStorage.getItem('username');
 if (username === null) {
     const pathname = window.location.pathname;
@@ -280,6 +300,28 @@ if (username !== null) {
                 board_id: board_id,
                 maxVote: maxVote,
             }));
+        }
+    }
+
+    $("#custom_color").change(function() {
+        ws.send(JSON.stringify({
+            type: 'user_color',
+            board_id: board_id,
+            username: username,
+            custom_color: $('#custom_color').val(),
+        }));
+        $(this).attr("type", "hidden");
+    });
+ 
+    function setColor() {
+        const $input = $("#custom_color");
+        const currentType = $input.attr("type");
+        if (currentType === "hidden") {
+            current_custom_color = $(`#users div[data-username=${username}]`).children().css('color');
+            console.log(current_custom_color);
+            $input.val(rgbToHex(current_custom_color)).attr("type", "color");
+        } else {
+            $input.attr("type", "hidden");
         }
     }
 
@@ -584,6 +626,9 @@ if (username !== null) {
                         $(`#cursor_${ws_data.user_id}`).animate({ top: `${ws_data.pos_y}px`, left: `${ws_data.pos_x}px` }, 300);
                     }
                 }
+            } else if (ws_data.type == 'user_color') {
+                var $div_username = $(`#users div[data-username=${ws_data.username}]`);
+                $div_username.children().css('color', ws_data.custom_color);
             } else if (ws_data.type == 'board_info') {
                 board_author = ws_data.board_info.author;
                 board_data = ws_data.board_info.data;

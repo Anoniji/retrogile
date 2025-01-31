@@ -21,20 +21,83 @@ clients = set()
 POS = 0
 
 
-def generate_color(_key):
+def username_color(board_id, username):
     """
-    Generates a unique hexadecimal color code based on the given key.
+    Generates a unique hexadecimal color code for a username.
+
+    First, it checks if a custom color is defined for the user in the specified board's JSON file.
+    If a custom color is found, it returns that color. Otherwise, it generates a dark color 
+    based on the username using a SHA256 hash.
 
     Args:
-        key (str): The input key string.
+        board_id (str): The ID of the board.
+        username (str): The username.
 
     Returns:
-        str: The generated hexadecimal color code in the format "#XXXXXX".
+        str: The hexadecimal color code in the format "#RRGGBB".
     """
-    hash_object = hashlib.sha256(_key.encode("utf-8"))
+
+    if board_id:
+        board_path = f"./board/{board_id}.json"
+        if os.path.isfile(board_path):
+            with open(board_path, encoding="utf-8") as f:
+                _tmps = json.load(f)
+
+            user_param = _tmps["users_list"].get(username)
+            if user_param:
+                custom_color = user_param.get('custom_color')
+                if custom_color:
+                    return custom_color
+
+    # If no custom color is found, generate a dark color based on the username.
+    hash_object = hashlib.sha256(username.encode("utf-8"))
     hex_dig = hash_object.hexdigest()
-    color_hex = f"#{hex_dig[:6]}"
+
+    # Convert the first 6 hex characters to integers (representing R, G, and B).
+    r = int(hex_dig[:2], 16)
+    g = int(hex_dig[2:4], 16)
+    b = int(hex_dig[4:6], 16)
+
+    # Adjust the RGB values to ensure a dark color (maximum of 50% brightness).
+    max_value = 128  # 50% of 256
+
+    r = min(r, max_value)
+    g = min(g, max_value)
+    b = min(b, max_value)
+
+    # Format back to hex with padding.
+    color_hex = f"#{r:02x}{g:02x}{b:02x}"
     return color_hex
+
+
+def user_set_color(board_id, data):
+    """
+    Sets a custom color for a user on a specific board.
+
+    Reads the board's JSON file, updates the user's custom color if the user exists,
+    and then writes the updated data back to the file.
+
+    Args:
+        board_id (str): The ID of the board.
+        data (dict): A dictionary containing the username and the desired custom color.
+    """
+
+    if board_id:
+        board_path = f"./board/{board_id}.json"
+        if os.path.isfile(board_path):
+            with open(board_path, encoding="utf-8") as f:
+                _tmps = json.load(f)
+
+            username = data.get('username')
+            if username:
+                user_param = _tmps["users_list"].get(username)
+                if user_param:
+                    # Update the user's custom color.
+                    _tmps["users_list"][username]['custom_color'] = data.get('custom_color')
+
+            # Write the updated data back to the JSON file.
+            with open(board_path, "w", encoding="utf-8") as f:
+                json.dump(_tmps, f, indent=4)
 
 
 def update_board(board_data_old):
@@ -612,7 +675,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         message_username = data.get("username")
         users[client_id] = {
             "username": message_username,
-            "color": generate_color(message_username),
+            "color": username_color(board_id, message_username),
             "board_id": board_id,
         }
 
@@ -643,7 +706,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
                 "user_id": client_id,
                 "username": message_username,
                 "board_id": board_id,
-                "color": generate_color(message_username),
+                "color": username_color(board_id, message_username),
             },
         )
 
@@ -719,6 +782,10 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             clients,
             {"type": message_type, "board_id": board_id, message_type: data},
         )
+
+    elif message_type == "user_color":
+        user_set_color(board_id, data)
+        send_list = send_list_multi(send_list, clients, data)
 
     elif message_type == "message":
         message_content = data.get("content")
