@@ -15,12 +15,18 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Get Tags
         id: tags
         run: |
           git fetch --tags
+
+      - name: Auto minify the files
+        uses: nizarmah/auto-minify@v3
+
       - name: Build and Push the Docker image
         run: |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
