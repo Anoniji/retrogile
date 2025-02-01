@@ -705,17 +705,13 @@ canvas {
     width: 8px !important;
 }
 
-#notification-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-}
-
 #notifications {
     position: fixed;
     top: 0;
-    right: 0;
-    z-index: -1;
+    left: 50vw;
+    width: 250px;
+    margin-left: -125px;
+    z-index: 1;
     border: 1px solid #ccc;
     border-radius: 0 0 0 3px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -723,10 +719,13 @@ canvas {
 
 .notification {
     display: none;
+    text-align: center;
     padding: 6px;
     font-size: 12px;
     background-color: #dce8f7;
     border-color: #dce8f7;
+    overflow: hidden;
+    user-select: none;
 }
 
 .notification .material-icons {

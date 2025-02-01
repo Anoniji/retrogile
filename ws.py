@@ -479,6 +479,20 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             del child_card['children']
             del board_info["data"][child_col][child_id]
 
+    elif mode == "card_unmerge":
+        col_id = data.get("col_id")
+        parent_id = data.get("card_uuid")
+        child_id = data.get("cardContent")
+
+        _tmps = board_info["data"][col_id][parent_id]["children"][int(child_id)]
+        board_info["data"][col_id][card_uuid] = _tmps
+        board_info["data"][col_id][card_uuid]['pos'] = len(
+            board_info["data"][col_id].keys()) + 1
+        board_info["data"][col_id][card_uuid]['votes'] = 0
+        board_info["data"][col_id][card_uuid]['children'] = []
+
+        del board_info["data"][col_id][parent_id]["children"][int(child_id)]
+
     elif mode == "card_view":
         if data.get("author") in board_info["users_list"].keys():
             if board_info["users_list"][data.get("author")]["card_visibility"]:
@@ -767,6 +781,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         "card_add",
         "card_edit",
         "card_parent",
+        "card_unmerge",
         "card_view",
         "card_vote",
         "card_delete",
@@ -804,6 +819,21 @@ def message_responce(send_list, websocket, board_id, client_id, data):
     return send_list
 
 
+def ws_stats():
+    """
+    Prints statistics about users, clients, and the current position.
+    """
+    global users, clients, POS 
+
+    num_users = len(users)
+    print(f"> Total users  : {num_users}")
+
+    num_clients = len(clients)
+    print(f"> Total clients: {num_clients}")
+
+    print(f"> Next position: {POS}")
+    print("-"*25)
+
 async def handler(websocket):
     """
     Handles incoming WebSocket messages and dispatches them to appropriate
@@ -825,12 +855,12 @@ async def handler(websocket):
     # pylint: disable=W0602
     global users, clients, POS
 
-    print("new_client>")
     clients.add(websocket)
     client_id = POS
     board_id = False
     send_list = []
     POS += 1
+    ws_stats()
 
     try:
         while True:
@@ -846,7 +876,7 @@ async def handler(websocket):
             send_list = []
 
     except websockets.exceptions.ConnectionClosedOK:
-        print("close_client>")
+        ws_stats()
 
     finally:
         clients.remove(websocket)
@@ -877,6 +907,7 @@ async def main():
     The server runs indefinitely until it's manually stopped.
     """
     async with websockets.serve(handler, "0.0.0.0", 8009):
+        print('Websocket Started')
         await asyncio.Future()
 
 

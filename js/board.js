@@ -411,6 +411,20 @@ if (username !== null) {
         }        
     }
 
+    function unmergeCard(col_id, parent, cardPos) {
+        if (board_author != username) return;
+        if ($('#board_merge_bloc i').text() == 'call_merge') return;
+        ws.send(JSON.stringify({
+            type: 'card_unmerge',
+            author: username,
+            board_id: board_id,
+            user_id: user_id,
+            col_id: col_id,
+            card_uuid: parent,
+            cardContent: cardPos,
+        }));      
+    }
+
     function editCard(card_uuid) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
         customPrompt(col_id, 'Editing Card content', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
@@ -747,8 +761,10 @@ if (username !== null) {
                         html += `<div class='votes' onclick='voteCard("${uuid}");'>${value.votes}</div>
                             <div class='info_content'>${value.content}</div>`
 
+                        child_cnt = 0;
                         $.each(value.children, function (_, child) {
-                            html += `<div class="card_child"><i class='material-icons'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
+                            html += `<div class="card_child"><i class='material-icons' onclick='unmergeCard("${index}", "${uuid}", "${child_cnt}");'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
+                            child_cnt += 1;
                         });
 
                         html += `    <div class='child_drop' data-parentId='${uuid}'>
@@ -885,7 +901,7 @@ if (username !== null) {
                 sortableList.appendChild(fragment);
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
-            } else if (['force_reload', 'col_reorder', 'card_parent', 'col_add'].includes(ws_data.type)) {
+            } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add'].includes(ws_data.type)) {
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
