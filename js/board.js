@@ -257,35 +257,25 @@ function board_vote_order() {
     });
 }
 
-if (username !== null) {
-    let ws;
-    let reconnectInterval = 1000;
-    let board_author;
-    let user_id = false;
-    var pos_x;
-    var pos_y;
-    var curr_highlightUser;
-    var maxVoteTotal;
-    var stockList = {};
-    let timeout;
-    var colLst;
+var stockList = {};
+let timeout;
+var colLst;
 
-    $('#board').scroll(function() {
-        $board = $('#board');
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            let scrollPosition = $board.scrollLeft();
-            if (!colLst.includes(scrollPosition)) {
-                adjustScrollbar(scrollPosition);
-            }
-            }, 200);
-        });
+function scrollFix() {
+    $board = $('#board');
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        let scrollPosition = $board.scrollLeft();
+        if (!colLst.includes(scrollPosition)) {
+            adjustScrollbar(scrollPosition);
+        }
+    }, 200);
 
-        function adjustScrollbar(position) {
-            let closestPosition = colLst[0];
-            let minDifference = Math.abs(position - closestPosition);
+    function adjustScrollbar(position) {
+        let closestPosition = colLst[0];
+        let minDifference = Math.abs(position - closestPosition);
 
-            for (let i = 1; i < colLst.length; i++) {
+        for (let i = 1; i < colLst.length; i++) {
             let difference = Math.abs(position - colLst[i]);
             if (difference < minDifference) {
                 minDifference = difference;
@@ -297,6 +287,21 @@ if (username !== null) {
             scrollLeft: closestPosition
         }, 500);
     }
+}
+
+if (username !== null) {
+    let ws;
+    let reconnectInterval = 1000;
+    let board_author;
+    let user_id = false;
+    var pos_x;
+    var pos_y;
+    var curr_highlightUser;
+    var maxVoteTotal;
+
+    $('#board').scroll(function() {
+        scrollFix();
+    });
 
     function board_copy_link() {
         try {
@@ -935,4 +940,10 @@ if (username !== null) {
 
 window.onload = () => {
     applySavedSize("info_content");
+};
+
+window.onresize = function(event) {
+    colLst = generateColumnBoundaries($('.col').length, $('.col').width() + 32);
+    scrollFix();
+    console.log('resize');
 };

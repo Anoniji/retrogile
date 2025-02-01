@@ -287,6 +287,7 @@ footer a {
     top: -3px;
     right: -1px;
     width: 64px;
+    border-radius: 0;
 }
 
 #board-params {
@@ -746,7 +747,7 @@ canvas {
         overflow-x: auto !important;
         overflow-y: hidden !important;
         display: flex !important;
-        height: calc(100vh - 148px) !important;
+        height: calc(100vh - 158px) !important;
         scrollbar-width: thin !important;
     }
     .main_board .col {
@@ -756,12 +757,12 @@ canvas {
     }
     .main_board .col ul {
         min-height: initial !important;
-        height: calc(100vh - 163px - 75px) !important;
+        height: calc(100vh - 173px - 75px) !important;
         max-height: initial !important;
     }
 
     .list_board .col {
-        width: calc(100% - 34px) !important;
+        width: calc(100% - 32px) !important;
     }
 }
 
