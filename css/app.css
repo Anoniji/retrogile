@@ -92,7 +92,13 @@ nav {
     border-radius: 8px;
     font-weight: bold;
     cursor: default;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
     user-select: none;
+}
+
+.nav_disconnected {
+    box-shadow: 0 0 2px #b12116;
+    background-color: #b12116;
 }
 
 nav i {
@@ -603,9 +609,11 @@ right: -37px;
 }
 
 #console #board_log {
+    font-family: "Courier New", "Courier", monospace;
     padding: 8px;
     font-size: 12px;
     max-height: calc(100vh - 107px);
+    color: #f2f2f2;
     border-top: 1px solid #f2f2f2;
     overflow-y: auto;
     overflow-x: hidden;
@@ -707,7 +715,7 @@ canvas {
 
 #notifications {
     position: fixed;
-    top: 0;
+    top: -6px;
     left: 50vw;
     width: 250px;
     margin-left: -125px;
@@ -720,7 +728,7 @@ canvas {
 .notification {
     display: none;
     text-align: center;
-    padding: 6px;
+    padding: 12px 6px 6px;
     font-size: 12px;
     background-color: #dce8f7;
     border-color: #dce8f7;

@@ -201,12 +201,15 @@ function customPrompt(col_id, message, defaultValue) {
 }
 
 const log = (text, color) => {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const second = now.getSeconds();
     var board_log = $('#board_log');
-    board_log.append(`<span style='color: ${color}'>${text}</span><br>`);
+    board_log.append(`[${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}.${second.toString().padStart(2, '0')}] <span style='color: ${color}'>${text}</span><br>`);
     var log_height = board_log[0].scrollHeight;
     board_log.animate({ scrollTop: log_height }, 200);
 };
-
 
 function searchKey(object, classes) {
     for (const key in object) {
@@ -218,7 +221,6 @@ function searchKey(object, classes) {
     }
     return false;
 }
-
 
 function board_timer(seconds) {
     const $countdownElement = $('#board_timer .title');
@@ -240,7 +242,6 @@ function board_timer(seconds) {
     $countdownElement.data('intervalId', intervalId);
     updateCount();
 }
-
 
 function board_vote(maxVote) {
     $('#board_vote .title').html(maxVote);
@@ -307,10 +308,8 @@ if (username !== null) {
         try {
             navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
                 if (result.state == 'granted' || result.state == 'prompt') {
+                    showNotification('(!)', 'Board url copied');
                     navigator.clipboard.writeText(window.location.href);
-                    log(username + ' >>> url copied!', 'yellow');
-                } else {
-                    log(username + ' >>> clipboard access denied!', 'red');
                 }
             });
         } catch (err) {
@@ -361,7 +360,6 @@ if (username !== null) {
         const currentType = $input.attr("type");
         if (currentType === "hidden") {
             current_custom_color = $(`#users div[data-username=${username}]`).children().css('color');
-            console.log(current_custom_color);
             $input.val(rgbToHex(current_custom_color)).attr("type", "color");
         } else {
             $input.attr("type", "hidden");
@@ -654,7 +652,7 @@ if (username !== null) {
                 });
             } else if (ws_data.type == 'user_add') {
                 if (user_id != ws_data.user_id && ws_data.board_id == board_id) {
-                    log(ws_data.username + ' >>> connected', 'yellow');
+                    log(`< ${ws_data.username} > connected`, 'yellow');
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`);
 
                     var $div_username = $(`#users div[data-username=${ws_data.username}]`);
@@ -667,7 +665,7 @@ if (username !== null) {
                     }
                 }
             } else if (ws_data.type == 'user_remove') {
-                log(ws_data.username + ' >>> disconnected', 'red');
+                log(`< ${ws_data.username} > disconnected`, 'red');
                 $(`#cursor_${ws_data.user_id}`).hide('fade', 300).remove();
 
                 var $div_username = $(`#users div[data-username=${ws_data.username}]`);
@@ -706,6 +704,11 @@ if (username !== null) {
                     if (username in list_votes) {
                         $('#board_vote .title').html(list_votes[username]);
                     }
+                }
+
+                const url = window.location.href;
+                if (!url.startsWith("https://") && !url.includes("localhost") && !url.includes("127.0.0.1")) {
+                    $('#board_copy_link').remove();
                 }
 
                 $('#board').html('');
@@ -802,7 +805,7 @@ if (username !== null) {
             } else if (ws_data.type == 'start_vote') {
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
                 $('.votes').text('0');
-                log('Vote Session >>> started', 'red');
+                log(`< Vote Session > started`, 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
                 html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}">`;
@@ -877,7 +880,7 @@ if (username !== null) {
                             totalVotes += valeurVote;
                         }
                     });
-                    log(`Total Vote >>> ${totalVotes} / ${maxVoteTotal}`, 'cyan');
+                    log(`< Vote Session > Total: ${totalVotes} / ${maxVoteTotal}`, 'cyan');
                 }
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
@@ -908,7 +911,7 @@ if (username !== null) {
                     username: username,
                 }));
             } else {
-                log(`${ws_data.username} >>> ${ws_data.content}`, 'cyan');
+                log(`< ${ws_data.username} > ${ws_data.content}`, 'white');
             }
         });
 
@@ -924,7 +927,7 @@ if (username !== null) {
         };
 
         ws.onopen = () => {
-            log(username + ' >>> Your are logged!', 'green');
+            $('nav').removeClass('nav_disconnected');
             ws.send(JSON.stringify({
                 type: 'connect',
                 board_id: board_id,
@@ -941,7 +944,8 @@ if (username !== null) {
         };
 
         ws.onclose = () => {
-            log(username + ' >>> Please Wait, your are disconnected!', 'red');
+            showNotification('Please Wait,', 'your are disconnected!');
+            $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
             reconnectInterval *= 2;
         };
@@ -961,5 +965,4 @@ window.onload = () => {
 window.onresize = function(event) {
     colLst = generateColumnBoundaries($('.col').length, $('.col').width() + 32);
     scrollFix();
-    console.log('resize');
 };
