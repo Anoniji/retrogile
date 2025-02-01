@@ -412,6 +412,60 @@ def board_manager_response(ws_lst, data, board_info, card_data):
     ]
 
 
+def children_manager_by_id(board_info, mode, card_uuid, data):
+    """
+    Manages children cards within a board's data structure.
+
+    Args:
+        board_info (dict): A dictionary containing the board's data.
+        mode (str): The mode of operation ("card_parent" or other).
+        card_uuid (str): A UUID (used only if mode is not "card_parent").
+        data (dict): A dictionary containing data relevant to the operation.
+
+    Returns:
+        dict: The modified board_info dictionary.
+    """
+    if mode == "card_parent":
+        parent_id = data.get("card_uuid")
+        child_id = data.get("cardContent")
+
+        parent_card, parent_col = find_content_by_id(
+            board_info["data"], parent_id)
+        child_card, child_col = find_content_by_id(
+            board_info["data"], child_id)
+
+        if parent_card and child_card:
+            del child_card['pos']
+            del child_card['votes']
+
+            board_info["data"][parent_col][parent_id]["children"].append(
+                child_card)
+
+            if len(child_card['children']) > 0:
+                board_info["data"][parent_col][parent_id]["children"].extend(
+                    child_card['children'])
+
+            del child_card['children']
+            del board_info["data"][child_col][child_id]
+
+        return board_info
+
+    card_uuid = uuid.uuid4().hex
+    col_id = data.get("col_id")
+    parent_id = data.get("card_uuid")
+    child_id = data.get("cardContent")
+
+    board_info["data"][col_id][card_uuid] = board_info["data"][
+        col_id][parent_id]["children"][int(child_id)].copy()
+    board_info["data"][col_id][card_uuid]['pos'] = len(
+        board_info["data"][col_id].keys()) + 1
+    board_info["data"][col_id][card_uuid]['votes'] = 0
+    board_info["data"][col_id][card_uuid]['children'] = []
+
+    del board_info["data"][col_id][parent_id]["children"][int(child_id)]
+    return board_info
+
+
 def board_manager_by_id(send_list, board_id, mode, websocket, data):
     """
     Manages board operations based on the specified mode.
@@ -456,42 +510,8 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                 data.get("cardContent")
             )
 
-    elif mode == "card_parent":
-        parent_id = data.get("card_uuid")
-        child_id = data.get("cardContent")
-
-        parent_card, parent_col = find_content_by_id(
-            board_info["data"], parent_id)
-        child_card, child_col = find_content_by_id(
-            board_info["data"], child_id)
-
-        if parent_card and child_card:
-            del child_card['pos']
-            del child_card['votes']
-
-            board_info["data"][parent_col][parent_id]["children"].append(
-                child_card)
-
-            if len(child_card['children']) > 0:
-                board_info["data"][parent_col][parent_id]["children"].extend(
-                    child_card['children'])
-
-            del child_card['children']
-            del board_info["data"][child_col][child_id]
-
-    elif mode == "card_unmerge":
-        col_id = data.get("col_id")
-        parent_id = data.get("card_uuid")
-        child_id = data.get("cardContent")
-
-        _tmps = board_info["data"][col_id][parent_id]["children"][int(child_id)]
-        board_info["data"][col_id][card_uuid] = _tmps
-        board_info["data"][col_id][card_uuid]['pos'] = len(
-            board_info["data"][col_id].keys()) + 1
-        board_info["data"][col_id][card_uuid]['votes'] = 0
-        board_info["data"][col_id][card_uuid]['children'] = []
-
-        del board_info["data"][col_id][parent_id]["children"][int(child_id)]
+    elif mode in ["card_parent", "card_unmerge"]:
+        board_info = children_manager_by_id(board_info, mode, card_uuid, data)
 
     elif mode == "card_view":
         if data.get("author") in board_info["users_list"].keys():
@@ -823,8 +843,6 @@ def ws_stats():
     """
     Prints statistics about users, clients, and the current position.
     """
-    global users, clients, POS 
-
     num_users = len(users)
     print(f"> Total users  : {num_users}")
 
