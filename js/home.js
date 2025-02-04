@@ -32,7 +32,7 @@ if (username === null) {
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
             if (ws_data.type == 'board_list') {
-                $('#board').append('');
+                $('#board').html('');
                 board_list = ws_data.board_list;
                 $.each(board_list,function(index,value){
                     html = `<div id='col_${index}' class='col'>`;
