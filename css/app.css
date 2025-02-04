@@ -208,6 +208,12 @@ nav div {
     float: left;
 }
 
+.list_board_loading {
+    font-size: 14px;
+    line-height: 32px;
+    user-select: none;
+}
+
 #board_access #username_bloc {
     position: relative;
     clear: both;
