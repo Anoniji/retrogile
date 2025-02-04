@@ -80,6 +80,7 @@ button {
     left: 24px;
     width: 164px;
     cursor: pointer;
+    user-select: none;
 }
 
 nav {
@@ -148,12 +149,17 @@ nav div {
     top: 2px;
     width: 128px;
     z-index: 2;
+    user-select: none;
 }
 
 #board_access_bloc {
     background-color: #333333;
     box-shadow: 0 0 2px #333333;
     border-radius: 8px 0 8px 8px;
+}
+
+#board_access_bloc .right button {
+    user-select: none;
 }
 
 #board_icone {
@@ -214,6 +220,7 @@ nav div {
     right: 18px;
     color: #333333;
     cursor: pointer;
+    user-select: none;
 }
 
 #licenses_list {
@@ -278,6 +285,7 @@ footer a {
     top: 24px;
     right: 16px;
     cursor: pointer;
+    user-select: none;
 }
 
 #users_custom_color i {
