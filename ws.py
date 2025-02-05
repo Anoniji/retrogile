@@ -42,12 +42,12 @@ def username_color(board_id, username):
         if os.path.isfile(board_path):
             with open(board_path, encoding="utf-8") as f:
                 _tmps = json.load(f)
-
-            user_param = _tmps["users_list"].get(username)
-            if user_param:
-                custom_color = user_param.get('custom_color')
-                if custom_color:
-                    return custom_color
+                if "users_list" in _tmps and isinstance(_tmps["users_list"], dict):
+                    user_param = _tmps["users_list"].get(username)
+                    if user_param:
+                        custom_color = user_param.get('custom_color')
+                        if custom_color:
+                            return custom_color
 
     # If no custom color is found, generate a dark color based on the username.
     hash_object = hashlib.sha256(username.encode("utf-8"))
@@ -454,6 +454,9 @@ def children_manager_by_id(board_info, mode, card_uuid, data):
     col_id = data.get("col_id")
     parent_id = data.get("card_uuid")
     child_id = data.get("cardContent")
+
+    if card_uuid not in board_info["data"][col_id]:
+        return board_info
 
     board_info["data"][col_id][card_uuid] = board_info["data"][
         col_id][parent_id]["children"][int(child_id)].copy()
