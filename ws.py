@@ -11,6 +11,7 @@ import uuid
 import hashlib
 import asyncio
 import datetime
+from pathlib import Path
 from collections import OrderedDict
 import websockets
 
@@ -45,7 +46,7 @@ def username_color(board_id, username):
                 if "users_list" in _tmps and isinstance(_tmps["users_list"], dict):
                     user_param = _tmps["users_list"].get(username)
                     if user_param:
-                        custom_color = user_param.get('custom_color')
+                        custom_color = user_param.get("custom_color")
                         if custom_color:
                             return custom_color
 
@@ -88,12 +89,12 @@ def user_set_color(board_id, data):
             with open(board_path, encoding="utf-8") as f:
                 _tmps = json.load(f)
 
-            username = data.get('username')
+            username = data.get("username")
             if username:
                 user_param = _tmps["users_list"].get(username)
                 if user_param:
                     # Update the user's custom color.
-                    _tmps["users_list"][username]['custom_color'] = data.get('custom_color')
+                    _tmps["users_list"][username]["custom_color"] = data.get("custom_color")
 
             # Write the updated data back to the JSON file.
             with open(board_path, "w", encoding="utf-8") as f:
@@ -166,18 +167,20 @@ def get_board_list_by_author(author):
                 if data["author"] == author:
                     curr_version = data.get("version", False)
                     if curr_version:
-                        temps_modification = os.path.getmtime(file_path)
-                        date_modification = datetime.datetime.fromtimestamp(temps_modification)
+                        temps_modif = os.path.getmtime(file_path)
+                        date_modif = datetime.datetime.fromtimestamp(
+                            temps_modif)
                         date_format = "%Y-%m-%d %H:%M:%S"
-                        date_format = date_modification.strftime(date_format)
+                        date_format = date_modif.strftime(date_format)
 
                         author_files.append(
                             {
-                                'board_name': data["board_name"],
-                                'board_version': BOARD_VERSION,
-                                'current_version': curr_version,
-                                'path': file_path,
-                                'last_edit': date_format,
+                                "board_uuid": Path(file_path).stem,
+                                "board_name": data["board_name"],
+                                "board_version": BOARD_VERSION,
+                                "current_version": curr_version,
+                                "path": file_path,
+                                "last_edit": date_format,
                             }
                         )
     return author_files
@@ -223,7 +226,7 @@ def get_board_info_by_id(board_id, username_filter=False):
                         card_visibility = False
                         user_param = _tmps["users_list"].get(card_data["author"])
                         if user_param:
-                            card_visibility = user_param['card_visibility']
+                            card_visibility = user_param["card_visibility"]
 
                         if card_data["author"] != username_filter and not card_visibility:
                             _tmps["data"][
@@ -396,7 +399,7 @@ def board_manager_response(ws_lst, data, board_info, card_data):
         message_data["cardContent"] = data["cardContent"]
         if (
             websocket != ws
-            and not board_info["users_list"].get(message_data["author"])['card_visibility']
+            and not board_info["users_list"].get(message_data["author"])["card_visibility"]
         ):
             message_data["cardContent"] = "<div class='hide_content'></div>"
 
@@ -435,17 +438,17 @@ def children_manager_by_id(board_info, mode, card_uuid, data):
             board_info["data"], child_id)
 
         if parent_card and child_card:
-            del child_card['pos']
-            del child_card['votes']
+            del child_card["pos"]
+            del child_card["votes"]
 
             board_info["data"][parent_col][parent_id]["children"].append(
                 child_card)
 
-            if len(child_card['children']) > 0:
+            if len(child_card["children"]) > 0:
                 board_info["data"][parent_col][parent_id]["children"].extend(
-                    child_card['children'])
+                    child_card["children"])
 
-            del child_card['children']
+            del child_card["children"]
             del board_info["data"][child_col][child_id]
 
         return board_info
@@ -455,18 +458,19 @@ def children_manager_by_id(board_info, mode, card_uuid, data):
     parent_id = data.get("card_uuid")
     child_id = data.get("cardContent")
 
-    if card_uuid not in board_info["data"][col_id]:
+    if card_uuid in board_info["data"][col_id]:
         return board_info
 
     board_info["data"][col_id][card_uuid] = board_info["data"][
         col_id][parent_id]["children"][int(child_id)].copy()
-    board_info["data"][col_id][card_uuid]['pos'] = len(
+    board_info["data"][col_id][card_uuid]["pos"] = len(
         board_info["data"][col_id].keys()) + 1
-    board_info["data"][col_id][card_uuid]['votes'] = 0
-    board_info["data"][col_id][card_uuid]['children'] = []
+    board_info["data"][col_id][card_uuid]["votes"] = 0
+    board_info["data"][col_id][card_uuid]["children"] = []
 
     del board_info["data"][col_id][parent_id]["children"][int(child_id)]
     return board_info
+
 
 def board_manager_by_id(send_list, board_id, mode, websocket, data):
     """
@@ -510,8 +514,30 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             ]
         )
 
-    else:
-        print(f"Not implemeted for {mode}")
+    elif mode in ("board_delete", "board_rename"):
+        board_info = get_board_info_by_id(data.get("board_uuid"))
+        board_info_author = board_info.get("author")
+        if board_info_author == data.get("username"):
+            board_uuid = data.get("board_uuid")
+            board_path = f"./board/{board_uuid}.json"
+            if os.path.isfile(board_path):
+
+                if mode == "board_delete":
+                    os.remove(board_path)
+                else:
+                    board_info["board_name"] = data.get("board_name")
+                    with open(board_path, "w", encoding="utf-8") as f:
+                        json.dump(board_info, f, indent=4)
+
+                send_list.append(
+                    [
+                        websocket,
+                        {
+                            "type": "board_list",
+                            "board_list": get_board_list_by_author(data.get("username")),
+                        },
+                    ]
+                )
 
     return send_list
 
@@ -955,7 +981,7 @@ async def main():
     The server runs indefinitely until it's manually stopped.
     """
     async with websockets.serve(handler, "0.0.0.0", 8009):
-        print('Websocket Started')
+        print("Websocket Started")
         await asyncio.Future()
 
 

@@ -592,6 +592,38 @@ right: -37px;
     height: 79px;
 }
 
+#board .col_board ul {
+    margin: -6px 0 0px;
+}
+
+#board .col_board ul li {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+#board .col_board ul li div {
+    display: inline-block;
+    transition: color .3s ease;
+    width: 32%;
+}
+
+#board .col_board ul li .edit_board:hover {
+    color: #2196f3;
+}
+
+#board .col_board ul li .delete_board:hover {
+    color: #F44336;
+}
+
+#board .col_board ul li div i {
+    font-size: 36px;
+    line-height: 82px;
+}
+
+#board .col_board .board_last_edit {
+    border-top: none;
+}
 
 #console {
     position: fixed;

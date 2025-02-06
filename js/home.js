@@ -6,6 +6,11 @@
  *
  */
 
+function removeNonAlphanumeric(str) {
+    if (!str) return false;
+    return str.replace(/[^a-zA-Z0-9]/g, '');
+}
+
 var username = localStorage.getItem('username');
 if (username === null) {
 	location.href = '../';
@@ -15,6 +20,34 @@ if (username === null) {
     let ws;
     let reconnectInterval = 1000;
 
+    function renameBoard(board_uuid) {
+        if (!board_uuid) return;
+        let board_name = prompt('New name for the board');
+        board_name = removeNonAlphanumeric(board_name);
+
+        console.log(board_name);
+
+        if (board_name) {
+            ws.send(JSON.stringify({
+                type: 'board_rename',
+                username: localStorage.getItem('username'),
+                board_uuid: board_uuid,
+                board_name: board_name
+            }));
+        }
+    }
+
+    function deleteBoard(board_uuid) {
+        if (!board_uuid) return;
+        let check_confirm = confirm('Are you sure you want to delete this board?');
+        if (check_confirm) {
+            ws.send(JSON.stringify({
+                type: 'board_delete',
+                username: localStorage.getItem('username'),
+                board_uuid: board_uuid
+            }));
+        }
+    }
 
     function openBoard(board_link) {
         if (!board_link) return;
@@ -27,38 +60,36 @@ if (username === null) {
             ws_path = `wss://wss-${location.hostname}`;
         }
         ws = new WebSocket(ws_path);
-        let isDisconnected = false;
-
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
             if (ws_data.type == 'board_list') {
                 $('#board').html('');
                 board_list = ws_data.board_list;
-                $.each(board_list,function(index,value){
-                    html = `<div id='col_${index}' class='col'>`;
-                    html += `   <h1 class="board_list">${value['board_name']}`;
-                    html += `       <i onclick='openBoard("${value['path']}");' class='open_icon material-icons' title='Open board'>`;
-
+                $.each(board_list,function(_,value){
+                    html = `<div id='col_${value['board_uuid']}' class='col col_board'>`;
+                    html += `   <h1 class="board_list">${value['board_name']}</h1>`;
+                    html += '   <ul>';
+                    html += '       <li>';
+                    html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='Rename board'>edit_note</i></div>`;
+                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='Delete board'>folder_delete</i></div>`;
+                    html += `           <div><i onclick='openBoard("${value['path']}");' class='material-icons' title='Open board'>`;
                     if (value['board_version'] != value['current_version']) {
                         html += `sync_problem`;
                     } else {
-                        html += `open_in_new`;
+                        html += `web`;
                     }
-
-                    html += `       </i>`;
-                    html += `   </h1>`;
+                    html += `       </i></div>`;
+                    html += '       </li>';
+                    html += '   </ul>';
                     html += `   <div class='board_last_edit'>last edit: ${value['last_edit']}</div>`;
                     html += `</div>`;
                     $('#board').append(html);
                 });
-                if (!isDisconnected) {
-                    ws.close();
-                    isDisconnected = true;
-                }
             }
         });
 
         ws.onopen = () => {
+            $('nav').removeClass('nav_disconnected');
             ws.send(JSON.stringify({
                 type: 'board_list',
                 username: localStorage.getItem('username')
@@ -66,10 +97,9 @@ if (username === null) {
         };
 
         ws.onclose = () => {
-            if (!isDisconnected) {
-                setTimeout(connect, reconnectInterval);
-                reconnectInterval *= 2;
-            }
+            $('nav').addClass('nav_disconnected');
+            setTimeout(connect, reconnectInterval);
+            reconnectInterval *= 2;
         };
     }
     connect();
