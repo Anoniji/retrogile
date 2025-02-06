@@ -468,8 +468,55 @@ def children_manager_by_id(board_info, mode, card_uuid, data):
     del board_info["data"][col_id][parent_id]["children"][int(child_id)]
     return board_info
 
-
 def board_manager_by_id(send_list, board_id, mode, websocket, data):
+    """
+    Manages board operations based on the specified mode.
+
+    Args:
+        send_list (list): A list to which messages to be sent are appended. Each item
+                         in the list should be a list containing the websocket and
+                         the message payload (dictionary).
+        board_id (int or str): The ID of the board to operate on (if applicable).
+        mode (str): The operation mode.
+        websocket: The websocket connection object.
+        data (dict):  A dictionary containing request data, potentially including
+                      the "username" key.
+
+    Returns:
+        list: The updated send_list.
+    """
+    if mode == "board_info":       
+        send_list.append(
+            [
+                websocket,
+                {
+                    "type": "board_info",
+                    "board_info": get_board_info_by_id(
+                        board_id, data.get("username", False)
+                    ),
+                    "board_id": board_id,
+                },
+            ]
+        )
+
+    elif mode == "board_list":
+        send_list.append(
+            [
+                websocket,
+                {
+                    "type": "board_list",
+                    "board_list": get_board_list_by_author(data.get("username")),
+                },
+            ]
+        )
+
+    else:
+        print(f"Not implemeted for {mode}")
+
+    return send_list
+
+
+def card_manager_by_id(send_list, board_id, mode, websocket, data):
     """
     Manages board operations based on the specified mode.
 
@@ -697,18 +744,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
     """
 
     message_type = data.get("type")
-    if message_type == "board_list":
-        send_list.append(
-            [
-                websocket,
-                {
-                    "type": "board_list",
-                    "board_list": get_board_list_by_author(data.get("username")),
-                },
-            ]
-        )
-
-    elif message_type == "connect":
+    if message_type == "connect":
         message_username = data.get("username")
         users[client_id] = {
             "username": message_username,
@@ -762,20 +798,11 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             },
         )
 
-    elif message_type == "board_info":
-        send_list.append(
-            [
-                websocket,
-                {
-                    "type": "board_info",
-                    "board_info": get_board_info_by_id(
-                        board_id, data.get("username", False)
-                    ),
-                    "board_id": board_id,
-                },
-            ]
+    elif message_type in ("board_list", "board_info", "board_rename", "board_delete"):
+        send_list = board_manager_by_id(
+            send_list, board_id, message_type, websocket, data
         )
-
+   
     elif message_type == "start_timer":
         timer_in_seconds = data.get("timerInSeconds")
         delta = datetime.timedelta(seconds=int(timer_in_seconds))
@@ -809,7 +836,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         "card_vote",
         "card_delete",
     ):
-        send_list = board_manager_by_id(
+        send_list = card_manager_by_id(
             send_list, board_id, message_type, websocket, data
         )
 
