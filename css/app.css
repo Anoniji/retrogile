@@ -208,6 +208,10 @@ nav div {
     float: left;
 }
 
+#board_access .right .start_board_bnt i {
+    margin-right: 5px;
+}
+
 .list_board_loading {
     font-size: 14px;
     line-height: 32px;
