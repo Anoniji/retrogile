@@ -485,7 +485,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
     Returns:
         list: The updated send_list.
     """
-    if mode == "board_info":       
+    if mode == "board_info":
         send_list.append(
             [
                 websocket,
@@ -802,7 +802,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         send_list = board_manager_by_id(
             send_list, board_id, message_type, websocket, data
         )
-   
+
     elif message_type == "start_timer":
         timer_in_seconds = data.get("timerInSeconds")
         delta = datetime.timedelta(seconds=int(timer_in_seconds))
