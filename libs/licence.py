@@ -8,10 +8,11 @@ Retrogile Licence Manager
 import sys
 import os
 import uuid
-import requests
 import gevent.monkey
 
 gevent.monkey.patch_all()
+
+import requests
 
 
 class LicenceManager:
@@ -63,7 +64,7 @@ class LicenceManager:
         """
         url = f"https://anoniji.dev/retrogile/licence.php?uuid={self.uuid}"
         try:
-            response = requests.get(url, timeout=3)
+            response = requests.get(url, timeout=3, verify=False)
             response.raise_for_status()  # Lève une exception pour les codes d'erreur HTTP
             if response.text.strip() == "True":
                 return  # Licence valide, on ne fait rien
