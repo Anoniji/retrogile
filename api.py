@@ -15,10 +15,9 @@ from flask import Flask, render_template, send_from_directory
 from flask_jsonpify import jsonify
 
 from gevent import monkey
+from libs import licence
 
 monkey.patch_all()
-
-from libs import licence
 
 logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 
