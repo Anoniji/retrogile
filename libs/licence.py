@@ -5,14 +5,14 @@
 Retrogile Licence Manager
 """
 
-import gevent.monkey
-
-gevent.monkey.patch_all() 
-
 import uuid
 import requests
 import sys
 import os
+import gevent.monkey
+
+gevent.monkey.patch_all()
+
 
 class LicenceManager:
     def __init__(self, licence_file="licence.lic"):
@@ -37,9 +37,9 @@ class LicenceManager:
             with open(self.licence_file, "w") as f:
                 f.write(new_uuid)
             return new_uuid
-        else:
-            with open(self.licence_file, "r") as f:
-                return f.read().strip()
+
+        with open(self.licence_file, "r") as f:
+            return f.read().strip()
 
     def validate_licence(self):
         """
@@ -54,7 +54,6 @@ class LicenceManager:
 
             print("Error: Invalid licence.")
             sys.exit(1)
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             print("Error: Unable to contact the licence server.")
             sys.exit(1)
-
