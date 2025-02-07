@@ -461,7 +461,7 @@ def children_manager_by_id(board_info, mode, card_uuid, data):
     if parent_id not in board_info["data"][col_id]:
         return board_info
 
-    if int(child_id) < len(board_info["data"][col_id][parent_id]["children"]):
+    if int(child_id) >= len(board_info["data"][col_id][parent_id]["children"]):
         return board_info
 
     board_info["data"][col_id][card_uuid] = board_info["data"][
