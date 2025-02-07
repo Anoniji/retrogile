@@ -9,10 +9,9 @@ import sys
 import os
 import uuid
 import gevent.monkey
+import requests
 
 gevent.monkey.patch_all(ssl=False)
-
-import requests
 
 
 class LicenceManager:
