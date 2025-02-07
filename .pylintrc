@@ -1,4 +1,5 @@
 [main]
+max-public-methods=2
 max-branches=20
 
 [design]
