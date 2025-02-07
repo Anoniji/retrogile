@@ -1,9 +1,9 @@
 [main]
-max-public-methods=2
 max-branches=20
 
 [design]
 max-locals=20
+max-public-methods=2
 
 [MESSAGES CONTROL]
 disable=W1201,W1203
