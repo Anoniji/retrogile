@@ -27,7 +27,8 @@ class LicenceManager:
         uuid (str): The licence UUID.
 
     Methods:
-        _get_licence_uuid(): Retrieves the licence UUID from the file, or creates it if the file doesn't exist.
+        _get_licence_uuid(): Retrieves the licence UUID from the file, 
+                             or creates it if the file doesn't exist.
         validate_licence(): Validates the licence by contacting the remote server.
     """
     def __init__(self, licence_file="licence.lic"):
