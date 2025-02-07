@@ -5,16 +5,31 @@
 Retrogile Licence Manager
 """
 
-import uuid
-import requests
 import sys
 import os
+import uuid
+import requests
 import gevent.monkey
 
 gevent.monkey.patch_all()
 
 
 class LicenceManager:
+    """
+    Manages the licence verification process for an application.
+
+    This class provides functionality to:
+        - Read or create a licence file containing a UUID.
+        - Validate the licence by contacting a remote server.
+
+    Attributes:
+        licence_file (str, optional): The name of the licence file. Defaults to "licence.lic".
+        uuid (str): The licence UUID.
+
+    Methods:
+        _get_licence_uuid(): Retrieves the licence UUID from the file, or creates it if the file doesn't exist.
+        validate_licence(): Validates the licence by contacting the remote server.
+    """
     def __init__(self, licence_file="licence.lic"):
         """
         Initializes the LicenceManager object.
