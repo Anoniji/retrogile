@@ -5,4 +5,4 @@ max-branches=20
 max-locals=20
 
 [MESSAGES CONTROL]
-disable=W1201,W1203,C0413,too-few-public-methods  
+disable=W1201,W1203,too-few-public-methods  
