@@ -15,6 +15,8 @@ from pathlib import Path
 from collections import OrderedDict
 import websockets
 
+from libs import licence
+
 
 BOARD_VERSION = 4
 users = {}
@@ -989,4 +991,6 @@ async def main():
 
 
 if __name__ == "__main__":
+    licence_manager = licence.LicenceManager()
+    licence_manager.validate_licence()
     asyncio.run(main())
