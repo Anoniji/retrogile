@@ -50,11 +50,11 @@ class LicenceManager:
         """
         if not os.path.exists(self.licence_file):
             new_uuid = uuid.uuid4().hex + uuid.uuid4().hex
-            with open(self.licence_file, "w") as f:
+            with open(self.licence_file, "w", encoding="utf-8") as f:
                 f.write(new_uuid)
             return new_uuid
 
-        with open(self.licence_file, "r") as f:
+        with open(self.licence_file, "r", encoding="utf-8") as f:
             return f.read().strip()
 
     def validate_licence(self):
