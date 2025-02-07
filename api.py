@@ -11,6 +11,8 @@ import uuid
 import datetime
 import logging
 
+from libs import licence
+
 from flask import Flask, render_template, send_from_directory
 from flask_jsonpify import jsonify
 
@@ -215,6 +217,8 @@ def png(path):
 
 if __name__ == "__main__":
     try:
+        licence_manager = licence.LicenceManager()
+        licence_manager.validate_licence()
         app.run(host="0.0.0.0", port=8008, debug=True)
 
     except OSError as e:
