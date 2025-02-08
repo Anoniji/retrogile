@@ -62,7 +62,7 @@ class LicenceManager:
         """
         Validates the licence by contacting the remote server.
         """
-        url = f"https://anoniji.dev/retrogile/licence.php?uuid={self.uuid}"
+        url = f"https://licence.anoniji.ovh/retrogile/licence.php?uuid={self.uuid}"
         try:
             response = requests.get(url, timeout=3)
             response.raise_for_status()  # Lève une exception pour les codes d'erreur HTTP
