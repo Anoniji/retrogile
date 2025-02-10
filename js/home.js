@@ -24,15 +24,26 @@ if (username === null) {
         if (!board_uuid) return;
         let board_name = prompt('New name for the board');
         board_name = removeNonAlphanumericSpace(board_name);
-
-        console.log(board_name);
-
         if (board_name) {
             ws.send(JSON.stringify({
                 type: 'board_rename',
                 username: localStorage.getItem('username'),
                 board_uuid: board_uuid,
                 board_name: board_name
+            }));
+        }
+    }
+
+    function templateBoard(board_uuid) {
+        if (!board_uuid) return;
+        let new_name = prompt('Name for the new board');
+        new_name = removeNonAlphanumericSpace(new_name);
+        if (new_name) {
+            ws.send(JSON.stringify({
+                type: 'board_template',
+                username: localStorage.getItem('username'),
+                board_uuid: board_uuid,
+                new_name: new_name
             }));
         }
     }
@@ -71,8 +82,9 @@ if (username === null) {
                     html += '   <ul>';
                     html += '       <li>';
                     html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='Rename board'>edit_note</i></div>`;
+                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='Copy Template'>folder_copy</i></div>`;
                     html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='Delete board'>folder_delete</i></div>`;
-                    html += `           <div><i onclick='openBoard("${value['path']}");' class='material-icons' title='Open board'>`;
+                    html += `           <div class='open_board'><i onclick='openBoard("${value['path']}");' class='material-icons' title='Open board'>`;
                     if (value['board_version'] != value['current_version']) {
                         html += `sync_problem`;
                     } else {
