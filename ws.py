@@ -519,20 +519,19 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
             ]
         )
 
-    elif mode in ("board_delete", "board_rename"):
+    elif mode in ("board_template", "board_delete", "board_rename"):
         board_info = get_board_info_by_id(data.get("board_uuid"))
         board_info_author = board_info.get("author")
         if board_info_author == data.get("username"):
-            board_uuid = data.get("board_uuid")
-            board_path = f"./board/{board_uuid}.json"
-            if os.path.isfile(board_path):
+            if mode == "board_template":
+                new_board_uuid = uuid.uuid4().hex
+                new_board_path = f"./board/{new_board_uuid}.json"
 
-                if mode == "board_delete":
-                    os.remove(board_path)
-                else:
-                    board_info["board_name"] = data.get("board_name")
-                    with open(board_path, "w", encoding="utf-8") as f:
-                        json.dump(board_info, f, indent=4)
+                board_info["board_name"] = data.get("new_name")
+                for category in board_info["data"]:
+                    board_info["data"][category] = {}
+                with open(new_board_path, "w", encoding="utf-8") as f:
+                    json.dump(board_info, f, indent=4)
 
                 send_list.append(
                     [
@@ -543,6 +542,28 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                         },
                     ]
                 )
+
+            else:
+                board_uuid = data.get("board_uuid")
+                board_path = f"./board/{board_uuid}.json"
+                if os.path.isfile(board_path):
+
+                    if mode == "board_delete":
+                        os.remove(board_path)
+                    else:
+                        board_info["board_name"] = data.get("board_name")
+                        with open(board_path, "w", encoding="utf-8") as f:
+                            json.dump(board_info, f, indent=4)
+
+                    send_list.append(
+                        [
+                            websocket,
+                            {
+                                "type": "board_list",
+                                "board_list": get_board_list_by_author(data.get("username")),
+                            },
+                        ]
+                    )
 
     return send_list
 
@@ -829,7 +850,13 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             },
         )
 
-    elif message_type in ("board_list", "board_info", "board_rename", "board_delete"):
+    elif message_type in (
+        "board_list",
+        "board_info",
+        "board_rename",
+        "board_template",
+        "board_delete",
+    ):
         send_list = board_manager_by_id(
             send_list, board_id, message_type, websocket, data
         )
