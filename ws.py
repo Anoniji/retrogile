@@ -15,7 +15,7 @@ from pathlib import Path
 from collections import OrderedDict
 import websockets
 
-from libs import licence
+from libs import licence, tools
 
 
 BOARD_VERSION = 4
@@ -103,50 +103,6 @@ def user_set_color(board_id, data):
                 json.dump(_tmps, f, indent=4)
 
 
-def update_board(board_data_old):
-    """
-    Updates the given board data.
-
-    This function checks the current version of the board data.
-    If the version is 1, it updates the version to 2 and
-    clears the users_list.
-
-    Args:
-        board_data_old: A dictionary containing the old board data.
-
-    Returns:
-        The updated board data.
-    """
-    if board_data_old["version"] <= 1:
-        board_data_old["version"] = 2
-        board_data_old["users_list"] = []
-
-    if board_data_old["version"] <= 2:
-        board_data_old["version"] = 3
-        for category in board_data_old["data"]:
-            for _, child_data in board_data_old["data"][category].items():
-                child_data["children"] = []
-
-        board_data_old["users_list"] = []
-
-    if board_data_old["version"] <= 3:
-        board_data_old["version"] = 4
-
-        new_users_list = {}
-        for user in board_data_old["users_list"]:
-            new_users_list[user] = {
-                "custom_color": False,
-                "card_visibility": False,
-            }
-        board_data_old["users_list"] = new_users_list
-
-        for category in board_data_old["data"]:
-            for _, child_data in board_data_old["data"][category].items():
-                del child_data["hidden"]
-
-    return board_data_old
-
-
 def get_board_list_by_author(author):
     """
     Retrieves a list of board files authored by a specific user.
@@ -216,7 +172,7 @@ def get_board_info_by_id(board_id, username_filter=False):
                     return False
 
                 if _tmps["version"] != BOARD_VERSION:
-                    _tmps = update_board(_tmps)
+                    _tmps = tools.update_board(_tmps)
                     with open(board_path, "w", encoding="utf-8") as f:
                         json.dump(_tmps, f, indent=4)
 
@@ -268,30 +224,6 @@ def update_timer_in_board(board_id, new_timer_value):
     return False
 
 
-def reset_votes_in_nested_dict(my_dict):
-    """
-    Recursively resets the "votes" value to 0 in a nested dictionary.
-
-    This function iterates through a nested dictionary and sets the value of
-    the "votes" key to 0 for all occurrences.
-    It recursively traverses nested dictionaries to ensure that all "votes"
-    values are reset.
-
-    Args:
-        my_dict (dict): The nested dictionary to be processed.
-
-    Returns:
-        dict: The modified nested dictionary with all "votes" values reset.
-    """
-    for key, value in my_dict.items():
-        if isinstance(value, dict):
-            reset_votes_in_nested_dict(value)
-        elif key == "votes":
-            my_dict[key] = 0
-
-    return my_dict
-
-
 def board_votes_reset_by_id(board_id, max_vote):
     """
     Resets the vote count for a specific board.
@@ -311,7 +243,7 @@ def board_votes_reset_by_id(board_id, max_vote):
     board_info["votes_list"] = {}
     for key, value in board_info["data"].items():
         if isinstance(value, dict):
-            reset_votes_in_nested_dict(value)
+            tools.reset_votes_in_nested_dict(value)
         elif key == "votes":
             board_info["data"][key] = 0
 
@@ -345,38 +277,6 @@ def board_votes_init(board_id, max_vote):
         json.dump(board_info, f, indent=4)
 
     return True
-
-
-def find_content_by_id(data, id_to_find, parent=False):
-    """
-    Searches for the given ID within the nested dictionary structure and
-    returns its associated content and the path to the ID.
-
-    Args:
-        data: The dictionary to search.
-        id_to_find: The ID to search for.
-        parent: The name of the parent key (optional, default: False).
-             Used for tracking the path to the ID.
-
-    Returns:
-        A tuple containing:
-          - The content associated with the given ID if found, otherwise None.
-          - A list representing the path to the ID, starting from the root.
-            If the ID is not found, the list is empty.
-    """
-    if not data or not id_to_find:
-        return None, []
-
-    result, dic_path = (False, False)
-    for key, value in data.items():
-        if key == id_to_find:
-            return value, parent
-        if isinstance(value, dict):
-            result, dic_path = find_content_by_id(value, id_to_find, key)
-        if result:
-            return result, dic_path if parent else dic_path
-
-    return None, []
 
 
 def board_manager_response(ws_lst, data, board_info, card_data):
@@ -434,9 +334,9 @@ def children_manager_by_id(board_info, mode, card_uuid, data):
         parent_id = data.get("card_uuid")
         child_id = data.get("cardContent")
 
-        parent_card, parent_col = find_content_by_id(
+        parent_card, parent_col = tools.find_content_by_id(
             board_info["data"], parent_id)
-        child_card, child_col = find_content_by_id(
+        child_card, child_col = tools.find_content_by_id(
             board_info["data"], child_id)
 
         if parent_card and child_card:
