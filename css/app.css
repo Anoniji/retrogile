@@ -605,15 +605,23 @@ right: -37px;
 #board .col_board ul li div {
     display: inline-block;
     transition: color .3s ease;
-    width: 32%;
+    width: 23%;
 }
 
 #board .col_board ul li .edit_board:hover {
     color: #2196f3;
 }
 
+#board .col_board ul li .template_board:hover {
+    color: #ff9800;
+}
+
 #board .col_board ul li .delete_board:hover {
     color: #F44336;
+}
+
+#board .col_board ul li .open_board:hover {
+    color: #9e9e9e;
 }
 
 #board .col_board ul li div i {
