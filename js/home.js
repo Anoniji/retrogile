@@ -6,9 +6,9 @@
  *
  */
 
-function removeNonAlphanumeric(str) {
-    if (!str) return false;
-    return str.replace(/[^a-zA-Z0-9]/g, '');
+function removeNonAlphanumericSpace(str) {
+    if(!str) return false;
+    return str.replace(/[^a-zA-Z0-9 ]/g, '');
 }
 
 var username = localStorage.getItem('username');
@@ -23,7 +23,7 @@ if (username === null) {
     function renameBoard(board_uuid) {
         if (!board_uuid) return;
         let board_name = prompt('New name for the board');
-        board_name = removeNonAlphanumeric(board_name);
+        board_name = removeNonAlphanumericSpace(board_name);
 
         console.log(board_name);
 
