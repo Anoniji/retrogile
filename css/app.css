@@ -661,6 +661,11 @@ right: -37px;
     color: #f2f2f2;
 }
 
+#console h3 #click_cnt {
+    float: right;
+    padding-right: 3px;
+}
+
 #console h3 i {
     font-size: 13px;
     position: relative;
