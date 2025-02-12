@@ -144,7 +144,10 @@ function escapeHtml(unsafe) {
         .replace(/'/g, '&#039;');
 }
 
+var freeze_board = false;
+var waiting_unfreeze = false;
 function customPrompt(col_id, message, defaultValue) {
+    freeze_board = true;
     $('.custom-prompt').remove();
     const dialog = document.createElement('li');
     dialog.classList.add('custom-prompt');
@@ -175,6 +178,7 @@ function customPrompt(col_id, message, defaultValue) {
         button.addEventListener('click', () => {
             const value = escapeHtml(input.value);
             dialog.remove();
+            freeze_board = false;
             resolve(value);
         });
 
@@ -187,6 +191,7 @@ function customPrompt(col_id, message, defaultValue) {
             if (event.key === 'Enter') {
                 const value = escapeHtml(input.value);
                 dialog.remove();
+                freeze_board = false;
                 resolve(value);
             }
         });
@@ -194,6 +199,7 @@ function customPrompt(col_id, message, defaultValue) {
         document.addEventListener('keyup', (event) => {
             if (event.key === 'Escape') {
                 dialog.remove();
+                freeze_board = false;
                 resolve(null);
             }
         });
@@ -395,6 +401,14 @@ if (username !== null) {
                     cardContent: cardContent.trim(),
                 }));
             }
+            if(waiting_unfreeze) {
+                waiting_unfreeze = false;
+                ws.send(JSON.stringify({
+                    type: 'board_info',
+                    board_id: board_id,
+                    username: username,
+                }));    
+            }
         });
     }
 
@@ -436,6 +450,14 @@ if (username !== null) {
                     card_uuid: card_uuid,
                     cardContent: cardContent.trim(),
                 }));
+            }
+            if(waiting_unfreeze) {
+                waiting_unfreeze = false;
+                ws.send(JSON.stringify({
+                    type: 'board_info',
+                    board_id: board_id,
+                    username: username,
+                }));    
             }
         });
     }
@@ -685,6 +707,10 @@ if (username !== null) {
                 var $div_username = $(`#users div[data-username=${ws_data.username}]`);
                 $div_username.children().css('color', ws_data.custom_color);
             } else if (ws_data.type == 'board_info') {
+                if(freeze_board) {
+                    waiting_unfreeze = true;
+                    return;
+                }
                 board_author = ws_data.board_info.author;
                 board_data = ws_data.board_info.data;
                 check_timer = ws_data.board_info.timer;
