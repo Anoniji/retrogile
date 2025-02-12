@@ -264,6 +264,29 @@ function board_vote_order() {
     });
 }
 
+function randomBetweenZeroAndScreenWidth() {
+    return Math.floor(Math.random() * (window.innerWidth - 32));
+}
+
+function randomBetweenZeroAndScreenHeight() {
+    return Math.floor(Math.random() * (window.innerHeight - 32));
+}
+
+var cnt_clk = 0
+function cursor_clicked(elem) {
+    $(`#${elem}`).css(
+        'opacity', '0').css(
+        'top', `${randomBetweenZeroAndScreenHeight()}px`).css(
+        'left', `${randomBetweenZeroAndScreenWidth()}px`).css(
+        'opacity', '.4');
+
+    cnt_clk += 1;
+    $('#click_cnt').html(`${cnt_clk} dbclicks`);
+    if(cnt_clk % 20 == 0) {
+        play_confetti();
+    }
+}
+
 var stockList = {};
 let timeout;
 var colLst;
@@ -659,7 +682,7 @@ if (username !== null) {
                 $('#users, #cursors').html('');
                 $.each(ws_data.users_list, function (index, value) {
                     if (user_id && user_id != index && value.board_id == board_id) {
-                        $('#cursors').append(`<div id='cursor_${index}' class='cursor'><div class='username'>${value.username}</div></div>`)
+                        $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${value.username}</div></div>`)
                     }
                     if (value.board_id == board_id) {
                         var $div_username = $(`#users div[data-username=${value.username}]`);
@@ -675,7 +698,7 @@ if (username !== null) {
             } else if (ws_data.type == 'user_add') {
                 if (user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(`< ${ws_data.username} > connected`, 'yellow');
-                    $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor'><div class='username'>${ws_data.username}</div></div>`);
+                    $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${ws_data.username}</div></div>`);
 
                     var $div_username = $(`#users div[data-username=${ws_data.username}]`);
                     if ($($div_username).length > 0) {
