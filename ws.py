@@ -192,6 +192,11 @@ def get_board_info_by_id(board_id, username_filter=False):
                                 card_uuid][
                                 "content"] = "<div class='hide_content'></div>"
 
+                        _tmps["data"][
+                            col_name][
+                            card_uuid][
+                            "username_color"] = username_color(board_id, card_data["author"])
+
                 return OrderedDict(_tmps.items())
 
     return False
@@ -304,6 +309,7 @@ def board_manager_response(ws_lst, data, board_info, card_data):
             and not board_info["users_list"].get(message_data["author"])["card_visibility"]
         ):
             message_data["cardContent"] = "<div class='hide_content'></div>"
+        message_data["username_color"] = username_color(board_id, message_data["author"])
 
     return [
         ws,
