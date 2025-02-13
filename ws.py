@@ -698,9 +698,10 @@ def message_responce(send_list, websocket, board_id, client_id, data):
     message_type = data.get("type")
     if message_type == "connect":
         message_username = data.get("username")
+        color_username = username_color(board_id, message_username)
         users[client_id] = {
             "username": message_username,
-            "color": username_color(board_id, message_username),
+            "color": color_username,
             "board_id": board_id,
         }
 
@@ -710,6 +711,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
                 {
                     "type": "connect_status",
                     "user_id": client_id,
+                    "user_color": color_username,
                     "error": False,
                     "board_id": board_id,
                 },
