@@ -391,13 +391,18 @@ if (username !== null) {
     }
 
     $("#custom_color").change(function() {
+        custom_color = $('#custom_color').val();
         ws.send(JSON.stringify({
             type: 'user_color',
             board_id: board_id,
             username: username,
-            custom_color: $('#custom_color').val(),
+            custom_color: custom_color,
         }));
         $(this).attr("type", "hidden");
+        if(!isLightColor(custom_color)) {
+            $('button').animate({color: "#f2f2f2"}, 300);
+        }
+        $('button').animate({backgroundColor: custom_color}, 300); 
     });
  
     function setColor() {
