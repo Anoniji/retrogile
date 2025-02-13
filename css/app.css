@@ -729,6 +729,7 @@ right: -37px;
     border-bottom: 1px solid #333333;
     text-align: center !important;
     margin: 0 !important;
+    border-radius: 0 0 8px 8px !important;
 }
 
 .custom-prompt textarea {
