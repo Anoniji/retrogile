@@ -44,6 +44,22 @@ function rgbToHex(rgbValue) {
     return '#' + r + g + b;
 }
 
+function hexToRgb(hexValue) {
+    hex = hexValue.replace("#", "");
+
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    return { r: r, g: g, b: b };
+}
+
+function isLightColor(color) {
+    const rgb = hexToRgb(color);
+    const light = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+    return light > 128;
+}
+
 var username = localStorage.getItem('username');
 if (username === null) {
     const pathname = window.location.pathname;
@@ -677,6 +693,11 @@ if (username !== null) {
             if (ws_data.type == 'connect_status') {
                 if (!ws_data.error) {
                     user_id = ws_data.user_id;
+                    user_color = ws_data.user_color;
+                    if(!isLightColor(user_color)) {
+                        $('button').animate({color: "#f2f2f2"}, 300);
+                    }
+                    $('button').animate({backgroundColor: user_color}, 300);                  
                 }
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
