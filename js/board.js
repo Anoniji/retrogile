@@ -399,7 +399,9 @@ if (username !== null) {
             custom_color: custom_color,
         }));
         $(this).attr("type", "hidden");
-        if(!isLightColor(custom_color)) {
+        if(isLightColor(custom_color)) {
+            $('button').animate({color: "#333"}, 300);
+        } else {
             $('button').animate({color: "#f2f2f2"}, 300);
         }
         $('button').animate({backgroundColor: custom_color}, 300); 
