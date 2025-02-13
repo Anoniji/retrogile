@@ -101,6 +101,7 @@ if (username === null) {
         });
 
         ws.onopen = () => {
+	    reconnectInterval = 1000;
             $('nav').removeClass('nav_disconnected');
             ws.send(JSON.stringify({
                 type: 'board_list',
