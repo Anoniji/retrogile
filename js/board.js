@@ -16,6 +16,10 @@ function removeNonNumeric(str) {
     return str.replace(/[^0-9]/g, '');
 }
 
+function isNumeric(str) {
+    return !isNaN(parseFloat(str)) && isFinite(str);
+}
+
 function generateColumnBoundaries(numColumns, sectionWidth) {
     const boundaries = [];
     for (let i = 0; i < numColumns; i++) {
@@ -267,6 +271,7 @@ function board_timer(seconds) {
 
 function board_vote(maxVote) {
     $('#board_vote .title').html(maxVote);
+    $('nav #vote_progress').show();
 }
 
 function board_vote_order() {
@@ -544,6 +549,7 @@ if (username !== null) {
         if (board_author != username) return;
         let colName = prompt('Zone name');
         colName = removeNonAlphanumeric(colName);
+        if (isNumeric(colName)) return;
         if (colName) {
             ws.send(JSON.stringify({
                 type: 'col_add',
@@ -552,6 +558,11 @@ if (username !== null) {
                 user_id: user_id,
                 colName: colName,
             }));
+
+            if($('.col').length == 4) {
+                $('.col').addClass('col_5');
+                $('#board_add_bloc').hide();
+            }
         }
     }
 
@@ -629,6 +640,10 @@ if (username !== null) {
     function deleteCol(col_id) {
         if (board_author != username) return;
         if (window.confirm('You really want to delete this column?')) {
+            if($('.col').length == 5) {
+                $('.col').removeClass('col_5');
+                $('#board_add_bloc').show();
+            }
             ws.send(JSON.stringify({
                 type: 'col_delete',
                 author: username,
@@ -704,7 +719,7 @@ if (username !== null) {
                     if(!isLightColor(user_color)) {
                         $('button').animate({color: "#f2f2f2"}, 300);
                     }
-                    $('button').animate({backgroundColor: user_color}, 300);                  
+                    $('button, nav #vote_progress').animate({backgroundColor: user_color}, 300);
                 }
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
@@ -757,6 +772,11 @@ if (username !== null) {
             } else if (ws_data.type == 'user_color') {
                 var $div_username = $(`#users div[data-username=${ws_data.username}]`);
                 $div_username.children().css('color', ws_data.custom_color);
+                ws.send(JSON.stringify({
+                    type: 'board_info',
+                    board_id: board_id,
+                    username: username,
+                }));
             } else if (ws_data.type == 'board_info') {
                 if(freeze_board) {
                     waiting_unfreeze = true;
@@ -780,6 +800,10 @@ if (username !== null) {
                 if (check_votes) {
                     if (username in list_votes) {
                         $('#board_vote .title').html(list_votes[username]);
+                        if(list_votes[username]) {
+                            $('nav #vote_progress').show();
+                            maxVoteTotal = $('#users .user').length * check_votes;
+                        }                    
                     }
                 }
 
@@ -795,11 +819,14 @@ if (username !== null) {
                     return;
                 }
 
+                col_class = 'col';
                 if (board_author != username) {
                     $('#board_add_bloc, #board_merge_bloc').remove();
                     $('#board_timer, #board_vote').prop('disabled', true);
-                } else {
+                } else if(Object.keys(board_data).length < 5) {
                     $('#board_add_bloc, #board_merge_bloc').show();
+                } else {
+                    col_class += ' col_5';
                 }
 
                 if (list_users.hasOwnProperty(username)) {
@@ -810,7 +837,7 @@ if (username !== null) {
                 }
 
                 $.each(board_data, function (index, value) {
-                    html = `<div id='col_${index}' data-col='${index}' class='col'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
+                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
                         html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
@@ -824,8 +851,14 @@ if (username !== null) {
                     const sortedData = Object.fromEntries(entries);
 
                     $.each(sortedData, function (uuid, value) {
-                        html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}' data-username="${value.author}" data-uuid="${uuid}">`;
-                        html += `<div class='card_icon'>`;
+                        html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}' data-username="${value.author}" data-uuid="${uuid}" style="border-color: ${value.username_color}">`;
+                        html += `<div class='card_icon' style='background-color: ${value.username_color}`;
+                        if(isLightColor(value.username_color)) {
+                            html += '; color: #333';
+                        } else {
+                            html += '; border-color: #d3d3d3';
+                        }
+                        html += `'>`;
                         html += `<div class='info_author'>by ${value.author}</div>`;
                         if (value.author == username) {
                             html += `<div class='edit_icon' onclick='editCard("${uuid}");'>
@@ -838,12 +871,25 @@ if (username !== null) {
                             </div>`;
                         }
                         html += `</div>`;
-                        html += `<div class='votes' onclick='voteCard("${uuid}");'>${value.votes}</div>
+
+                        html += `<div class='votes' onclick='voteCard("${uuid}");' style='background-color: ${value.username_color}`;
+                        if(isLightColor(value.username_color)) {
+                            html += '; color: #333';
+                        } else {
+                            html += '; border-color: #d3d3d3';
+                        }
+                        html += `'>${value.votes}</div>
                             <div class='info_content'>${value.content}</div>`
 
                         child_cnt = 0;
                         $.each(value.children, function (_, child) {
-                            html += `<div class="card_child"><i class='material-icons' onclick='unmergeCard("${index}", "${uuid}", "${child_cnt}");'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
+                            html += `<div class="card_child" style='background-color: ${value.username_color}`;
+                            if(isLightColor(value.username_color)) {
+                                html += '; color: #333; border-color: #333';
+                            } else {
+                                html += '; color: #f2f2f2; border-color: #f2f2f2';
+                            }
+                            html += `'><i class='material-icons' onclick='unmergeCard("${index}", "${uuid}", "${child_cnt}");'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
                             child_cnt += 1;
                         });
 
@@ -882,11 +928,16 @@ if (username !== null) {
             } else if (ws_data.type == 'start_vote') {
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
                 $('.votes').text('0');
-                log(`< Vote Session > started`, 'red');
                 board_vote(ws_data.maxVote);
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}">`;
-                html += `<div class='card_icon'>`;
+                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}" style="border-color: ${ws_data.card_add.username_color}">`;
+                html += `<div class='card_icon' style='background-color: ${ws_data.card_add.username_color}`;
+                if(isLightColor(ws_data.card_add.username_color)) {
+                    html += '; color: #333';
+                } else {
+                    html += '; border-color: #d3d3d3';
+                }
+                html += `'>`;
                 html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
                 if (ws_data.card_add.author == username) {
                     html += `<div class='edit_icon' onclick='editCard("${ws_data.card_uuid}");'>
@@ -899,7 +950,13 @@ if (username !== null) {
                     </div>`;
                 }
                 html += `</div>`;
-                html += `<div class='votes' onclick='voteCard("${ws_data.card_uuid}");'>${parseInt(ws_data.card_add.votes)}</div>
+                html += `<div class='votes' onclick='voteCard("${ws_data.card_uuid}");' style='background-color: ${ws_data.card_add.username_color}`;
+                if(isLightColor(ws_data.card_add.username_color)) {
+                    html += '; color: #333';
+                } else {
+                    html += '; border-color: #d3d3d3';
+                }
+                html += `'>${parseInt(ws_data.card_add.votes)}</div>
                     <div class='info_content'>${ws_data.card_add.cardContent}</div>
                     <div class='child_drop' data-parentId='${ws_data.card_uuid}'></div>
                     </div>`;
@@ -948,17 +1005,23 @@ if (username !== null) {
                 }));
             } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
-                if (board_author == username) {
-                    var elementsVotes = $('.votes');
-                    var totalVotes = 0;
-                    elementsVotes.each(function () {
-                        var valeurVote = parseInt($(this).text());
-                        if (!isNaN(valeurVote)) {
-                            totalVotes += valeurVote;
-                        }
-                    });
-                    log(`< Vote Session > Total: ${totalVotes} / ${maxVoteTotal}`, 'cyan');
+                var elementsVotes = $('.votes');
+                var totalVotes = 0;
+                elementsVotes.each(function () {
+                    var valeurVote = parseInt($(this).text());
+                    if (!isNaN(valeurVote)) {
+                        totalVotes += valeurVote;
+                    }
+                });
+
+                pct_votes = 100 - (totalVotes * 100 / maxVoteTotal);
+                $('nav #vote_progress').css('width', `${pct_votes}%`);
+                if (pct_votes < 1) {
+                    showNotification('Voting session', 'is finished!');
+                    $('nav #vote_progress').hide().css('width', '100%');
+
                 }
+
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
             } else if (ws_data.type == 'col_order') {
