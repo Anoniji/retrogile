@@ -529,6 +529,7 @@ if (username !== null) {
                     col_id: col_id,
                     card_uuid: card_uuid,
                 }));
+                $(`.uuid_${card_uuid} .votes`).effect('highlight', { color: "#f2f2f2" }, 700);
             }
         }
     }
@@ -872,7 +873,7 @@ if (username !== null) {
                         }
                         html += `</div>`;
 
-                        html += `<div class='votes' onclick='voteCard("${uuid}");' style='background-color: ${value.username_color}`;
+                        html += `<div class='votes' ondblclick='voteCard("${uuid}");' style='background-color: ${value.username_color}`;
                         if(isLightColor(value.username_color)) {
                             html += '; color: #333';
                         } else {
@@ -950,7 +951,7 @@ if (username !== null) {
                     </div>`;
                 }
                 html += `</div>`;
-                html += `<div class='votes' onclick='voteCard("${ws_data.card_uuid}");' style='background-color: ${ws_data.card_add.username_color}`;
+                html += `<div class='votes' ondblclick='voteCard("${ws_data.card_uuid}");' style='background-color: ${ws_data.card_add.username_color}`;
                 if(isLightColor(ws_data.card_add.username_color)) {
                     html += '; color: #333';
                 } else {
