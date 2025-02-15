@@ -15,7 +15,8 @@ from pathlib import Path
 from collections import OrderedDict
 import websockets
 
-from libs import licence, tools
+from libs import licence, tools, boards
+boards = boards.Board()
 
 
 BOARD_VERSION = 4
@@ -41,16 +42,13 @@ def username_color(board_id, username):
     """
 
     if board_id:
-        board_path = f"./board/{board_id}.json"
-        if os.path.isfile(board_path):
-            with open(board_path, encoding="utf-8") as f:
-                _tmps = json.load(f)
-                if "users_list" in _tmps and isinstance(_tmps["users_list"], dict):
-                    user_param = _tmps["users_list"].get(username)
-                    if user_param:
-                        custom_color = user_param.get("custom_color")
-                        if custom_color:
-                            return custom_color
+        _tmps, _ = boards.get_board(board_id)
+        if "users_list" in _tmps and isinstance(_tmps["users_list"], dict):
+            user_param = _tmps["users_list"].get(username)
+            if user_param:
+                custom_color = user_param.get("custom_color")
+                if custom_color:
+                    return custom_color
 
     # If no custom color is found, generate a dark color based on the username.
     hash_object = hashlib.sha256(username.encode("utf-8"))
@@ -86,21 +84,17 @@ def user_set_color(board_id, data):
     """
 
     if board_id:
-        board_path = f"./board/{board_id}.json"
-        if os.path.isfile(board_path):
-            with open(board_path, encoding="utf-8") as f:
-                _tmps = json.load(f)
+        _tmps, _ = boards.get_board(board_id)
 
-            username = data.get("username")
-            if username:
-                user_param = _tmps["users_list"].get(username)
-                if user_param:
-                    # Update the user's custom color.
-                    _tmps["users_list"][username]["custom_color"] = data.get("custom_color")
+        username = data.get("username")
+        if username:
+            user_param = _tmps["users_list"].get(username)
+            if user_param:
+                # Update the user's custom color.
+                _tmps["users_list"][username]["custom_color"] = data.get("custom_color")
 
-            # Write the updated data back to the JSON file.
-            with open(board_path, "w", encoding="utf-8") as f:
-                json.dump(_tmps, f, indent=4)
+        # Write the updated data back to the JSON file.
+        boards.update_board(board_id, _tmps)
 
 
 def get_board_list_by_author(author):
@@ -163,41 +157,37 @@ def get_board_info_by_id(board_id, username_filter=False):
             - If the board is not found, returns False.
     """
     if board_id:
-        board_path = f"./board/{board_id}.json"
-        if os.path.isfile(board_path):
-            with open(board_path, encoding="utf-8") as f:
-                _tmps = json.load(f)
+        _tmps, _ = boards.get_board(board_id)
 
-                if "version" not in _tmps:
-                    return False
+        if "version" not in _tmps:
+            return False
 
-                if _tmps["version"] != BOARD_VERSION:
-                    _tmps = tools.update_board(_tmps)
-                    with open(board_path, "w", encoding="utf-8") as f:
-                        json.dump(_tmps, f, indent=4)
+        if _tmps["version"] != BOARD_VERSION:
+            _tmps = tools.update_board(_tmps)
+            boards.update_board(board_id, _tmps)
 
-                if not username_filter:
-                    return _tmps
+        if not username_filter:
+            return _tmps
 
-                for col_name in _tmps["data"]:
-                    for card_uuid, card_data in _tmps["data"][col_name].items():
-                        card_visibility = False
-                        user_param = _tmps["users_list"].get(card_data["author"])
-                        if user_param:
-                            card_visibility = user_param["card_visibility"]
+        for col_name in _tmps["data"]:
+            for card_uuid, card_data in _tmps["data"][col_name].items():
+                card_visibility = False
+                user_param = _tmps["users_list"].get(card_data["author"])
+                if user_param:
+                    card_visibility = user_param["card_visibility"]
 
-                        if card_data["author"] != username_filter and not card_visibility:
-                            _tmps["data"][
-                                col_name][
-                                card_uuid][
-                                "content"] = "<div class='hide_content'></div>"
+                if card_data["author"] != username_filter and not card_visibility:
+                    _tmps["data"][
+                        col_name][
+                        card_uuid][
+                        "content"] = "<div class='hide_content'></div>"
 
-                        _tmps["data"][
-                            col_name][
-                            card_uuid][
-                            "username_color"] = username_color(board_id, card_data["author"])
+                _tmps["data"][
+                    col_name][
+                    card_uuid][
+                    "username_color"] = username_color(board_id, card_data["author"])
 
-                return OrderedDict(_tmps.items())
+        return OrderedDict(_tmps.items())
 
     return False
 
@@ -218,12 +208,10 @@ def update_timer_in_board(board_id, new_timer_value):
     of the `new_timer_value` in milliseconds.
     The updated board information is then written to a JSON file.
     """
-    board_info = get_board_info_by_id(board_id)
-    if board_info:
-        board_info["timer"] = int(new_timer_value.timestamp() * 1000)
-        board_path = f"./board/{board_id}.json"
-        with open(board_path, "w", encoding="utf-8") as f:
-            json.dump(board_info, f, indent=4)
+    _tmps = get_board_info_by_id(board_id)
+    if _tmps:
+        _tmps["timer"] = int(new_timer_value.timestamp() * 1000)
+        boards.update_board(board_id, _tmps)
         return True
 
     return False
@@ -240,22 +228,23 @@ def board_votes_reset_by_id(board_id, max_vote):
     Returns:
         bool: True if the reset was successful, False otherwise.
     """
-    board_info = get_board_info_by_id(board_id)
-    if not board_info:
+    _tmps = get_board_info_by_id(board_id)
+    if not _tmps:
         return False
 
-    board_info["votes"] = int(max_vote)
-    board_info["votes_list"] = {}
-    for key, value in board_info["data"].items():
+    if not max_vote:
+        _tmps["votes"] = False
+    else:
+        _tmps["votes"] = int(max_vote)
+
+    _tmps["votes_list"] = {}
+    for key, value in _tmps["data"].items():
         if isinstance(value, dict):
             tools.reset_votes_in_nested_dict(value)
         elif key == "votes":
-            board_info["data"][key] = 0
+            _tmps["data"][key] = 0
 
-    board_path = f"./board/{board_id}.json"
-    with open(board_path, "w", encoding="utf-8") as f:
-        json.dump(board_info, f, indent=4)
-
+    boards.update_board(board_id, _tmps)
     return True
 
 
@@ -270,17 +259,17 @@ def board_votes_init(board_id, max_vote):
     Returns:
         bool: True if the initialization was successful, False otherwise.
     """
-    board_info = get_board_info_by_id(board_id)
-    if not board_info:
+    _tmps = get_board_info_by_id(board_id)
+    if not _tmps:
         return False
 
-    for user in board_info["users_list"].keys():
-        board_info["votes_list"][user] = int(max_vote)
+    if not max_vote:
+        _tmps["users_list"] = {}
+    else:
+        for user in _tmps["users_list"].keys():
+            _tmps["votes_list"][user] = int(max_vote)
 
-    board_path = f"./board/{board_id}.json"
-    with open(board_path, "w", encoding="utf-8") as f:
-        json.dump(board_info, f, indent=4)
-
+    boards.update_board(board_id, _tmps)
     return True
 
 
@@ -458,8 +447,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                         os.remove(board_path)
                     else:
                         board_info["board_name"] = data.get("board_name")
-                        with open(board_path, "w", encoding="utf-8") as f:
-                            json.dump(board_info, f, indent=4)
+                        boards.update_board(board_id, board_info)
 
                     send_list.append(
                         [
@@ -554,10 +542,7 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
         ):
             del board_info["data"][data.get("col_id")][data.get("card_uuid")]
 
-    board_path = f"./board/{board_id}.json"
-    with open(board_path, "w", encoding="utf-8") as f:
-        json.dump(board_info, f, indent=4)
-
+    boards.update_board(board_id, board_info)
     for ws in clients:
         send_list.append(
             board_manager_response(
@@ -629,9 +614,7 @@ def col_manager_by_board_id(board_id, mode, data):
 
         del board_info["data"][data.get("colName")]
 
-    board_path = f"./board/{board_id}.json"
-    with open(board_path, "w", encoding="utf-8") as f:
-        json.dump(board_info, f, indent=4)
+    boards.update_board(board_id, board_info)
     return True
 
 
@@ -657,10 +640,7 @@ def add_user_to_board(board_id, username):
             "card_visibility": False,
         }
 
-    board_path = f"./board/{board_id}.json"
-    with open(board_path, "w", encoding="utf-8") as f:
-        json.dump(board_info, f, indent=4)
-
+    boards.update_board(board_id, board_info)
     return True
 
 
@@ -703,6 +683,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
 
     message_type = data.get("type")
     if message_type == "connect":
+        boards.add_client(board_id)
         message_username = data.get("username")
         color_username = username_color(board_id, message_username)
         users[client_id] = {
@@ -839,6 +820,12 @@ def ws_stats():
     """
     Prints statistics about users, clients, and the current position.
     """
+
+    print("-"*25)
+
+    num_boards = len(boards.boards)
+    print(f"> Boards loaded: {num_boards}")
+
     num_users = len(users)
     print(f"> Total users  : {num_users}")
 
@@ -846,7 +833,7 @@ def ws_stats():
     print(f"> Total clients: {num_clients}")
 
     print(f"> Next position: {POS}")
-    print("-"*25)
+
 
 async def handler(websocket):
     """
@@ -883,6 +870,7 @@ async def handler(websocket):
             send_list = message_responce(
                 send_list, websocket, board_id, client_id, data
             )
+
             if len(send_list) > 0:
                 for ws_client, message in send_list:
                     await ws_client.send(json.dumps(message))
@@ -909,6 +897,7 @@ async def handler(websocket):
                 )
 
         if client_id in users:
+            boards.remove_client(board_id)
             del users[client_id]
 
 
