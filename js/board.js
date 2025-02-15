@@ -270,8 +270,14 @@ function board_timer(seconds) {
 }
 
 function board_vote(maxVote) {
-    $('#board_vote .title').html(maxVote);
-    $('nav #vote_progress').show();
+
+    if(maxVote == 0) {
+        $('#board_vote .title').html('Vote');
+        $('nav #vote_progress').hide();
+    } else {
+        $('#board_vote .title').html(maxVote);
+        $('nav #vote_progress').show();
+    }
 }
 
 function board_vote_order() {
