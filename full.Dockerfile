@@ -8,5 +8,7 @@ COPY ./ ./
 RUN apk add --update alpine-sdk
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN apk del git
+
 RUN chmod +x ./run.sh
 CMD [ "./run.sh" ]
