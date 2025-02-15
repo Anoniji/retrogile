@@ -68,7 +68,7 @@ class Board:
         Args:
             board_id (str): The ID of the board.
         """
-        board, clients = self.get_board(board_id)  # Loads the board if it's not already in self.boards
+        board, _ = self.get_board(board_id)
         if board:
             self.boards[board_id]["clients"] += 1
 
@@ -79,7 +79,7 @@ class Board:
         Args:
             board_id (str): The ID of the board.
         """
-        board, clients = self.get_board(board_id)
+        board, _ = self.get_board(board_id)
         if board:
             self.boards[board_id]["clients"] -= 1
             if self.boards[board_id]["clients"] == 0:
@@ -93,15 +93,15 @@ class Board:
             board_id (str): The ID of the board.
             new_data (dict): The new data for the board.
         """
-        board, clients = self.get_board(board_id)
+        board, _ = self.get_board(board_id)
 
         if board:
             try:
                 json_file = f"./board/{board_id}.json"
                 with open(json_file, 'w', encoding="utf-8") as f:
-                    json.dump(new_data, f, indent=4)  # Write the updated JSON file
+                    json.dump(new_data, f, indent=4)
 
-                self.boards[board_id]['data'] = new_data  # Update the in-memory data
+                self.boards[board_id]['data'] = new_data
 
             except FileNotFoundError:
                 print(f"Error: The JSON file '{json_file}' was not found.")
