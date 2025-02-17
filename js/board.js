@@ -28,7 +28,18 @@ function generateColumnBoundaries(numColumns, sectionWidth) {
     return boundaries;
 }
 
+function getFirstLetters(username) {
+    if (typeof username !== 'string' || username.length === 0) {
+        return "<i class='material-icons'>face</i>";
+    }
+    return '<span>' + username.charAt(0).toUpperCase() + '</span>';
+}
+
 function rgbToHex(rgbValue) {
+    if(rgbValue.includes("none")) {
+        rgbValue = rgbValue.split(' none', 1)[0];
+    }
+    
     const match = rgbValue.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
     if (!match) {
         throw new Error('Format RGB invalide');
@@ -422,7 +433,7 @@ if (username !== null) {
         const $input = $("#custom_color");
         const currentType = $input.attr("type");
         if (currentType === "hidden") {
-            current_custom_color = $(`#users div[data-username=${username}]`).children().css('color');
+            current_custom_color = $(`#users div[data-username=${username}]`).css('background');
             $input.val(rgbToHex(current_custom_color)).attr("type", "color");
         } else {
             $input.attr("type", "hidden");
@@ -740,7 +751,12 @@ if (username !== null) {
                             var currentCount = parseInt($div_username.attr('data-count'));
                             $div_username.attr('data-count', currentCount + 1);
                         } else {
-                            $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");'><i class='material-icons' style='color: ${value.color}'>face</i></div>`)
+                            if(isLightColor(value.color)) {
+                                txt_color = 'color: #333;';
+                            } else {
+                                txt_color = 'color: #f2f2f2;';
+                            }
+                            $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}</div>`)
                             $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
                         }
                     }
@@ -755,7 +771,12 @@ if (username !== null) {
                         var currentCount = parseInt($div_username.attr('data-count'));
                         $div_username.attr('data-count', currentCount + 1);
                     } else {
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' onclick='highlightUser("${ws_data.username}");'><i class='material-icons' style='color: ${ws_data.color}'>face</i></div>`)
+                        if(isLightColor(ws_data.color)) {
+                            txt_color = 'color: #333;';
+                        } else {
+                            txt_color = 'color: #f2f2f2;';
+                        }
+                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' onclick='highlightUser("${ws_data.username}");' style='${txt_color}background: ${ws_data.color}'>${getFirstLetters(ws_data.username)}</div>`)
                         $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
                     }
                 }
@@ -778,7 +799,12 @@ if (username !== null) {
                 }
             } else if (ws_data.type == 'user_color') {
                 var $div_username = $(`#users div[data-username=${ws_data.username}]`);
-                $div_username.children().css('color', ws_data.custom_color);
+                if(isLightColor(ws_data.custom_color)) {
+                    $div_username.css('color', '#333');
+                } else {
+                    $div_username.css('color', '#f2f2f2');
+                }
+                $div_username.css('background', ws_data.custom_color);
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
