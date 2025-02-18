@@ -1,26 +1,26 @@
 <!doctype html>
-<html lang="fr">
+<html lang="{{ translates.lang }}">
 
 <head>
     <title>Retrogile</title>
 
     <!-- meta -->
     <meta charset="utf-8">
-    <meta name="description" content="Agile Retrospective Management Tool">
+    <meta name="description" content="{{ translates.description }}">
     <meta name="author" content="Niji Ano">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="./img/favicon.png" />
 
     <!-- Dublin Core -->
     <meta name="DC.Creator" content="niji, ano">
-    <meta name="DC.Language" content="en">
+    <meta name="DC.Language" content="{{ translates.lang }}">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Retrogile">
-    <meta name="twitter:description" content="Agile Retrospective Management Tool">
+    <meta name="twitter:description" content="{{ translates.description }}">
     <!-- Sociaux -->
     <meta property="og:title" content="Retrogile">
-    <meta property="og:description" content="Agile Retrospective Management Tool">
+    <meta property="og:description" content="{{ translates.description }}">
     
     <!-- links -->
     <link rel="icon" type="image/png" href="./img/favicon.png" />
@@ -37,22 +37,22 @@
         <div id="nav_logo"></div>
         <div id="board_access_bloc">
             <div id="username_bloc">
-                <input type="text" id="username" placeholder="Username (First name + 3rd letter of last name)" maxlength="32">
+                <input type="text" id="username" placeholder="{{ translates.index_1 }}" maxlength="32">
                 <i id="username_cleaner" class="material-icons">cleaning_services</i>
             </div>
             <div>
-                <input type="text" id="boardname" placeholder="Board name" maxlength="32">
+                <input type="text" id="boardname" placeholder="{{ translates.index_2 }}" maxlength="32">
             </div>
             <div class="right">
-                <button class="list_board_btn" onclick="list_board()" title="List of boards"><i class="material-icons">list</i></button>
+                <button class="list_board_btn" onclick="list_board()" title="{{ translates.index_3 }}"><i class="material-icons">list</i></button>
                 <button class="start_board_bnt" onclick="start_board()">
-                    <i class="material-icons">east</i><div class="label_button">Create a new board</div>
+                    <i class="material-icons">east</i><div class="label_button">{{ translates.index_4 }}</div>
                 </button>
             </div>
         </div>
     </div>
     <footer>
-        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="./LICENSES">Show list of external libraries and their licenses</a>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="./LICENSES">{{ translates.footer }}</a>
     </footer>
 
     <script src="./js/jquery.min.js"></script>
