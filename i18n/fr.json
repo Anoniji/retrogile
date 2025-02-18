@@ -1,0 +1,28 @@
+{
+	"lang": "fr",
+	"description": "Agile Retrospective Management Tool",
+
+	"index_1": "Nom d'utilisateur (Prénom + 1ème lettre du nom)",
+	"index_2": "Nom du board",
+	"index_3": "Liste des bords",
+	"index_4": "Créer un nouveau board",
+
+	"licenses_1": "Liste des bibliothèques externes et leurs licences",
+
+	"board_1": "Définir la couleur de l'utilisateur",
+	"board_2": "Minuteur",
+	"board_3": "Voter",
+	"board_4": "Confetti",
+	"board_5": "Réduire le texte",
+	"board_6": "Agrandir le texte",
+	"board_7": "Ajouter une colonne",
+	"board_8": "Basculer la fusion des cartes",
+	"board_9": "Afficher mes cartes",
+	"board_10": "Trier les votes",
+	"board_11": "Copier le lien du board",
+	"board_12": "Discussion",
+	"board_13": "Publier un message sur la discussion du board",
+
+	"loading": "Chargement...",
+	"footer": "Liste des bibliothèques externes et leurs licences"
+}
