@@ -37,6 +37,30 @@ if os.path.isfile("version"):
 
 
 def load_translate(lang):
+    """Loads translation data from a JSON file.
+
+    This function attempts to load a translation file for the specified language.
+    If the file is found, it parses the JSON data and returns it as a dictionary.
+    If the specified language file is not found, it defaults to loading the
+    English translation (en.json).
+
+    Args:
+        lang: The language code (e.g., "fr", "es", "en") for the desired translation.
+
+    Returns:
+        A dictionary containing the translation data.  Returns the English
+        translation if the requested language file is not found.
+
+    Raises:
+        FileNotFoundError: If the default English translation file (en.json) is
+                         also not found.  (While the current code catches
+                         FileNotFoundError for the target language, it assumes
+                         en.json *must* exist.  A robust version might handle
+                         this case more explicitly).
+        json.JSONDecodeError: If either the target language file or the English
+                             default file contains invalid JSON.  (This isn't
+                             explicitly handled in the code but is a possibility).
+    """
     try:
         with open(f"./i18n/{lang}.json", "r", encoding="utf-8") as f:
             return json.load(f)
