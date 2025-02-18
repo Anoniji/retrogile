@@ -1,26 +1,26 @@
 <!doctype html>
-<html lang="fr">
+<html lang="{{ translates.lang }}">
 
 <head>
     <title>Retrogile</title>
 
     <!-- meta -->
     <meta charset="utf-8">
-    <meta name="description" content="Agile Retrospective Management Tool">
+    <meta name="description" content="{{ translates.description }}">
     <meta name="author" content="Niji Ano">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="../img/favicon.png" />
 
     <!-- Dublin Core -->
     <meta name="DC.Creator" content="niji, ano">
-    <meta name="DC.Language" content="en">
+    <meta name="DC.Language" content="{{ translates.lang }}">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Retrogile">
-    <meta name="twitter:description" content="Agile Retrospective Management Tool">
+    <meta name="twitter:description" content="{{ translates.description }}">
     <!-- Sociaux -->
     <meta property="og:title" content="Retrogile">
-    <meta property="og:description" content="Agile Retrospective Management Tool">
+    <meta property="og:description" content="{{ translates.description }}">
     
     <!-- links -->
     <link rel="icon" type="image/png" href="../img/favicon.png" />
@@ -35,13 +35,13 @@
         <div id="users"></div>
         <div id="vote_progress"></div>
     </nav>
-    <div id="users_custom_color" title="Set Username Color">
+    <div id="users_custom_color" title="{{ translates.board_1 }}">
         <i class="material-icons" onclick="setColor()">palette</i>
         <input type="hidden" id="custom_color" name="custom_color">
     </div>
 
     <section id="loader">
-        <div>Loading...</div>
+        <div>{{ translates.loading }}</div>
     </section>
     <section id="cursors"></section>
     <section id="wallpaper"></section>
@@ -49,35 +49,35 @@
     <section id="board-params">
         <div id="board_name"></div>
         <button id="board_timer" onclick="startTimer()">
-            <i class="material-icons">timer</i><div class="title">Timer</div>
+            <i class="material-icons">timer</i><div class="title">{{ translates.board_2 }}</div>
         </button>
         <button id="board_vote" onclick="startVote()">
-            <i class="material-icons">how_to_vote</i><div class="title">Vote</div>
+            <i class="material-icons">how_to_vote</i><div class="title">{{ translates.board_3 }}</div>
         </button>
         <button id="board_confetti" onclick="startConfetti()">
-            <i class="material-icons">celebration</i><div class="title">Confetti</div>
+            <i class="material-icons">celebration</i><div class="title">{{ translates.board_4 }}</div>
         </button>
         <div id="r_menu">
-            <button id="board_text_decrease" onclick="cardTextSize('info_content', -1, true);" title="Text Decrease">
+            <button id="board_text_decrease" onclick="cardTextSize('info_content', -1, true);" title="{{ translates.board_5 }}">
                 <i class="material-icons">text_decrease</i>
             </button>
-            <button id="board_text_increase" onclick="cardTextSize('info_content', 1, true);" title="Text Increase">
+            <button id="board_text_increase" onclick="cardTextSize('info_content', 1, true);" title="{{ translates.board_6 }}">
                 <i class="material-icons">text_increase</i>
             </button>
-            <button id="board_add_bloc" onclick="addCol()" title="Add Column">
+            <button id="board_add_bloc" onclick="addCol()" title="{{ translates.board_7 }}">
                 <i class="material-icons">post_add</i>
             </button>
-            <button id="board_merge_bloc" onclick="mergeCard()" title="Toggle Merge Card">
+            <button id="board_merge_bloc" onclick="mergeCard()" title="{{ translates.board_8 }}">
                 <i class="material-icons">call_merge</i>
             </button>
             <button id="board_cards_visibility" onclick="viewCardToggle()">
-                <i class="material-icons">visibility</i><div class="title">Show my cards</div>
+                <i class="material-icons">visibility</i><div class="title">{{ translates.board_9 }}</div>
             </button>
             <button id="board_vote_order" onclick="board_vote_order()">
-                <i class="material-icons">filter_list</i><div class="title">Sort votes</div>
+                <i class="material-icons">filter_list</i><div class="title">{{ translates.board_10 }}</div>
             </button>
             <button id="board_copy_link" onclick="board_copy_link()">
-                <i class="material-icons">content_copy</i><div class="title">Copy Board link</div>
+                <i class="material-icons">content_copy</i><div class="title">{{ translates.board_11 }}</div>
             </button>
         </div>
     </section>
@@ -85,20 +85,20 @@
     <section id="notifications"></section>
     <section id="console">
         <h3>
-            <i class="material-icons">chat</i> Discussion
+            <i class="material-icons">chat</i> {{ translates.board_12 }}
             <span id="click_cnt"></span>
         </h3>
         <div>
             <div id="board_log"></div>
             <form id="form">
-                <input type="text" id="chat_msg" placeholder="Post message on Board discussion">
+                <input type="text" id="chat_msg" placeholder="{{ translates.board_13 }}">
             </form>
         </div>
     </section>
 
     <section class="emitter"></section>
     <footer>
-        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="../LICENSES">Show list of external libraries and their licenses</a>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="../LICENSES">{{ translates.footer }}</a>
     </footer>
 
     <script src="../js/jquery.min.js"></script>
