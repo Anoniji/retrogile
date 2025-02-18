@@ -11,7 +11,7 @@ import uuid
 import datetime
 import logging
 
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from flask_jsonpify import jsonify
 
 from gevent import monkey
@@ -27,10 +27,26 @@ logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 app = Flask(__name__, template_folder="./pages/")
 current_year = datetime.datetime.now().year
 CURRENT_VERSION = "1.0dev"
+LIST_LANGS = ['fr', 'en']
 
 if os.path.isfile("version"):
     with open("version", "r", encoding="utf-8") as file_version:
         CURRENT_VERSION = file_version.read().strip()
+
+# ///////////////////////////////////////////////////////////////////////
+
+
+def load_translate(lang):
+    try:
+        with open(f"./i18n/{lang}.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    except FileNotFoundError:
+        with open("./i18n/en.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+
+
+# ///////////////////////////////////////////////////////////////////////
 
 
 @app.route("/")
@@ -43,9 +59,11 @@ def index():
         - Otherwise: Returns a JSON response
     """
     if os.path.isfile("./pages/index.html"):
+        lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
             "index.html", current_year=current_year,
-            current_version=CURRENT_VERSION
+            current_version=CURRENT_VERSION,
+            translates=load_translate(lang)
         )
 
     return jsonify(["index_not_found"])
@@ -61,9 +79,11 @@ def licenses():
         - Otherwise: Returns a JSON response
     """
     if os.path.isfile("./pages/licenses.html"):
+        lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
             "licenses.html", current_year=current_year,
-            current_version=CURRENT_VERSION
+            current_version=CURRENT_VERSION,
+            translates=load_translate(lang)
         )
 
     return jsonify(["licenses_not_found"])
@@ -125,9 +145,11 @@ def home():
         - Otherwise: Returns a JSON response
     """
     if os.path.isfile("./pages/home.html"):
+        lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
             "home.html", current_year=current_year,
-            current_version=CURRENT_VERSION
+            current_version=CURRENT_VERSION,
+            translates=load_translate(lang)
         )
 
     return jsonify(["board_not_found"])
@@ -146,9 +168,11 @@ def board(board_id):
              otherwise a JSON response indicating the board is not found.
     """
     if os.path.isfile("./pages/board.html"):
+        lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
             "board.html", current_year=current_year,
-            current_version=CURRENT_VERSION, board_id=board_id
+            current_version=CURRENT_VERSION, board_id=board_id,
+            translates=load_translate(lang)
         )
 
     return jsonify(["board_not_found"])
