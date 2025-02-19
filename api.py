@@ -259,6 +259,25 @@ def png(path):
     return jsonify(["png_not_found"])
 
 
+@app.route("/i18n/<string:path>", methods=["GET"])
+def i18n(path):
+    """
+    Retrieves a i18n json from the specified path.
+
+    Args:
+        path (str): The relative path to the i18n json
+
+    Returns:
+        flask.Response:
+            - If the i18n is found, returns the i18n content.
+            - If the i18n is not found, returns a JSON response
+    """
+    if os.path.isfile("i18n/" + path):
+        return send_from_directory("i18n", path, mimetype="application/json")
+
+    return jsonify(["i18n_not_found"])
+
+
 # ///////////////////////////////////////////////////////////////////////
 
 
