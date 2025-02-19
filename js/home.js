@@ -15,14 +15,23 @@ var username = localStorage.getItem('username');
 if (username === null) {
 	location.href = '../';
 } else {
-    $( "#board_name" ).html(`List of "${username}" boards`);
+    $.ajax({
+        dataType: "json",
+        url: '/i18n/' + lang + '.json',
+        async: false, 
+        success: function(translations) {
+            window.i18n = translations;
+        }
+    });
+
+    $( "#board_name" ).html(`${window.i18n['board_js_1']} "${username}" ${window.i18n['board_js_2']}`);
 
     let ws;
     let reconnectInterval = 1000;
 
     function renameBoard(board_uuid) {
         if (!board_uuid) return;
-        let board_name = prompt('New name for the board');
+        let board_name = prompt(window.i18n['board_js_3']);
         board_name = removeNonAlphanumericSpace(board_name);
         if (board_name) {
             ws.send(JSON.stringify({
@@ -36,7 +45,7 @@ if (username === null) {
 
     function templateBoard(board_uuid) {
         if (!board_uuid) return;
-        let new_name = prompt('Name for the new board');
+        let new_name = prompt(window.i18n['board_js_4']);
         new_name = removeNonAlphanumericSpace(new_name);
         if (new_name) {
             ws.send(JSON.stringify({
@@ -50,7 +59,7 @@ if (username === null) {
 
     function deleteBoard(board_uuid) {
         if (!board_uuid) return;
-        let check_confirm = confirm('Are you sure you want to delete this board?');
+        let check_confirm = confirm(window.i18n['board_js_5']);
         if (check_confirm) {
             ws.send(JSON.stringify({
                 type: 'board_delete',
@@ -81,10 +90,10 @@ if (username === null) {
                     html += `   <h1 class="board_list">${value['board_name']}</h1>`;
                     html += '   <ul>';
                     html += '       <li>';
-                    html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='Rename board'>edit_note</i></div>`;
-                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='Copy Template'>folder_copy</i></div>`;
-                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='Delete board'>folder_delete</i></div>`;
-                    html += `           <div class='open_board'><i onclick='openBoard("${value['path']}");' class='material-icons' title='Open board'>`;
+                    html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='${window.i18n['board_js_6']}'>edit_note</i></div>`;
+                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='${window.i18n['board_js_7']}'>folder_copy</i></div>`;
+                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='${window.i18n['board_js_8']}'>folder_delete</i></div>`;
+                    html += `           <div class='open_board'><i onclick='openBoard("${value['path']}");' class='material-icons' title='${window.i18n['board_js_9']}'>`;
                     if (value['board_version'] != value['current_version']) {
                         html += `sync_problem`;
                     } else {
@@ -93,7 +102,7 @@ if (username === null) {
                     html += `       </i></div>`;
                     html += '       </li>';
                     html += '   </ul>';
-                    html += `   <div class='board_last_edit'>last edit: ${value['last_edit']}</div>`;
+                    html += `   <div class='board_last_edit'>${window.i18n['board_js_10']}${value['last_edit']}</div>`;
                     html += `</div>`;
                     $('#board').append(html);
                 });
