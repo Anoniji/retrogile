@@ -358,6 +358,15 @@ function scrollFix() {
 }
 
 if (username !== null) {
+    $.ajax({
+        dataType: "json",
+        url: '/i18n/' + lang + '.json',
+        async: false, 
+        success: function(translations) {
+            window.i18n = translations;
+        }
+    });
+    
     let ws;
     let reconnectInterval = 1000;
     let board_author;
@@ -426,7 +435,7 @@ if (username !== null) {
         } else {
             $('button').animate({color: "#f2f2f2"}, 300);
         }
-        $('button').animate({backgroundColor: custom_color}, 300); 
+        $('button, #vote_progress').animate({backgroundColor: custom_color}, 300); 
     });
  
     function setColor() {
@@ -742,6 +751,7 @@ if (username !== null) {
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
                 $.each(ws_data.users_list, function (index, value) {
+                    console.log(`${user_id} && ${user_id} != ${index} && ${value.board_id} == ${board_id}`);
                     if (user_id && user_id != index && value.board_id == board_id) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${value.username}</div></div>`)
                     }
@@ -762,6 +772,7 @@ if (username !== null) {
                     }
                 });
             } else if (ws_data.type == 'user_add') {
+                console.log(`${user_id} != ${ws_data.user_id} && ${ws_data.board_id} == ${board_id}`);
                 if (user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(`< ${ws_data.username} > connected`, 'yellow');
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${ws_data.username}</div></div>`);
@@ -1118,7 +1129,7 @@ if (username !== null) {
         };
 
         ws.onclose = () => {
-            showNotification('Please Wait,', 'your are disconnected!');
+            showNotification(window.i18n['ws_1'], window.i18n['ws_2']);
             $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
             reconnectInterval *= 2;
