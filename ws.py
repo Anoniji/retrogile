@@ -292,7 +292,7 @@ def board_manager_response(ws_lst, data, board_info, card_data):
     mode, board_id, card_uuid, card_votes = card_data
     message_data = data.copy()
     if mode in ("card_add", "card_edit"):
-        message_data["cardContent"] = data["cardContent"]
+        message_data["cardContent"] = tools.remove_symbols(data["cardContent"])
         if (
             websocket != ws
             and not board_info["users_list"].get(message_data["author"])["card_visibility"]
@@ -622,7 +622,7 @@ def col_manager_by_board_id(board_id, mode, data):
         if data.get("colName") in board_info["data"]:
             return False
 
-        board_info["data"][data.get("colName")] = {}
+        board_info["data"][tools.remove_symbols(data.get("colName"))] = {}
 
     elif mode == "col_order":
         cnt = 0
