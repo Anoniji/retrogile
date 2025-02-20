@@ -36,10 +36,10 @@ function getFirstLetters(username) {
 }
 
 function rgbToHex(rgbValue) {
-    if(rgbValue.includes("none")) {
+    if (rgbValue.includes("none")) {
         rgbValue = rgbValue.split(' none', 1)[0];
     }
-    
+
     const match = rgbValue.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
     if (!match) {
         throw new Error('Format RGB invalide');
@@ -88,7 +88,7 @@ function showNotification(user, message) {
     var notification = $('<div class="notification">');
     notification.append(`<b>${user}</b> ${message}`);
     $('body #notifications').append(notification);
-    notification.slideDown(300).delay(2000).slideUp(300, function() {
+    notification.slideDown(300).delay(2000).slideUp(300, function () {
         $(this).remove();
     });
 }
@@ -282,7 +282,7 @@ function board_timer(seconds) {
 
 function board_vote(maxVote) {
 
-    if(maxVote == 0) {
+    if (maxVote == 0) {
         $('#board_vote .title').html('Vote');
         $('nav #vote_progress').hide();
     } else {
@@ -314,13 +314,13 @@ var cnt_clk = 0
 function cursor_clicked(elem) {
     $(`#${elem}`).css(
         'opacity', '0').css(
-        'top', `${randomBetweenZeroAndScreenHeight()}px`).css(
-        'left', `${randomBetweenZeroAndScreenWidth()}px`).css(
-        'opacity', '.4');
+            'top', `${randomBetweenZeroAndScreenHeight()}px`).css(
+                'left', `${randomBetweenZeroAndScreenWidth()}px`).css(
+                    'opacity', '.4');
 
     cnt_clk += 1;
     $('#click_cnt').html(`${cnt_clk} dbclicks`);
-    if(cnt_clk % 20 == 0) {
+    if (cnt_clk % 20 == 0) {
         play_confetti();
     }
 }
@@ -332,7 +332,7 @@ var colLst;
 function scrollFix() {
     $board = $('#board');
     clearTimeout(timeout);
-    timeout = setTimeout(function() {
+    timeout = setTimeout(function () {
         let scrollPosition = $board.scrollLeft();
         if (!colLst.includes(scrollPosition)) {
             adjustScrollbar(scrollPosition);
@@ -358,15 +358,6 @@ function scrollFix() {
 }
 
 if (username !== null) {
-    $.ajax({
-        dataType: "json",
-        url: '/i18n/' + lang + '.json',
-        async: false, 
-        success: function(translations) {
-            window.i18n = translations;
-        }
-    });
-    
     let ws;
     let reconnectInterval = 1000;
     let board_author;
@@ -376,7 +367,7 @@ if (username !== null) {
     var curr_highlightUser;
     var maxVoteTotal;
 
-    $('#board').scroll(function() {
+    $('#board').scroll(function () {
         scrollFix();
     });
 
@@ -421,7 +412,7 @@ if (username !== null) {
         }
     }
 
-    $("#custom_color").change(function() {
+    $("#custom_color").change(function () {
         custom_color = $('#custom_color').val();
         ws.send(JSON.stringify({
             type: 'user_color',
@@ -430,14 +421,14 @@ if (username !== null) {
             custom_color: custom_color,
         }));
         $(this).attr("type", "hidden");
-        if(isLightColor(custom_color)) {
-            $('button').animate({color: "#333"}, 300);
+        if (isLightColor(custom_color)) {
+            $('button').animate({ color: "#333" }, 300);
         } else {
-            $('button').animate({color: "#f2f2f2"}, 300);
+            $('button').animate({ color: "#f2f2f2" }, 300);
         }
-        $('button, #vote_progress').animate({backgroundColor: custom_color}, 300); 
+        $('button, #vote_progress').animate({ backgroundColor: custom_color }, 300); 
     });
- 
+
     function setColor() {
         const $input = $("#custom_color");
         const currentType = $input.attr("type");
@@ -478,13 +469,13 @@ if (username !== null) {
                     cardContent: cardContent.trim(),
                 }));
             }
-            if(waiting_unfreeze) {
+            if (waiting_unfreeze) {
                 waiting_unfreeze = false;
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
                     username: username,
-                }));    
+                }));
             }
         });
     }
@@ -497,7 +488,7 @@ if (username !== null) {
         } else {
             $('#board_merge_bloc i').text('call_merge')
             $('.child_drop').hide();
-        }        
+        }
     }
 
     function unmergeCard(col_id, parent, cardPos) {
@@ -511,7 +502,7 @@ if (username !== null) {
             col_id: col_id,
             card_uuid: parent,
             cardContent: cardPos,
-        }));      
+        }));
     }
 
     function editCard(card_uuid) {
@@ -528,13 +519,13 @@ if (username !== null) {
                     cardContent: cardContent.trim(),
                 }));
             }
-            if(waiting_unfreeze) {
+            if (waiting_unfreeze) {
                 waiting_unfreeze = false;
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
                     username: username,
-                }));    
+                }));
             }
         });
     }
@@ -586,7 +577,7 @@ if (username !== null) {
                 colName: colName,
             }));
 
-            if($('.col').length == 4) {
+            if ($('.col').length == 4) {
                 $('.col').addClass('col_5');
                 $('#board_add_bloc').hide();
             }
@@ -667,7 +658,7 @@ if (username !== null) {
     function deleteCol(col_id) {
         if (board_author != username) return;
         if (window.confirm('You really want to delete this column?')) {
-            if($('.col').length == 5) {
+            if ($('.col').length == 5) {
                 $('.col').removeClass('col_5');
                 $('#board_add_bloc').show();
             }
@@ -743,10 +734,10 @@ if (username !== null) {
                 if (!ws_data.error) {
                     user_id = ws_data.user_id;
                     user_color = ws_data.user_color;
-                    if(!isLightColor(user_color)) {
-                        $('button').animate({color: "#f2f2f2"}, 300);
+                    if (!isLightColor(user_color)) {
+                        $('button').animate({ color: "#f2f2f2" }, 300);
                     }
-                    $('button, nav #vote_progress').animate({backgroundColor: user_color}, 300);
+                    $('button, nav #vote_progress').animate({ backgroundColor: user_color }, 300);
                 }
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
@@ -761,7 +752,7 @@ if (username !== null) {
                             var currentCount = parseInt($div_username.attr('data-count'));
                             $div_username.attr('data-count', currentCount + 1);
                         } else {
-                            if(isLightColor(value.color)) {
+                            if (isLightColor(value.color)) {
                                 txt_color = 'color: #333;';
                             } else {
                                 txt_color = 'color: #f2f2f2;';
@@ -782,7 +773,7 @@ if (username !== null) {
                         var currentCount = parseInt($div_username.attr('data-count'));
                         $div_username.attr('data-count', currentCount + 1);
                     } else {
-                        if(isLightColor(ws_data.color)) {
+                        if (isLightColor(ws_data.color)) {
                             txt_color = 'color: #333;';
                         } else {
                             txt_color = 'color: #f2f2f2;';
@@ -810,7 +801,7 @@ if (username !== null) {
                 }
             } else if (ws_data.type == 'user_color') {
                 var $div_username = $(`#users div[data-username=${ws_data.username}]`);
-                if(isLightColor(ws_data.custom_color)) {
+                if (isLightColor(ws_data.custom_color)) {
                     $div_username.css('color', '#333');
                 } else {
                     $div_username.css('color', '#f2f2f2');
@@ -822,7 +813,7 @@ if (username !== null) {
                     username: username,
                 }));
             } else if (ws_data.type == 'board_info') {
-                if(freeze_board) {
+                if (freeze_board) {
                     waiting_unfreeze = true;
                     return;
                 }
@@ -844,10 +835,10 @@ if (username !== null) {
                 if (check_votes) {
                     if (username in list_votes) {
                         $('#board_vote .title').html(list_votes[username]);
-                        if(list_votes[username]) {
+                        if (list_votes[username]) {
                             $('nav #vote_progress').show();
                             maxVoteTotal = $('#users .user').length * check_votes;
-                        }                    
+                        }
                     }
                 }
 
@@ -867,7 +858,7 @@ if (username !== null) {
                 if (board_author != username) {
                     $('#board_add_bloc, #board_merge_bloc').remove();
                     $('#board_timer, #board_vote').prop('disabled', true);
-                } else if(Object.keys(board_data).length < 5) {
+                } else if (Object.keys(board_data).length < 5) {
                     $('#board_add_bloc, #board_merge_bloc').show();
                 } else {
                     col_class += ' col_5';
@@ -897,7 +888,7 @@ if (username !== null) {
                     $.each(sortedData, function (uuid, value) {
                         html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}' data-username="${value.author}" data-uuid="${uuid}" style="border-color: ${value.username_color}">`;
                         html += `<div class='card_icon' style='background-color: ${value.username_color}`;
-                        if(isLightColor(value.username_color)) {
+                        if (isLightColor(value.username_color)) {
                             html += '; color: #333';
                         } else {
                             html += '; border-color: #d3d3d3';
@@ -917,7 +908,7 @@ if (username !== null) {
                         html += `</div>`;
 
                         html += `<div class='votes' ondblclick='voteCard("${uuid}");' style='background-color: ${value.username_color}`;
-                        if(isLightColor(value.username_color)) {
+                        if (isLightColor(value.username_color)) {
                             html += '; color: #333';
                         } else {
                             html += '; border-color: #d3d3d3';
@@ -928,7 +919,7 @@ if (username !== null) {
                         child_cnt = 0;
                         $.each(value.children, function (_, child) {
                             html += `<div class="card_child" style='background-color: ${value.username_color}`;
-                            if(isLightColor(value.username_color)) {
+                            if (isLightColor(value.username_color)) {
                                 html += '; color: #333; border-color: #333';
                             } else {
                                 html += '; color: #f2f2f2; border-color: #f2f2f2';
@@ -944,11 +935,11 @@ if (username !== null) {
                         $(`#col_${index} .sortable`).append(html);
                     });
                     $(`#col_${index} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
-                    $(`#col_${index} .child_drop`).sortable({ 
+                    $(`#col_${index} .child_drop`).sortable({
                         items: 'li:not(.unsortable)',
                         placeholder: 'ui-state-highlight',
                         connectWith: '.sortable, .child_drop',
-                        update: function (e, u) { $('.child_drop').each(function (_, e) { if($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
+                        update: function (e, u) { $('.child_drop').each(function (_, e) { if ($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
                     });
                 });
 
@@ -976,7 +967,7 @@ if (username !== null) {
             } else if (ws_data.type == 'card_add') {
                 html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}" style="border-color: ${ws_data.card_add.username_color}">`;
                 html += `<div class='card_icon' style='background-color: ${ws_data.card_add.username_color}`;
-                if(isLightColor(ws_data.card_add.username_color)) {
+                if (isLightColor(ws_data.card_add.username_color)) {
                     html += '; color: #333';
                 } else {
                     html += '; border-color: #d3d3d3';
@@ -995,7 +986,7 @@ if (username !== null) {
                 }
                 html += `</div>`;
                 html += `<div class='votes' ondblclick='voteCard("${ws_data.card_uuid}");' style='background-color: ${ws_data.card_add.username_color}`;
-                if(isLightColor(ws_data.card_add.username_color)) {
+                if (isLightColor(ws_data.card_add.username_color)) {
                     html += '; color: #333';
                 } else {
                     html += '; border-color: #d3d3d3';
@@ -1008,10 +999,10 @@ if (username !== null) {
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
                 $(`#col_${ws_data.card_add.col_id} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
                 $(`#col_${ws_data.card_add.col_id} .child_drop`).sortable({ 
-                        items: 'li:not(.unsortable)',
-                        placeholder: 'ui-state-highlight',
-                        connectWith: '.sortable, .child_drop',
-                        update: function (e, u) { $('.child_drop').each(function (_, e) { if($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
+                    items: 'li:not(.unsortable)',
+                    placeholder: 'ui-state-highlight',
+                    connectWith: '.sortable, .child_drop',
+                    update: function (e, u) { $('.child_drop').each(function (_, e) { if ($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
                 });
 
                 if (curr_highlightUser) {
@@ -1025,7 +1016,7 @@ if (username !== null) {
             } else if (ws_data.type == 'card_view') {
 
                 notif_txt = 'hide these cards';
-                if(ws_data.card_view.visibility) {
+                if (ws_data.card_view.visibility) {
                     notif_txt = 'show these cards';
                 }
 
@@ -1129,7 +1120,7 @@ if (username !== null) {
         };
 
         ws.onclose = () => {
-            showNotification(window.i18n['ws_1'], window.i18n['ws_2']);
+            showNotification('{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
             reconnectInterval *= 2;
@@ -1147,7 +1138,7 @@ window.onload = () => {
     applySavedSize("info_content");
 };
 
-window.onresize = function(event) {
+window.onresize = function (event) {
     colLst = generateColumnBoundaries($('.col').length, $('.col').width() + 32);
     scrollFix();
 };
