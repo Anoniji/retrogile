@@ -554,6 +554,49 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
     return send_list
 
 
+def votes_manager_by_id(send_list, board_id, mode, websocket, data):
+    """
+    Manages votes for a specific board.
+
+    Args:
+        send_list (list): List of messages to be sent.
+        board_id (int/str): ID of the board.
+        mode (str): Vote management mode ("start_vote" or other).
+        websocket: Websocket object for communication.
+        data (dict): Additional data (may contain "maxVote").
+
+    Returns:
+        list: The updated send_list. Returns False if the board doesn't exist.
+    """
+    if mode == "start_vote":
+        board_votes_reset_by_id(board_id, data.get("maxVote"))
+        board_votes_init(board_id, data.get("maxVote"))
+        send_list.append(
+            send_list_multi(send_list, clients, data)
+        )
+
+    elif mode == "stats_vote":
+        board_info = get_board_info_by_id(board_id)
+        if not board_info:
+            return False
+
+        votes_remaining = sum(board_info["votes_list"].values())
+        votes_total = len(board_info["votes_list"].keys()) * board_info["votes"]
+        send_list.append(
+            [
+                websocket,
+                {
+                    "type": "stats_vote",
+                    "board_id": board_id,
+                    "votes_remaining": votes_remaining,
+                    "votes_total": votes_total,
+                },
+            ]
+        )
+
+    return send_list
+
+
 def col_manager_by_board_id(board_id, mode, data):
     """
     Manages column operations for a specific board.
@@ -766,10 +809,13 @@ def message_responce(send_list, websocket, board_id, client_id, data):
             },
         )
 
-    elif message_type == "start_vote":
-        board_votes_reset_by_id(board_id, data.get("maxVote"))
-        board_votes_init(board_id, data.get("maxVote"))
-        send_list = send_list_multi(send_list, clients, data)
+    elif message_type in (
+        "start_vote",
+        "stats_vote",
+    ):
+        send_list = votes_manager_by_id(
+            send_list, board_id, message_type, websocket, data
+        )
 
     elif message_type == "start_confetti":
         send_list = send_list_multi(send_list, clients, data)
