@@ -838,6 +838,11 @@ if (username !== null) {
                         if (list_votes[username]) {
                             $('nav #vote_progress').show();
                             maxVoteTotal = $('#users .user').length * check_votes;
+                            ws.send(JSON.stringify({
+                                type: 'stats_vote',
+                                board_id: board_id,
+                                username: username,
+                            }));
                         }
                     }
                 }
@@ -964,6 +969,15 @@ if (username !== null) {
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
                 $('.votes').text('0');
                 board_vote(ws_data.maxVote);
+            } else if (ws_data.type == 'stats_vote') {
+                totalVotes = ws_data.votes_remaining;
+                maxVoteTotal = ws_data.votes_total;
+                pct_votes = (totalVotes * 100 / maxVoteTotal);
+                $('nav #vote_progress').css('width', `${pct_votes}%`);
+                if (pct_votes < 1) {
+                    showNotification('{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
+                    $('nav #vote_progress').hide().css('width', '100%');
+                }
             } else if (ws_data.type == 'card_add') {
                 html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}" style="border-color: ${ws_data.card_add.username_color}">`;
                 html += `<div class='card_icon' style='background-color: ${ws_data.card_add.username_color}`;
@@ -1054,9 +1068,7 @@ if (username !== null) {
                 if (pct_votes < 1) {
                     showNotification('{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
                     $('nav #vote_progress').hide().css('width', '100%');
-
                 }
-
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
             } else if (ws_data.type == 'col_order') {
