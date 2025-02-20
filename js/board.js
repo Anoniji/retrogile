@@ -271,7 +271,7 @@ function board_timer(seconds) {
         $countdownElement.text(`${minutes}m ${seconds}s`);
         if (distance < 0) {
             clearInterval($countdownElement.data('intervalId'));
-            $countdownElement.text('Timer');
+            $countdownElement.text('{{ translates.board_js_1 }}');
             $('#wallpaper2').effect('highlight');
         }
     };
@@ -319,7 +319,7 @@ function cursor_clicked(elem) {
                     'opacity', '.4');
 
     cnt_clk += 1;
-    $('#click_cnt').html(`${cnt_clk} dbclicks`);
+    $('#click_cnt').html(`${cnt_clk} {{ translates.board_js_2 }}`);
     if (cnt_clk % 20 == 0) {
         play_confetti();
     }
@@ -375,7 +375,7 @@ if (username !== null) {
         try {
             navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
                 if (result.state == 'granted' || result.state == 'prompt') {
-                    showNotification('(!)', 'Board url copied');
+                    showNotification('(!)', '{{ translates.board_js_3 }}');
                     navigator.clipboard.writeText(window.location.href);
                 }
             });
@@ -386,7 +386,7 @@ if (username !== null) {
 
     function startTimer() {
         if (board_author != username) return;
-        let timerInSeconds = prompt('Timer in secondes');
+        let timerInSeconds = prompt('{{ translates.board_js_4 }}');
 
         timerInSeconds = removeNonNumeric(timerInSeconds);
         if (timerInSeconds && timerInSeconds != '') {
@@ -400,7 +400,7 @@ if (username !== null) {
 
     function startVote() {
         if (board_author != username) return;
-        let maxVote = prompt('Max votes');
+        let maxVote = prompt('{{ translates.board_js_5 }}');
 
         maxVote = removeNonNumeric(maxVote);
         if (maxVote && maxVote != '') {
@@ -456,7 +456,7 @@ if (username !== null) {
     }
 
     function addCard(col_id) {
-        customPrompt(col_id, 'Add new Card', '').then(cardContent => {
+        customPrompt(col_id, '{{ translates.board_js_6 }}', '').then(cardContent => {
             if (cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_add',
@@ -507,7 +507,7 @@ if (username !== null) {
 
     function editCard(card_uuid) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
-        customPrompt(col_id, 'Editing Card content', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
+        customPrompt(col_id, '{{ translates.board_js_7 }}', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
             if (cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_edit',
@@ -565,7 +565,7 @@ if (username !== null) {
 
     function addCol() {
         if (board_author != username) return;
-        let colName = prompt('Zone name');
+        let colName = prompt('{{ translates.board_js_8 }}');
         colName = removeNonAlphanumeric(colName);
         if (isNumeric(colName)) return;
         if (colName) {
@@ -657,7 +657,7 @@ if (username !== null) {
 
     function deleteCol(col_id) {
         if (board_author != username) return;
-        if (window.confirm('You really want to delete this column?')) {
+        if (window.confirm('{{ translates.board_js_9 }}')) {
             if ($('.col').length == 5) {
                 $('.col').removeClass('col_5');
                 $('#board_add_bloc').show();
@@ -765,7 +765,7 @@ if (username !== null) {
             } else if (ws_data.type == 'user_add') {
                 console.log(`${user_id} != ${ws_data.user_id} && ${ws_data.board_id} == ${board_id}`);
                 if (user_id != ws_data.user_id && ws_data.board_id == board_id) {
-                    log(`< ${ws_data.username} > connected`, 'yellow');
+                    log(`< ${ws_data.username} > {{ translates.board_js_10 }}`, 'yellow');
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${ws_data.username}</div></div>`);
 
                     var $div_username = $(`#users div[data-username=${ws_data.username}]`);
@@ -783,7 +783,7 @@ if (username !== null) {
                     }
                 }
             } else if (ws_data.type == 'user_remove') {
-                log(`< ${ws_data.username} > disconnected`, 'red');
+                log(`< ${ws_data.username} > {{ translates.board_js_11 }}`, 'red');
                 $(`#cursor_${ws_data.user_id}`).hide('fade', 300).remove();
 
                 var $div_username = $(`#users div[data-username=${ws_data.username}]`);
@@ -849,7 +849,7 @@ if (username !== null) {
 
                 $('#board').html('');
                 if (!board_data) {
-                    $('#board_name').html('This board does not exist, <a href="../">return to home page</a>');
+                    $('#board_name').html('{{ translates.board_js_12 }}<a href="../">{{ translates.board_js_13 }}</a>');
                     $('#board_timer, #board_vote, #r_menu').remove();
                     return;
                 }
@@ -894,15 +894,15 @@ if (username !== null) {
                             html += '; border-color: #d3d3d3';
                         }
                         html += `'>`;
-                        html += `<div class='info_author'>by ${value.author}</div>`;
+                        html += `<div class='info_author'>{{ translates.board_js_14 }} ${value.author}</div>`;
                         if (value.author == username) {
                             html += `<div class='edit_icon' onclick='editCard("${uuid}");'>
                                 <i class='material-icons'>edit</i>
-                                <div class='type'>Edit</div>
+                                <div class='type'>{{ translates.board_js_15 }}</div>
                             </div>`;
                             html += `<div class='delete_icon' onclick='deleteCard("${uuid}");'>
                                 <i class='material-icons'>delete</i>
-                                <div class='type'>Delete</div>
+                                <div class='type'>{{ translates.board_js_16 }}</div>
                             </div>`;
                         }
                         html += `</div>`;
@@ -973,15 +973,15 @@ if (username !== null) {
                     html += '; border-color: #d3d3d3';
                 }
                 html += `'>`;
-                html += `<div class='info_author'>by ${ws_data.card_add.author}</div>`;
+                html += `<div class='info_author'>{{ translates.board_js_14 }} ${ws_data.card_add.author}</div>`;
                 if (ws_data.card_add.author == username) {
                     html += `<div class='edit_icon' onclick='editCard("${ws_data.card_uuid}");'>
                         <i class='material-icons'>edit</i>
-                        <div class='type'>Edit</div>
+                        <div class='type'>{{ translates.board_js_15 }}</div>
                     </div>`;
                     html += `<div class='delete_icon' onclick='deleteCard("${ws_data.card_uuid}");'>
                         <i class='material-icons'>delete</i>
-                        <div class='type'>Delete</div>
+                        <div class='type'>{{ translates.board_js_16 }}</div>
                     </div>`;
                 }
                 html += `</div>`;
@@ -1015,9 +1015,9 @@ if (username !== null) {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
 
-                notif_txt = 'hide these cards';
+                notif_txt = '{{ translates.board_js_17 }}';
                 if (ws_data.card_view.visibility) {
-                    notif_txt = 'show these cards';
+                    notif_txt = '{{ translates.board_js_18 }}';
                 }
 
                 if (ws_data.card_view.author != username) {
@@ -1026,10 +1026,10 @@ if (username !== null) {
                     showNotification('You', notif_txt.replace('these', 'your'));
                     if (ws_data.card_view.hidden) {
                         $('#board_cards_visibility .material-icons').html('visibility_off');
-                        $('#board_cards_visibility .title').html('Hide my cards');
+                        $('#board_cards_visibility .title').html('{{ translates.board_js_19 }}');
                     } else {
                         $('#board_cards_visibility .material-icons').html('visibility');
-                        $('#board_cards_visibility .title').html('Show my cards');
+                        $('#board_cards_visibility .title').html('{{ translates.board_js_20 }}');
                     }
                 }
 
@@ -1052,7 +1052,7 @@ if (username !== null) {
                 pct_votes = 100 - (totalVotes * 100 / maxVoteTotal);
                 $('nav #vote_progress').css('width', `${pct_votes}%`);
                 if (pct_votes < 1) {
-                    showNotification('Voting session', 'is finished!');
+                    showNotification('{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
                     $('nav #vote_progress').hide().css('width', '100%');
 
                 }
