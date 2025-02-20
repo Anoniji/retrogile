@@ -15,7 +15,7 @@ var username = localStorage.getItem('username');
 if (username === null) {
     location.href = '../';
 } else {
-    $("#board_name").html(`{{ translates.board_js_1 }}"${username}"{{ translates.board_js_2 }}`);
+    $("#board_name").html('{{ translates.board_js_1 }}"${username}"{{ translates.board_js_2 }}');
 
     let ws;
     let reconnectInterval = 1000;
