@@ -5,6 +5,8 @@
 Retrogile Tools
 """
 
+import string
+
 
 def update_board(board_data_old):
     """
@@ -104,3 +106,20 @@ def find_content_by_id(data, id_to_find, parent=False):
             return result, dic_path if parent else dic_path
 
     return None, []
+
+
+def remove_symbols(text):
+    """
+    Removes specific symbols from a string.
+
+    Args:
+        text: The input string.
+
+    Returns:
+        The string without the specified symbols.
+    """
+    symbols_to_remove = "@^*_{}|\\;/"
+    text_without_symbols = text.translate(
+        str.maketrans('', '', symbols_to_remove))
+
+    return text_without_symbols
