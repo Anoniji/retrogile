@@ -5,8 +5,6 @@
 Retrogile Tools
 """
 
-import string
-
 
 def update_board(board_data_old):
     """
