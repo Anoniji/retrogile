@@ -15,14 +15,14 @@ var username = localStorage.getItem('username');
 if (username === null) {
     location.href = '../';
 } else {
-    $("#board_name").html(`{{ translates.board_js_1 }}"${username}"{{ translates.board_js_2 }}`);
+    $("#board_name").html(`{{ translates.home_js_1 }}"${username}"{{ translates.home_js_2 }}`);
 
     let ws;
     let reconnectInterval = 1000;
 
     function renameBoard(board_uuid) {
         if (!board_uuid) return;
-        let board_name = prompt('{{ translates.board_js_3 }}');
+        let board_name = prompt('{{ translates.home_js_3 }}');
         board_name = removeNonAlphanumericSpace(board_name);
         if (board_name) {
             ws.send(JSON.stringify({
@@ -36,7 +36,7 @@ if (username === null) {
 
     function templateBoard(board_uuid) {
         if (!board_uuid) return;
-        let new_name = prompt('{{ translates.board_js_4 }}');
+        let new_name = prompt('{{ translates.home_js_4 }}');
         new_name = removeNonAlphanumericSpace(new_name);
         if (new_name) {
             ws.send(JSON.stringify({
@@ -50,7 +50,7 @@ if (username === null) {
 
     function deleteBoard(board_uuid) {
         if (!board_uuid) return;
-        let check_confirm = confirm('{{ translates.board_js_5 }}');
+        let check_confirm = confirm('{{ translates.home_js_5 }}');
         if (check_confirm) {
             ws.send(JSON.stringify({
                 type: 'board_delete',
@@ -81,10 +81,10 @@ if (username === null) {
                     html += `   <h1 class="board_list">${value['board_name']}</h1>`;
                     html += '   <ul>';
                     html += '       <li>';
-                    html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.board_js_6 }}'>edit_note</i></div>`;
-                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.board_js_7 }}'>folder_copy</i></div>`;
-                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.board_js_8 }}'>folder_delete</i></div>`;
-                    html += `           <div class='open_board'><i onclick='openBoard("${value['path']}");' class='material-icons' title='{{ translates.board_js_9 }}'>`;
+                    html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_6 }}'>edit_note</i></div>`;
+                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_7 }}'>folder_copy</i></div>`;
+                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_8 }}'>folder_delete</i></div>`;
+                    html += `           <div class='open_board'><i onclick='openBoard("${value['path']}");' class='material-icons' title='{{ translates.home_js_9 }}'>`;
                     if (value['board_version'] != value['current_version']) {
                         html += `sync_problem`;
                     } else {
@@ -93,7 +93,7 @@ if (username === null) {
                     html += `       </i></div>`;
                     html += '       </li>';
                     html += '   </ul>';
-                    html += `   <div class='board_last_edit'>{{ translates.board_js_10 }}${value['last_edit']}</div>`;
+                    html += `   <div class='board_last_edit'>{{ translates.home_js_10 }}${value['last_edit']}</div>`;
                     html += `</div>`;
                     $('#board').append(html);
                 });
