@@ -15,7 +15,7 @@ from flask import Flask, render_template, send_from_directory, request, make_res
 from flask_jsonpify import jsonify
 
 from gevent import monkey
-from libs import licence
+from libs import licence, tools
 
 monkey.patch_all()
 
@@ -151,8 +151,8 @@ def create_board(board_name, author):
         json.dump(
             {
                 "version": 4,
-                "board_name": board_name,
-                "author": author,
+                "board_name": tools.remove_symbols(board_name),
+                "author": tools.remove_symbols(author),
                 "timer": False,
                 "votes": False,
                 "votes_list": {},
