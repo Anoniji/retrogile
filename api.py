@@ -11,7 +11,7 @@ import uuid
 import datetime
 import logging
 
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, make_response
 from flask_jsonpify import jsonify
 
 from gevent import monkey
@@ -24,7 +24,7 @@ logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 
 # ///////////////////////////////////////////////////////////////////////
 
-app = Flask(__name__, template_folder="./pages/")
+app = Flask(__name__, template_folder="./")
 current_year = datetime.datetime.now().year
 CURRENT_VERSION = "1.0dev"
 LIST_LANGS = ['fr', 'en']
@@ -85,7 +85,7 @@ def index():
     if os.path.isfile("./pages/index.html"):
         lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
-            "index.html", current_year=current_year,
+            "./pages/index.html", current_year=current_year,
             current_version=CURRENT_VERSION,
             translates=load_translate(lang)
         )
@@ -105,7 +105,7 @@ def licenses():
     if os.path.isfile("./pages/licenses.html"):
         lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
-            "licenses.html", current_year=current_year,
+            "./pages/licenses.html", current_year=current_year,
             current_version=CURRENT_VERSION,
             translates=load_translate(lang)
         )
@@ -171,7 +171,7 @@ def home():
     if os.path.isfile("./pages/home.html"):
         lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
-            "home.html", current_year=current_year,
+            "./pages/home.html", current_year=current_year,
             current_version=CURRENT_VERSION,
             translates=load_translate(lang)
         )
@@ -194,7 +194,7 @@ def board(board_id):
     if os.path.isfile("./pages/board.html"):
         lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
-            "board.html", current_year=current_year,
+            "./pages/board.html", current_year=current_year,
             current_version=CURRENT_VERSION, board_id=board_id,
             translates=load_translate(lang)
         )
@@ -219,6 +219,33 @@ def js(path):
         return send_from_directory("js", path, mimetype="application/javascript")
 
     return jsonify(["js_not_found"])
+
+
+@app.route("/jsi/<string:path>", methods=["GET"])
+def jsi(path):
+    """
+    Renders a JavaScript file from the `js` directory.
+
+    Args:
+        path (str): The relative path to the JavaScript file
+
+    Returns:
+        flask.Response:
+            - If the file exists, returns the JavaScript file
+            - If the file doesn't exist, returns a JSON response
+    """
+    if os.path.isfile("js/" + path):
+        lang = request.accept_languages.best_match(LIST_LANGS)
+        data = render_template(
+            "js/" + path, translates=load_translate(lang)
+        )
+
+        response = make_response(data)
+        response.headers['Content-Type'] = 'application/javascript'
+
+        return response
+
+    return jsonify(["jsi_not_found"])
 
 
 @app.route("/css/<string:path>", methods=["GET"])
