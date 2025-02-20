@@ -422,7 +422,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                 new_board_uuid = uuid.uuid4().hex
                 new_board_path = f"./board/{new_board_uuid}.json"
 
-                board_info["board_name"] = data.get("new_name")
+                board_info["board_name"] = tools.remove_symbols(data.get("new_name"))
                 for category in board_info["data"]:
                     board_info["data"][category] = {}
                 with open(new_board_path, "w", encoding="utf-8") as f:
@@ -446,7 +446,8 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
                     if mode == "board_delete":
                         os.remove(board_path)
                     else:
-                        board_info["board_name"] = data.get("board_name")
+                        board_info["board_name"] = tools.remove_symbols(
+                            data.get("board_name"))
                         boards.update_board(board_id, board_info)
 
                     send_list.append(
