@@ -73,6 +73,14 @@ def load_translate(lang):
 # ///////////////////////////////////////////////////////////////////////
 
 
+def path_check(path):
+    """Checks if a path is safe, disallowing relative paths and separators."""
+    return ".." not in path and "/" not in path and "\\" not in path
+
+
+# ///////////////////////////////////////////////////////////////////////
+
+
 @app.route("/")
 def index():
     """
@@ -234,7 +242,7 @@ def jsi(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("js/" + path):
+    if os.path.isfile("js/" + path) and path_check(path):
         lang = request.accept_languages.best_match(LIST_LANGS)
         data = render_template(
             "js/" + path, translates=load_translate(lang)
@@ -312,7 +320,7 @@ if __name__ == "__main__":
     try:
         licence_manager = licence.LicenceManager()
         licence_manager.validate_licence()
-        app.run(host="0.0.0.0", port=8008, debug=True)
+        app.run(host="0.0.0.0", port=8008, debug=False)
 
     except OSError as e:
         logging.error(f"Server error: {e}")
