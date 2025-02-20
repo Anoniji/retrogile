@@ -21,7 +21,7 @@
     <!-- Sociaux -->
     <meta property="og:title" content="Retrogile">
     <meta property="og:description" content="{{ translates.description }}">
-    
+
     <!-- links -->
     <link rel="icon" type="image/png" href="../img/favicon.png" />
     <link rel="stylesheet" href="../css/materialicons.css">
@@ -49,19 +49,24 @@
     <section id="board-params">
         <div id="board_name"></div>
         <button id="board_timer" onclick="startTimer()">
-            <i class="material-icons">timer</i><div class="title">{{ translates.board_2 }}</div>
+            <i class="material-icons">timer</i>
+            <div class="title">{{ translates.board_2 }}</div>
         </button>
         <button id="board_vote" onclick="startVote()">
-            <i class="material-icons">how_to_vote</i><div class="title">{{ translates.board_3 }}</div>
+            <i class="material-icons">how_to_vote</i>
+            <div class="title">{{ translates.board_3 }}</div>
         </button>
         <button id="board_confetti" onclick="startConfetti()">
-            <i class="material-icons">celebration</i><div class="title">{{ translates.board_4 }}</div>
+            <i class="material-icons">celebration</i>
+            <div class="title">{{ translates.board_4 }}</div>
         </button>
         <div id="r_menu">
-            <button id="board_text_decrease" onclick="cardTextSize('info_content', -1, true);" title="{{ translates.board_5 }}">
+            <button id="board_text_decrease" onclick="cardTextSize('info_content', -1, true);"
+                title="{{ translates.board_5 }}">
                 <i class="material-icons">text_decrease</i>
             </button>
-            <button id="board_text_increase" onclick="cardTextSize('info_content', 1, true);" title="{{ translates.board_6 }}">
+            <button id="board_text_increase" onclick="cardTextSize('info_content', 1, true);"
+                title="{{ translates.board_6 }}">
                 <i class="material-icons">text_increase</i>
             </button>
             <button id="board_add_bloc" onclick="addCol()" title="{{ translates.board_7 }}">
@@ -71,13 +76,16 @@
                 <i class="material-icons">call_merge</i>
             </button>
             <button id="board_cards_visibility" onclick="viewCardToggle()">
-                <i class="material-icons">visibility</i><div class="title">{{ translates.board_9 }}</div>
+                <i class="material-icons">visibility</i>
+                <div class="title">{{ translates.board_9 }}</div>
             </button>
             <button id="board_vote_order" onclick="board_vote_order()">
-                <i class="material-icons">filter_list</i><div class="title">{{ translates.board_10 }}</div>
+                <i class="material-icons">filter_list</i>
+                <div class="title">{{ translates.board_10 }}</div>
             </button>
             <button id="board_copy_link" onclick="board_copy_link()">
-                <i class="material-icons">content_copy</i><div class="title">{{ translates.board_11 }}</div>
+                <i class="material-icons">content_copy</i>
+                <div class="title">{{ translates.board_11 }}</div>
             </button>
         </div>
     </section>
@@ -98,7 +106,8 @@
 
     <section class="emitter"></section>
     <footer>
-        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="../LICENSES">{{ translates.footer }}</a>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="../LICENSES">{{ translates.footer
+            }}</a>
     </footer>
 
     <script src="../js/jquery.min.js"></script>
@@ -106,7 +115,7 @@
     <script src="../js/jquery.ui.touch-punch.min.js"></script>
     <script>let lang = '{{ translates.lang }}';</script>
     <script>let board_id = '{{ board_id }}';</script>
-    <script src="../js/board.js"></script>
+    <script src="../jsi/board.js"></script>
 </body>
 
 </html>
