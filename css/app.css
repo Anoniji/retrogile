@@ -817,8 +817,8 @@ canvas {
     position: fixed;
     top: -6px;
     left: 50vw;
-    width: 250px;
-    margin-left: -125px;
+    width: 280px;
+    margin-left: -140px;
     z-index: 3;
     border: 1px solid #ccc;
     border-radius: 0 0 0 3px;
