@@ -849,7 +849,7 @@ if (username !== null) {
 
                 $('#board').html('');
                 if (!board_data) {
-                    $('#board_name').html('{{ translates.board_js_12 }}<a href="../">{{ translates.board_js_13 }}</a>');
+                    $('#board_name').html("{{ translates.board_js_12 }}<a href='../'>{{ translates.board_js_13 }}</a>");
                     $('#board_timer, #board_vote, #r_menu').remove();
                     return;
                 }
@@ -894,7 +894,7 @@ if (username !== null) {
                             html += '; border-color: #d3d3d3';
                         }
                         html += `'>`;
-                        html += `<div class='info_author'>{{ translates.board_js_14 }} ${value.author}</div>`;
+                        html += `<div class='info_author'>{{ translates.board_js_14 }} <b>${value.author}</b></div>`;
                         if (value.author == username) {
                             html += `<div class='edit_icon' onclick='editCard("${uuid}");'>
                                 <i class='material-icons'>edit</i>
@@ -973,7 +973,7 @@ if (username !== null) {
                     html += '; border-color: #d3d3d3';
                 }
                 html += `'>`;
-                html += `<div class='info_author'>{{ translates.board_js_14 }} ${ws_data.card_add.author}</div>`;
+                html += `<div class='info_author'>{{ translates.board_js_14 }} <b>${ws_data.card_add.author}</b></div>`;
                 if (ws_data.card_add.author == username) {
                     html += `<div class='edit_icon' onclick='editCard("${ws_data.card_uuid}");'>
                         <i class='material-icons'>edit</i>
