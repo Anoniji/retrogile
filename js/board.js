@@ -274,7 +274,19 @@ function cursor_clicked(elem) {
     cnt_clk += 1;
     $('#click_cnt').html(`${cnt_clk} {{ translates.board_js_2 }}`);
     if (cnt_clk % 20 == 0) {
-        play_confetti();
+        confetti({
+            particleCount: 512,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+        });
+
+        confetti({
+            particleCount: 512,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+        });
     }
 }
 
