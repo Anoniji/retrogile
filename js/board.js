@@ -82,7 +82,9 @@ if (username === null) {
     location.href = `../#${lastpart}`;
 }
 
-$(function () { $('#console').accordion({ collapsible: true, active: false, heightStyle: 'content' }); });
+$(function () { $('#console').accordion({ collapsible: true, active: false, heightStyle: 'content', activate: function() {
+    $('#console_dot').hide('fade');
+}}); });
 
 function showNotification(user, message) {
     var notification = $('<div class="notification">');
@@ -1124,6 +1126,9 @@ if (username !== null) {
                     username: username,
                 }));
             } else {
+                if (!$('#console h3').hasClass('ui-state-active') && ws_data.username != username) {
+                    $('#console_dot').show('fade');
+                }
                 log(`< ${ws_data.username} > ${ws_data.content}`, 'white');
             }
         });
