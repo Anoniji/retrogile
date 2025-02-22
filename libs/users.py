@@ -5,7 +5,16 @@ import uuid
 
 
 class Users:
+    """
+    Manages user data, including loading, saving, creating, and retrieving user information.
+    User data is stored in a JSON file.
+    """
+
     def __init__(self):
+        """
+        Initializes the Users class.
+        Loads user data from the specified file or creates an empty user dictionary.
+        """
         self.filename = "board/users.db"
         self.users = self._load_users()
 
@@ -13,9 +22,7 @@ class Users:
         """
         Generates a unique hexadecimal color code for a username.
 
-        First, it checks if a custom color is defined for the user in the specified board's JSON file.
-        If a custom color is found, it returns that color. Otherwise, it generates a dark color 
-        based on the username using a SHA256 hash.
+        If no custom color is found, it generates a dark color based on the username using a SHA256 hash.
 
         Args:
             username (str): The username.
@@ -24,7 +31,7 @@ class Users:
             str: The hexadecimal color code in the format "#RRGGBB".
         """
 
-        # If no custom color is found, generate a dark color based on the username.
+        # Generate a dark color based on the username.
         hash_object = hashlib.sha256(username.encode("utf-8"))
         hex_dig = hash_object.hexdigest()
 
@@ -45,6 +52,12 @@ class Users:
         return color_hex
 
     def _load_users(self):
+        """
+        Loads user data from the JSON file.
+
+        Returns:
+            dict: A dictionary containing user data, or an empty dictionary if the file does not exist or is invalid.
+        """
         if os.path.exists(self.filename):
             with open(self.filename, 'r') as f:
                 try:
@@ -54,16 +67,37 @@ class Users:
         return {}
 
     def _save_users(self):
+        """
+        Saves user data to the JSON file.
+        """
         with open(self.filename, 'w') as f:
             json.dump(self.users, f, indent=4)
 
     def get_user(self, username):
+        """
+        Retrieves user data for a given username. Creates the user if they do not exist.
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            dict: A dictionary containing user data.
+        """
         if username in self.users:
             return self.users[username]
 
         return self._create_user(username)
 
     def _create_user(self, username):
+        """
+        Creates a new user with a unique ID and color.
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            dict: A dictionary containing the newly created user's data.
+        """
         user_id = str(uuid.uuid4())
         new_user = {
             "id": user_id,
@@ -75,14 +109,39 @@ class Users:
         return new_user
 
     def get_user_display_name(self, username):
+        """
+        Retrieves the display name for a given username.
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            str: The display name of the user, or the username if not found.
+        """
         user = self.get_user(username)
         return user.get("username", username)
 
     def get_user_color(self, username):
+        """
+        Retrieves the color for a given username.
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            str: The color of the user, or a generated color if not found.
+        """
         user = self.get_user(username)
         return user.get("color", self._username_color(username))
 
     def set_user_color(self, username, color):
+        """
+        Sets the color for a given username.
+
+        Args:
+            username (str): The username.
+            color (str): The hexadecimal color code.
+        """
         user = self.get_user(username)
         user['color'] = color
         self._save_users()
