@@ -440,7 +440,7 @@ if (username !== null) {
             type: 'start_confetti',
             board_id: board_id,
             startX: startX,
-            startY: startY,
+            startY: startY + parseInt($('#confetti').css('top')),
             angle: angle,
             distance: distance,
         }));
