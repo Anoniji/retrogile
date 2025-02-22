@@ -8,93 +8,20 @@ Retrogile WS
 import os
 import json
 import uuid
-import hashlib
 import asyncio
 import datetime
 from pathlib import Path
 from collections import OrderedDict
 import websockets
 
-from libs import licence, tools, boards
+from libs import licence, tools, boards, users
 boards = boards.Board()
+usersdb = users.Users()
 
-
-BOARD_VERSION = 4
+BOARD_VERSION = 5
 users = {}
 clients = set()
 POS = 0
-
-
-def username_color(board_id, username):
-    """
-    Generates a unique hexadecimal color code for a username.
-
-    First, it checks if a custom color is defined for the user in the specified board's JSON file.
-    If a custom color is found, it returns that color. Otherwise, it generates a dark color 
-    based on the username using a SHA256 hash.
-
-    Args:
-        board_id (str): The ID of the board.
-        username (str): The username.
-
-    Returns:
-        str: The hexadecimal color code in the format "#RRGGBB".
-    """
-
-    if board_id:
-        _tmps, _ = boards.get_board(board_id)
-        if "users_list" in _tmps and isinstance(_tmps["users_list"], dict):
-            user_param = _tmps["users_list"].get(username)
-            if user_param:
-                custom_color = user_param.get("custom_color")
-                if custom_color:
-                    return custom_color
-
-    # If no custom color is found, generate a dark color based on the username.
-    hash_object = hashlib.sha256(username.encode("utf-8"))
-    hex_dig = hash_object.hexdigest()
-
-    # Convert the first 6 hex characters to integers (representing R, G, and B).
-    r = int(hex_dig[:2], 16)
-    g = int(hex_dig[2:4], 16)
-    b = int(hex_dig[4:6], 16)
-
-    # Adjust the RGB values to ensure a dark color (maximum of 50% brightness).
-    max_value = 128  # 50% of 256
-
-    r = min(r, max_value)
-    g = min(g, max_value)
-    b = min(b, max_value)
-
-    # Format back to hex with padding.
-    color_hex = f"#{r:02x}{g:02x}{b:02x}"
-    return color_hex
-
-
-def user_set_color(board_id, data):
-    """
-    Sets a custom color for a user on a specific board.
-
-    Reads the board's JSON file, updates the user's custom color if the user exists,
-    and then writes the updated data back to the file.
-
-    Args:
-        board_id (str): The ID of the board.
-        data (dict): A dictionary containing the username and the desired custom color.
-    """
-
-    if board_id:
-        _tmps, _ = boards.get_board(board_id)
-
-        username = data.get("username")
-        if username:
-            user_param = _tmps["users_list"].get(username)
-            if user_param:
-                # Update the user's custom color.
-                _tmps["users_list"][username]["custom_color"] = data.get("custom_color")
-
-        # Write the updated data back to the JSON file.
-        boards.update_board(board_id, _tmps)
 
 
 def get_board_list_by_author(author):
@@ -185,7 +112,7 @@ def get_board_info_by_id(board_id, username_filter=False):
                 _tmps["data"][
                     col_name][
                     card_uuid][
-                    "username_color"] = username_color(board_id, card_data["author"])
+                    "username_color"] = usersdb.get_user_color(card_data["author"])
 
         return OrderedDict(_tmps.items())
 
@@ -298,7 +225,7 @@ def board_manager_response(ws_lst, data, board_info, card_data):
             and not board_info["users_list"].get(message_data["author"])["card_visibility"]
         ):
             message_data["cardContent"] = "<div class='hide_content'></div>"
-        message_data["username_color"] = username_color(board_id, message_data["author"])
+        message_data["username_color"] = usersdb.get_user_color(message_data["author"])
 
     return [
         ws,
@@ -579,7 +506,7 @@ def votes_manager_by_id(send_list, board_id, mode, websocket, data):
     elif mode == "stats_vote":
         board_info = get_board_info_by_id(board_id)
         if not board_info:
-            return False
+            return send_list
 
         votes_remaining = sum(board_info["votes_list"].values())
         votes_total = len(board_info["votes_list"].keys()) * board_info["votes"]
@@ -680,7 +607,6 @@ def add_user_to_board(board_id, username):
     board_users_list = board_info.get("users_list")
     if username not in board_users_list.keys():
         board_info["users_list"][username] = {
-            "custom_color": False,
             "card_visibility": False,
         }
 
@@ -729,7 +655,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
     if message_type == "connect":
         boards.add_client(board_id)
         message_username = data.get("username")
-        color_username = username_color(board_id, message_username)
+        color_username = usersdb.get_user_color(message_username)
         users[client_id] = {
             "username": message_username,
             "color": color_username,
@@ -764,7 +690,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
                 "user_id": client_id,
                 "username": message_username,
                 "board_id": board_id,
-                "color": username_color(board_id, message_username),
+                "color": usersdb.get_user_color(message_username),
             },
         )
 
@@ -843,7 +769,10 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         )
 
     elif message_type == "user_color":
-        user_set_color(board_id, data)
+        usersdb.set_user_color(
+            data.get("username"),
+            data.get("custom_color")
+        )
         send_list = send_list_multi(send_list, clients, data)
 
     elif message_type == "message":
