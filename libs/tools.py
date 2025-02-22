@@ -47,6 +47,12 @@ def update_board(board_data_old):
             for _, child_data in board_data_old["data"][category].items():
                 del child_data["hidden"]
 
+    if board_data_old["version"] <= 4:
+        board_data_old["version"] = 5
+        for user in board_data_old["users_list"].values():
+            if "custom_color" in user:
+                del user["custom_color"]
+
     return board_data_old
 
 
