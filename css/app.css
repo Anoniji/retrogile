@@ -767,15 +767,6 @@ right: -37px;
     font-weight: 700;
 }
 
-canvas {
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-}
-
 .ui-accordion .ui-accordion-content {
     padding: 0;
     border-top: 0;
@@ -843,6 +834,33 @@ canvas {
 .close {
     float: right;
     cursor: pointer;
+}
+
+#confetti {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+}
+
+#confetti .circle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, .1);
+    pointer-events: none;
+    border: 1px solid rgba(0, 0, 0, .2);
+    box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+}
+
+#confetti .line {
+    position: absolute;
+    border-bottom: 2px dashed rgba(0, 0, 0, .2);
+    transform-origin: 0 0;
+    pointer-events: none;
 }
 
 @media (max-width: 1020px) {
