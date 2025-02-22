@@ -1,3 +1,10 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+"""
+Retrogile Users Manager
+"""
+
 import json
 import os
 import hashlib
@@ -22,7 +29,8 @@ class Users:
         """
         Generates a unique hexadecimal color code for a username.
 
-        If no custom color is found, it generates a dark color based on the username using a SHA256 hash.
+        If no custom color is found, it generates a dark color based on
+        the username using a SHA256 hash.
 
         Args:
             username (str): The username.
@@ -56,10 +64,11 @@ class Users:
         Loads user data from the JSON file.
 
         Returns:
-            dict: A dictionary containing user data, or an empty dictionary if the file does not exist or is invalid.
+            dict: A dictionary containing user data, or an empty dictionary
+                  if the file does not exist or is invalid.
         """
         if os.path.exists(self.filename):
-            with open(self.filename, 'r') as f:
+            with open(self.filename, "r", encoding="utf-8") as f:
                 try:
                     return json.load(f)
                 except json.JSONDecodeError:
@@ -70,7 +79,7 @@ class Users:
         """
         Saves user data to the JSON file.
         """
-        with open(self.filename, 'w') as f:
+        with open(self.filename, "w", encoding="utf-8") as f:
             json.dump(self.users, f, indent=4)
 
     def get_user(self, username):
@@ -143,5 +152,5 @@ class Users:
             color (str): The hexadecimal color code.
         """
         user = self.get_user(username)
-        user['color'] = color
+        user["color"] = color
         self._save_users()
