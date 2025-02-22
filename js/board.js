@@ -378,12 +378,6 @@ if (username !== null) {
             custom_color: custom_color,
         }));
         $(this).attr("type", "hidden");
-        if (isLightColor(custom_color)) {
-            $('button').animate({ color: "#333" }, 300);
-        } else {
-            $('button').animate({ color: "#f2f2f2" }, 300);
-        }
-        $('button, #vote_progress').animate({ backgroundColor: custom_color }, 300); 
     });
 
     function setColor() {
@@ -821,6 +815,15 @@ if (username !== null) {
                     $div_username.css('color', '#f2f2f2');
                 }
                 $div_username.css('background', ws_data.custom_color);
+                if (username == ws_data.username) {
+                    if (isLightColor(ws_data.custom_color)) {
+                        $('button').animate({ color: "#333" }, 300);
+                    } else {
+                        $('button').animate({ color: "#f2f2f2" }, 300);
+                    }
+                    $('button, #vote_progress').animate({ backgroundColor: ws_data.custom_color }, 300); 
+                }
+
                 ws.send(JSON.stringify({
                     type: 'board_info',
                     board_id: board_id,
