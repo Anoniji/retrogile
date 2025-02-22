@@ -83,8 +83,9 @@ $('#username, #boardname').keypress(function (event) {
 
 if (hash) {
 	const hashValue = hash.substring(1);
-	$('#boardname').attr('placeholder', 'Board ID').val(hashValue).prop('disabled', true);
-	$('.label_button').html('Join the board');
+	$('#boardname').attr('placeholder', '{{ translates.app_js_1 }}').val(hashValue).prop('disabled', true);
+	$('.label_button').html('{{ translates.app_js_2 }}');
+	$('#username').focus();
 }
 
 $('#username_cleaner').click(function () {
