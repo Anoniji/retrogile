@@ -117,55 +117,6 @@ function applySavedSize(className) {
     }
 }
 
-function play_confetti(duration = 800) {
-    $('#board_confetti').prop('disabled', true);
-    const canvas = document.createElement('canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    document.body.appendChild(canvas);
-    const ctx = canvas.getContext('2d');
-
-    const confettiCount = 500;
-    const confetti = [];
-    for (let i = 0; i < confettiCount; i++) {
-        confetti.push({
-            x: Math.random() * canvas.width,
-            y: canvas.height,
-            width: Math.random() * 4 + 5,
-            height: Math.random() * 4 + 5,
-            angle: Math.random() * 2 * Math.PI,
-            speed: Math.random() * 8 + 1,
-            color: '#' + Math.floor(Math.random() * 16777215).toString(16),
-        });
-    }
-
-    const startTime = Date.now();
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        confetti.forEach(confetto => {
-            confetto.y -= confetto.speed;
-            confetto.x += Math.cos(confetto.angle) * confetto.speed;
-
-            ctx.fillStyle = confetto.color;
-            ctx.fillRect(confetto.x, confetto.y, confetto.width, confetto.height);
-
-            if (confetto.y < -confetto.height) {
-                confetto.y = canvas.height;
-                confetto.x = Math.random() * canvas.width;
-            }
-        });
-
-        if (Date.now() - startTime >= duration) {
-            $('#board_confetti').prop('disabled', false);
-            canvas.remove();
-            return;
-        }
-        requestAnimationFrame(draw);
-    }
-    draw();
-}
-
 function escapeHtml(unsafe) {
     return unsafe
         .replace(/&/g, '&amp;')
@@ -362,6 +313,12 @@ if (username !== null) {
     let reconnectInterval = 1000;
     let board_author;
     let user_id = false;
+
+    let confettiActive = false;
+    let isDrawing = false;
+    let line;
+    let startX, startY;
+
     var pos_x;
     var pos_y;
     var curr_highlightUser;
@@ -441,10 +398,67 @@ if (username !== null) {
     }
 
     function startConfetti() {
+        confettiActive = true;
+        $('#board_confetti').prop('disabled', true);
+    }
+
+    $('#confetti').on('mousedown', function(e) {
+        if(!confettiActive) return;
+        isDrawing = true;
+        startX = e.pageX - $(this).offset().left;
+        startY = e.pageY - $(this).offset().top;
+
+        circle = $('<div>').addClass('circle').css({
+            left: startX - 11,
+            top: startY - 11
+        }).appendTo('#confetti');
+    });
+
+    $('#confetti').on('mousemove', function(e) {
+        if (!isDrawing) return;
+
+        let mouseX = e.pageX - $(this).offset().left;
+        let mouseY = e.pageY - $(this).offset().top;
+
+        if (line) line.remove();
+
+        line = $('<div>').addClass('line').appendTo('#confetti');
+        updateLine(startX, startY, mouseX, mouseY, line);
+    });
+
+    $('#confetti').on('mouseup', function(e) {
+        if (!isDrawing) return;
+        isDrawing = false;
+
+        let endX = e.pageX - $(this).offset().left;
+        let endY = e.pageY - $(this).offset().top;
+
+        let distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+        let angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+
         ws.send(JSON.stringify({
             type: 'start_confetti',
             board_id: board_id,
+            startX: startX,
+            startY: startY,
+            angle: angle,
+            distance: distance,
         }));
+        $('.circle, .line').remove();
+        confettiActive = false;
+        $('#board_confetti').prop('disabled', false);
+    });
+
+    function updateLine(x1, y1, x2, y2, line) {
+        let distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        let angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+        line.css({
+            width: distance,
+            left: x1,
+            top: y1,
+            transform: `rotate(${angle}deg)`
+        });
     }
 
     function start_timer() {
@@ -964,7 +978,16 @@ if (username !== null) {
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
             } else if (ws_data.type == 'start_confetti') {
-                play_confetti();
+                confetti({
+                    particleCount: 256,
+                    startVelocity: Math.min(ws_data.distance / 5, 100),
+                    spread: 70,
+                    angle: 180 - ws_data.angle,
+                    origin: { x: ws_data.startX / $('#confetti').width(), y: ws_data.startY / $('#confetti').height() },
+                    gravity: 0.5,
+                    decay: 0.9,
+                    drift: 0.1,
+                });
             } else if (ws_data.type == 'start_vote') {
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
                 $('.votes').text('0');
