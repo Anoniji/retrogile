@@ -7,6 +7,7 @@ Retrogile Boards Manager
 
 import os
 import json
+import copy
 
 
 class Board:
@@ -56,8 +57,9 @@ class Board:
                 print(f"Error: The JSON file '{json_file}' is malformed.")
                 return (False, False)
 
+        board_data = copy.deepcopy(self.boards)
         return (
-            self.boards[board_id]["data"].copy(),
+            board_data[board_id]["data"],
             self.boards[board_id]["clients"],
         )
 
