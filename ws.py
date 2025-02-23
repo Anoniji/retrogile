@@ -12,8 +12,8 @@ import asyncio
 import datetime
 from pathlib import Path
 from collections import OrderedDict
-import websockets
 from urllib.parse import urlparse, parse_qs
+import websockets
 
 from libs import licence, tools, sessions, boards, users
 boards = boards.Board()
@@ -838,7 +838,8 @@ async def handler(websocket):
         parsed_url = urlparse(websocket.request.path)
         query_params = parse_qs(parsed_url.query)
         token = query_params.get("token", False)[0]
-    except Exception:
+
+    except AttributeError:
         return False
 
     if not token or not sesssdb.check(token):
