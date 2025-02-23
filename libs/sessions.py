@@ -38,15 +38,16 @@ class Sessions:
                     data = json.load(f)
                 except json.JSONDecodeError:
                     data = []
+
                 data.append(session_id)
                 f.seek(0)
                 f.truncate()
                 json.dump(data, f, indent=4)
 
         except FileNotFoundError:
-            # Gère le cas où le fichier n'existe pas encore
-            with open(self.filename, 'w') as f:
+            with open(self.filename, "w", encoding="utf-8") as f:
                 json.dump([session_id], f, indent=4)
+
         return session_id
 
     def check(self, session_id):
