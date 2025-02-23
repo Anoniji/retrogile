@@ -325,6 +325,7 @@ function scrollFix() {
 if (username !== null) {
     let ws;
     let reconnectInterval = 1000;
+    let needReload = false;
     let board_author;
     let user_id = false;
 
@@ -731,7 +732,7 @@ if (username !== null) {
         if (window.location.protocol === 'https:') {
             ws_path = `wss://wss-${location.hostname}`;
         }
-        ws = new WebSocket(ws_path);
+        ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
 
         $(document).on('mousemove', function (event) {
             pos_x = event.pageX;
@@ -1157,24 +1158,28 @@ if (username !== null) {
         };
 
         ws.onopen = () => {
-            reconnectInterval = 1000;
-            $('nav').removeClass('nav_disconnected');
-            ws.send(JSON.stringify({
-                type: 'connect',
-                board_id: board_id,
-                username: localStorage.getItem('username'),
-            }));
+            if(needReload) {
+                window.location.reload();
+            } else {
+                $('nav').removeClass('nav_disconnected');
+                ws.send(JSON.stringify({
+                    type: 'connect',
+                    board_id: board_id,
+                    username: localStorage.getItem('username'),
+                }));
 
-            ws.send(JSON.stringify({
-                type: 'board_info',
-                board_id: board_id,
-                username: username,
-            }));
+                ws.send(JSON.stringify({
+                    type: 'board_info',
+                    board_id: board_id,
+                    username: username,
+                }));
 
-            setInterval(function () { mouse_position() }, 2000);
+                setInterval(function () { mouse_position() }, 2000);            
+            }
         };
 
         ws.onclose = () => {
+            needReload = true;
             showNotification('{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
