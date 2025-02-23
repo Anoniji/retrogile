@@ -15,7 +15,7 @@ from flask import Flask, render_template, send_from_directory, request, make_res
 from flask_jsonpify import jsonify
 
 from gevent import monkey
-from libs import licence, tools
+from libs import licence, sessions, tools
 
 monkey.patch_all()
 
@@ -24,6 +24,7 @@ logging.basicConfig(filename="retrogile.log", level=logging.DEBUG)
 
 # ///////////////////////////////////////////////////////////////////////
 
+sesssdb = sessions.Sessions()
 app = Flask(__name__, template_folder="./")
 current_year = datetime.datetime.now().year
 CURRENT_VERSION = "1.0dev"
@@ -181,7 +182,7 @@ def home():
         return render_template(
             "./pages/home.html", current_year=current_year,
             current_version=CURRENT_VERSION,
-            translates=load_translate(lang)
+            translates=load_translate(lang),
         )
 
     return jsonify(["board_not_found"])
@@ -204,7 +205,7 @@ def board(board_id):
         return render_template(
             "./pages/board.html", current_year=current_year,
             current_version=CURRENT_VERSION, board_id=board_id,
-            translates=load_translate(lang)
+            translates=load_translate(lang),
         )
 
     return jsonify(["board_not_found"])
@@ -245,7 +246,9 @@ def jsi(path):
     if os.path.isfile("js/" + path) and path_check(path):
         lang = request.accept_languages.best_match(LIST_LANGS)
         data = render_template(
-            "js/" + path, translates=load_translate(lang)
+            "js/" + path,
+            translates=load_translate(lang),
+            ws_session=sesssdb.create(),
         )
 
         response = make_response(data)
