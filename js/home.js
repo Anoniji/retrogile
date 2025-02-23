@@ -19,6 +19,7 @@ if (username === null) {
 
     let ws;
     let reconnectInterval = 1000;
+    let needReload = false;
 
     function renameBoard(board_uuid) {
         if (!board_uuid) return;
@@ -70,7 +71,7 @@ if (username === null) {
         if (window.location.protocol === 'https:') {
             ws_path = `wss://wss-${location.hostname}`;
         }
-        ws = new WebSocket(ws_path);
+        ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
             if (ws_data.type == 'board_list') {
@@ -101,15 +102,19 @@ if (username === null) {
         });
 
         ws.onopen = () => {
-            reconnectInterval = 1000;
-            $('nav').removeClass('nav_disconnected');
-            ws.send(JSON.stringify({
-                type: 'board_list',
-                username: localStorage.getItem('username')
-            }));
+            if(needReload) {
+                window.location.reload();
+            } else {
+                $('nav').removeClass('nav_disconnected');
+                ws.send(JSON.stringify({
+                    type: 'board_list',
+                    username: localStorage.getItem('username')
+                }));
+            }
         };
 
         ws.onclose = () => {
+            needReload = true;
             $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
             reconnectInterval *= 2;
