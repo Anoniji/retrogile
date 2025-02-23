@@ -32,17 +32,21 @@ class Sessions:
             str: The generated session ID.
         """
         session_id = str(uuid.uuid4())
-        with open(self.filename, "r+", encoding="utf-8") as f:
-            try:
-                data = json.load(f)
-            except json.JSONDecodeError:
-                data = []
+        try:
+            with open(self.filename, "r+", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+                data.append(session_id)
+                f.seek(0)
+                f.truncate()
+                json.dump(data, f, indent=4)
 
-            data.append(session_id)
-            f.seek(0)
-            json.dump(data, f, indent=4)
-            f.truncate()
-
+        except FileNotFoundError:
+            # Gère le cas où le fichier n'existe pas encore
+            with open(self.filename, 'w') as f:
+                json.dump([session_id], f, indent=4)
         return session_id
 
     def check(self, session_id):
@@ -55,7 +59,7 @@ class Sessions:
         Returns:
             bool: True if the session ID was found and removed, False otherwise.
         """
-        with open(self.filename, 'r+', encoding="utf-8") as f:
+        with open(self.filename, "r+", encoding="utf-8") as f:
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
@@ -69,19 +73,3 @@ class Sessions:
                 return True
 
             return False
-
-# # Example Usage
-# if __name__ == "__main__":
-#     sessions = Sessions()
-#     session_id = sessions.create()
-#     print(f"Session created with ID: {session_id}")
-#     if sessions.check(session_id):
-#         print(f"Session with ID {session_id} found and removed.")
-#     else:
-#         print(f"Session with ID {session_id} not found.")
-
-#     # Attempt to remove a non-existent UUID
-#     if sessions.check(str(uuid.uuid4())):
-#        print("Session found and removed")
-#     else:
-#         print("Session not found")
