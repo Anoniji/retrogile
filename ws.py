@@ -13,10 +13,12 @@ import datetime
 from pathlib import Path
 from collections import OrderedDict
 import websockets
+from urllib.parse import urlparse, parse_qs
 
-from libs import licence, tools, boards, users
+from libs import licence, tools, sessions, boards, users
 boards = boards.Board()
 usersdb = users.Users()
+sesssdb = sessions.Sessions()
 
 BOARD_VERSION = 5
 users = {}
@@ -831,6 +833,16 @@ async def handler(websocket):
     """
     # pylint: disable=W0602
     global users, clients, POS
+
+    try:
+        parsed_url = urlparse(websocket.request.path)
+        query_params = parse_qs(parsed_url.query)
+        token = query_params.get("token", False)[0]
+    except Exception:
+        return False
+
+    if not token or not sesssdb.check(token):
+        return False
 
     clients.add(websocket)
     client_id = POS
