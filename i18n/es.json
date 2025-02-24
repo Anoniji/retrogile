@@ -29,7 +29,7 @@
 	"board_js_1": "Cronómetro",
 	"board_js_2": "dbclicks",
 	"board_js_3": "URL de la tabla copiada",
-	"board_js_4": "Cronómetro en segundos",
+	"board_js_4": "Cronómetro en minutos (máximo 20)",
 	"board_js_5": "Votos max",
 	"board_js_6": "Añadir una nueva tarjeta",
 	"board_js_7": "Modificación del contenido de la tarjeta",
