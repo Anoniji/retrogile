@@ -616,6 +616,27 @@ def add_user_to_board(board_id, username):
     return True
 
 
+def set_confetti_color(data):
+    """
+    Retrieves the user's confetti color from the database
+    and adds it to the data.
+
+    Args:
+        data (dict): A dictionary containing user information,
+                     including a 'username' key.
+
+    Returns:
+        dict: The modified 'data' dictionary with the 'color' key added
+              and the 'username' key removed.
+
+    """
+    confetti_color = usersdb.get_user_color(data.get('username'))
+    data['color'] = confetti_color
+    del data['username']
+
+    return data
+
+
 def send_list_multi(send_list, clients_lst, msg_data):
     """
     Appends a tuple of clients and message data to a send list.
@@ -751,7 +772,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         )
 
     elif message_type == "start_confetti":
-        send_list = send_list_multi(send_list, clients, data)
+        send_list = send_list_multi(send_list, clients, set_confetti_color(data))
 
     elif message_type in (
         "card_add",
