@@ -28,7 +28,7 @@ sesssdb = sessions.Sessions()
 app = Flask(__name__, template_folder="./")
 current_year = datetime.datetime.now().year
 CURRENT_VERSION = "1.0dev"
-LIST_LANGS = ['fr', 'en']
+LIST_LANGS = ['fr', 'es',  'en']
 
 if os.path.isfile("version"):
     with open("version", "r", encoding="utf-8") as file_version:
