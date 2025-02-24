@@ -29,7 +29,7 @@
 	"board_js_1": "Minuteur",
 	"board_js_2": "dbclicks",
 	"board_js_3": "URL du tableau copiée",
-	"board_js_4": "Minuteur en secondes",
+	"board_js_4": "Minuteur en minutes (max 20)",
 	"board_js_5": "Votes max",
 	"board_js_6": "Ajouter une nouvelle carte",
 	"board_js_7": "Modification du contenu de la carte",
