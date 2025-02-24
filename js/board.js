@@ -331,6 +331,8 @@ if (username !== null) {
     let user_id = false;
 
     let confettiActive = false;
+    let confettiSpread = false;
+    let confettiTimer = false;
     let isDrawing = false;
     let line;
     let startX, startY;
@@ -437,7 +439,7 @@ if (username !== null) {
     });
 
     $('#confetti').on('mouseup', function(e) {
-        if (!isDrawing) return;
+        if (!isDrawing && !confettiSpread) return;
         isDrawing = false;
 
         let endX = e.pageX - $(this).offset().left;
@@ -449,6 +451,7 @@ if (username !== null) {
         ws.send(JSON.stringify({
             type: 'start_confetti',
             board_id: board_id,
+            username: username,
             startX: startX,
             startY: startY + parseInt($('#confetti').css('top')),
             angle: angle,
@@ -456,7 +459,6 @@ if (username !== null) {
         }));
         $('.circle, .line').remove();
         confettiActive = false;
-        $('#board_confetti').prop('disabled', false);
     });
 
     function updateLine(x1, y1, x2, y2, line) {
@@ -997,16 +999,27 @@ if (username !== null) {
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
             } else if (ws_data.type == 'start_confetti') {
-                confetti({
-                    particleCount: 256,
-                    startVelocity: Math.min(ws_data.distance / 5, 100),
-                    spread: 70,
-                    angle: 180 - ws_data.angle,
-                    origin: { x: ws_data.startX / $('#confetti').width(), y: ws_data.startY / $('#confetti').height() },
-                    gravity: 0.5,
-                    decay: 0.9,
-                    drift: 0.1,
-                });
+                if(!confettiSpread) {
+                    confettiSpread = true;
+                    confetti({
+                        particleCount: 512,
+                        startVelocity: Math.min(ws_data.distance / 5, 100),
+                        spread: 70,
+                        angle: 180 - ws_data.angle,
+                        origin: { x: ws_data.startX / $('#confetti').width(), y: ws_data.startY / $('#confetti').height() },
+                        gravity: 0.5,
+                        decay: 0.9,
+                        drift: 0.1,
+                        colors: [ws_data.color.replace('#', '')]
+                    })
+                    if(confettiTimer) {
+                        clearTimeout(confettiTimer);
+                    }
+                    confettiTimer = setTimeout(function() {
+                        confettiSpread = false;
+                        $('#board_confetti').prop('disabled', false);
+                    }, 4000);
+                }
             } else if (ws_data.type == 'start_vote') {
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
                 $('.votes').text('0');
