@@ -29,7 +29,7 @@
 	"board_js_1": "Timer",
 	"board_js_2": "dbclicks",
 	"board_js_3": "Board url copied",
-	"board_js_4": "Timer in secondes",
+	"board_js_4": "Timer in minutes (max 20)",
 	"board_js_5": "Max votes",
 	"board_js_6": "Add new Card",
 	"board_js_7": "Editing Card content",
