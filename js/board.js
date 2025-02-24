@@ -1078,7 +1078,7 @@ if (username !== null) {
                 if (ws_data.card_view.author != username) {
                     showNotification(ws_data.card_view.author, notif_txt);
                 } else {
-                    showNotification('You', notif_txt.replace('these', 'your'));
+                    showNotification('{{ translates.board_js_23 }}', notif_txt.replace('{{ translates.board_js_24 }}', '{{ translates.board_js_25 }}'));
                     if (ws_data.card_view.hidden) {
                         $('#board_cards_visibility .material-icons').html('visibility_off');
                         $('#board_cards_visibility .title').html('{{ translates.board_js_19 }}');
