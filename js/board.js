@@ -904,7 +904,7 @@ if (username !== null) {
                 if (list_users.hasOwnProperty(username)) {
                     if (list_users[username]['card_visibility']) {
                         $('#board_cards_visibility .material-icons').html('visibility_off');
-                        $('#board_cards_visibility .title').html('Hide my cards');
+                        $('#board_cards_visibility .title').html('{{ translates.board_js_19 }}');
                     }
                 }
 
