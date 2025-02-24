@@ -86,8 +86,9 @@ $(function () { $('#console').accordion({ collapsible: true, active: false, heig
     $('#console_dot').hide('fade');
 }}); });
 
-function showNotification(user, message) {
-    var notification = $('<div class="notification">');
+function showNotification(type, user, message) {
+    var notification = $(`<div class="notification notif_${type}">`);
+    $(`.notif_${type}`).hide();
     notification.append(`<b>${user}</b> ${message}`);
     $('body #notifications').append(notification);
     notification.slideDown(300).delay(2000).slideUp(300, function () {
@@ -347,7 +348,7 @@ if (username !== null) {
         try {
             navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
                 if (result.state == 'granted' || result.state == 'prompt') {
-                    showNotification('(!)', '{{ translates.board_js_3 }}');
+                    showNotification('link', '(!)', '{{ translates.board_js_3 }}');
                     navigator.clipboard.writeText(window.location.href);
                 }
             });
@@ -358,14 +359,14 @@ if (username !== null) {
 
     function startTimer() {
         if (board_author != username) return;
-        let timerInSeconds = prompt('{{ translates.board_js_4 }}');
+        let timerInMinutes = prompt('{{ translates.board_js_4 }}');
 
-        timerInSeconds = removeNonNumeric(timerInSeconds);
-        if (timerInSeconds && timerInSeconds != '') {
+        timerInMinutes = removeNonNumeric(timerInMinutes);
+        if (timerInMinutes && timerInMinutes != '') {
             ws.send(JSON.stringify({
                 type: 'start_timer',
                 board_id: board_id,
-                timerInSeconds: timerInSeconds,
+                timerInMinutes: timerInMinutes,
             }));
         }
     }
@@ -1016,7 +1017,7 @@ if (username !== null) {
                 pct_votes = (totalVotes * 100 / maxVoteTotal);
                 $('nav #vote_progress').css('width', `${pct_votes}%`);
                 if (pct_votes < 1) {
-                    showNotification('{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
+                    showNotification('vote', '{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
                     $('nav #vote_progress').hide().css('width', '100%');
                 }
             } else if (ws_data.type == 'card_add') {
@@ -1070,15 +1071,17 @@ if (username !== null) {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
 
+                notif_type = 'hide'
                 notif_txt = '{{ translates.board_js_17 }}';
                 if (ws_data.card_view.visibility) {
+                    notif_type = 'show'
                     notif_txt = '{{ translates.board_js_18 }}';
                 }
 
                 if (ws_data.card_view.author != username) {
-                    showNotification(ws_data.card_view.author, notif_txt);
+                    showNotification(notif_type, ws_data.card_view.author, notif_txt);
                 } else {
-                    showNotification('{{ translates.board_js_23 }}', notif_txt.replace('{{ translates.board_js_24 }}', '{{ translates.board_js_25 }}'));
+                    showNotification(notif_type, '{{ translates.board_js_23 }}', notif_txt.replace('{{ translates.board_js_24 }}', '{{ translates.board_js_25 }}'));
                     if (ws_data.card_view.hidden) {
                         $('#board_cards_visibility .material-icons').html('visibility_off');
                         $('#board_cards_visibility .title').html('{{ translates.board_js_19 }}');
@@ -1107,7 +1110,7 @@ if (username !== null) {
                 pct_votes = 100 - (totalVotes * 100 / maxVoteTotal);
                 $('nav #vote_progress').css('width', `${pct_votes}%`);
                 if (pct_votes < 1) {
-                    showNotification('{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
+                    showNotification('vote', '{{ translates.board_js_21 }}', '{{ translates.board_js_22 }}');
                     $('nav #vote_progress').hide().css('width', '100%');
                 }
             } else if (ws_data.type == 'card_delete') {
@@ -1180,7 +1183,7 @@ if (username !== null) {
 
         ws.onclose = () => {
             needReload = true;
-            showNotification('{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
+            showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
             reconnectInterval *= 2;
