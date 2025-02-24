@@ -267,6 +267,11 @@ nav #users div {
     font-size: 12px;
 }
 
+#licenses_list li a {
+    text-decoration: none;
+    color: #333;
+}
+
 footer {
     position: fixed;
     left: 8px;
