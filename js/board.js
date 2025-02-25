@@ -371,7 +371,6 @@ if (username !== null) {
         if (timerInMinutes && timerInMinutes != '') {
             ws.send(JSON.stringify({
                 type: 'start_timer',
-                board_id: board_id,
                 timerInMinutes: timerInMinutes,
             }));
         }
@@ -385,7 +384,6 @@ if (username !== null) {
         if (maxVote && maxVote != '') {
             ws.send(JSON.stringify({
                 type: 'start_vote',
-                board_id: board_id,
                 maxVote: maxVote,
             }));
         }
@@ -395,8 +393,6 @@ if (username !== null) {
         custom_color = $('#custom_color').val();
         ws.send(JSON.stringify({
             type: 'user_color',
-            board_id: board_id,
-            username: username,
             custom_color: custom_color,
         }));
         $(this).attr("type", "hidden");
@@ -454,12 +450,10 @@ if (username !== null) {
 
         ws.send(JSON.stringify({
             type: 'start_confetti',
-            board_id: board_id,
-            username: username,
-            startX: startX,
+            startX: parseInt(startX),
             startY: startY + parseInt($('#confetti').css('top')),
-            angle: angle,
-            distance: distance,
+            angle: parseInt(angle),
+            distance: parseInt(distance),
         }));
         $('.circle, .line').remove();
         confettiActive = false;
@@ -480,7 +474,6 @@ if (username !== null) {
     function start_timer() {
         ws.send(JSON.stringify({
             type: 'start_timer',
-            board_id: board_id,
             timerInSeconds: timerInSeconds,
         }));
     }
@@ -492,7 +485,6 @@ if (username !== null) {
                     type: 'card_add',
                     pos: $(`#col_${col_id} ul`).children('li').length,
                     author: username,
-                    board_id: board_id,
                     user_id: user_id,
                     col_id: col_id,
                     votes: 0,
@@ -503,8 +495,6 @@ if (username !== null) {
                 waiting_unfreeze = false;
                 ws.send(JSON.stringify({
                     type: 'board_info',
-                    board_id: board_id,
-                    username: username,
                 }));
             }
         });
@@ -527,7 +517,6 @@ if (username !== null) {
         ws.send(JSON.stringify({
             type: 'card_unmerge',
             author: username,
-            board_id: board_id,
             user_id: user_id,
             col_id: col_id,
             card_uuid: parent,
@@ -542,7 +531,6 @@ if (username !== null) {
                 ws.send(JSON.stringify({
                     type: 'card_edit',
                     author: username,
-                    board_id: board_id,
                     user_id: user_id,
                     col_id: col_id,
                     card_uuid: card_uuid,
@@ -553,8 +541,6 @@ if (username !== null) {
                 waiting_unfreeze = false;
                 ws.send(JSON.stringify({
                     type: 'board_info',
-                    board_id: board_id,
-                    username: username,
                 }));
             }
         });
@@ -571,7 +557,6 @@ if (username !== null) {
                 ws.send(JSON.stringify({
                     type: 'card_vote',
                     author: username,
-                    board_id: board_id,
                     user_id: user_id,
                     col_id: col_id,
                     card_uuid: card_uuid,
@@ -586,7 +571,6 @@ if (username !== null) {
         ws.send(JSON.stringify({
             type: 'card_delete',
             author: username,
-            board_id: board_id,
             user_id: user_id,
             col_id: col_id,
             card_uuid: card_uuid,
@@ -602,7 +586,6 @@ if (username !== null) {
             ws.send(JSON.stringify({
                 type: 'col_add',
                 author: username,
-                board_id: board_id,
                 user_id: user_id,
                 colName: colName,
             }));
@@ -637,7 +620,6 @@ if (username !== null) {
         ws.send(JSON.stringify({
             type: 'col_reorder',
             author: username,
-            board_id: board_id,
             user_id: user_id,
             colName: newOrder,
             uuidList: false,
@@ -656,7 +638,6 @@ if (username !== null) {
             ws.send(JSON.stringify({
                 type: 'card_view',
                 author: username,
-                board_id: board_id,
                 user_id: user_id,
             }));
         }
@@ -666,7 +647,6 @@ if (username !== null) {
         ws.send(JSON.stringify({
             type: 'card_parent',
             author: username,
-            board_id: board_id,
             user_id: user_id,
             col_id: false,
             card_uuid: parentId,
@@ -687,7 +667,6 @@ if (username !== null) {
         ws.send(JSON.stringify({
             type: 'col_order',
             author: username,
-            board_id: board_id,
             user_id: user_id,
             colName: name.slice(4),
             uuidList: uuid_list,
@@ -704,7 +683,6 @@ if (username !== null) {
             ws.send(JSON.stringify({
                 type: 'col_delete',
                 author: username,
-                board_id: board_id,
                 user_id: user_id,
                 colName: col_id,
             }));
@@ -758,7 +736,6 @@ if (username !== null) {
         function mouse_position() {
             ws.send(JSON.stringify({
                 type: 'cursor_user',
-                board_id: board_id,
                 pos_x: pos_x,
                 pos_y: pos_y,
             }));
@@ -858,8 +835,6 @@ if (username !== null) {
 
                 ws.send(JSON.stringify({
                     type: 'board_info',
-                    board_id: board_id,
-                    username: username,
                 }));
             } else if (ws_data.type == 'board_info') {
                 if (freeze_board) {
@@ -889,8 +864,6 @@ if (username !== null) {
                             maxVoteTotal = $('#users .user').length * check_votes;
                             ws.send(JSON.stringify({
                                 type: 'stats_vote',
-                                board_id: board_id,
-                                username: username,
                             }));
                         }
                     }
@@ -1015,9 +988,9 @@ if (username !== null) {
             } else if (ws_data.type == 'start_confetti') {
                 if(!confettiSpread) {
                     confettiSpread = true;
-                    confetti_data = {
+                    confetti({
                         particleCount: 512,
-                        startVelocity: Math.min(ws_data.distance / 5, 100),
+                        startVelocity: parseInt(Math.min(ws_data.distance / 5, 100)),
                         spread: 70,
                         angle: 180 - ws_data.angle,
                         origin: { x: ws_data.startX / $('#confetti').width(), y: ws_data.startY / $('#confetti').height() },
@@ -1025,9 +998,7 @@ if (username !== null) {
                         decay: 0.9,
                         drift: 0.1,
                         colors: [ws_data.color.replace('#', '')]
-                    }
-                    confetti(confetti_data);
-                    console.log(confetti_data);
+                    });
                     if(confettiTimer) {
                         clearTimeout(confettiTimer);
                     }
@@ -1122,8 +1093,6 @@ if (username !== null) {
 
                 ws.send(JSON.stringify({
                     type: 'board_info',
-                    board_id: board_id,
-                    username: username,
                 }));
             } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
@@ -1154,8 +1123,6 @@ if (username !== null) {
                     } else {
                         ws.send(JSON.stringify({
                             type: 'board_info',
-                            board_id: board_id,
-                            username: username,
                         }));
                     }
                 });
@@ -1167,8 +1134,6 @@ if (username !== null) {
             } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add'].includes(ws_data.type)) {
                 ws.send(JSON.stringify({
                     type: 'board_info',
-                    board_id: board_id,
-                    username: username,
                 }));
             } else {
                 if (!$('#console h3').hasClass('ui-state-active') && ws_data.username != username) {
@@ -1183,7 +1148,6 @@ if (username !== null) {
             const textField = document.getElementById('chat_msg');
             ws.send(JSON.stringify({
                 type: 'message',
-                board_id: board_id,
                 content: escapeHtml(textField.value),
             }));
             textField.value = '';
@@ -1202,8 +1166,6 @@ if (username !== null) {
 
                 ws.send(JSON.stringify({
                     type: 'board_info',
-                    board_id: board_id,
-                    username: username,
                 }));
 
                 setInterval(function () { mouse_position() }, 2000);            
