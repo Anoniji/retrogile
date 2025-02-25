@@ -1002,7 +1002,7 @@ if (username !== null) {
             } else if (ws_data.type == 'start_confetti') {
                 if(!confettiSpread) {
                     confettiSpread = true;
-                    confetti({
+                    confetti_data = {
                         particleCount: 512,
                         startVelocity: Math.min(ws_data.distance / 5, 100),
                         spread: 70,
@@ -1012,7 +1012,9 @@ if (username !== null) {
                         decay: 0.9,
                         drift: 0.1,
                         colors: [ws_data.color.replace('#', '')]
-                    })
+                    }
+                    confetti(confetti_data);
+                    console.log(confetti_data);
                     if(confettiTimer) {
                         clearTimeout(confettiTimer);
                     }
