@@ -7,7 +7,6 @@ Retrogile Sessions Manager
 
 import json
 import uuid
-import os
 
 
 class Sessions:
@@ -20,9 +19,9 @@ class Sessions:
         Initializes the Sessions object.
         """
         self.filename = "board/sessions.db"
-        if not os.path.exists(self.filename):
-            with open(self.filename, "w", encoding="utf-8") as f:
-                json.dump([], f)
+        self.sess_dta = {}
+        with open(self.filename, "w", encoding="utf-8") as f:
+            json.dump({}, f)
 
     def create(self):
         """
@@ -32,33 +31,34 @@ class Sessions:
             str: The generated session ID.
         """
         session_id = str(uuid.uuid4())
-        try:
-            with open(self.filename, "r+", encoding="utf-8") as f:
-                try:
-                    data = json.load(f)
-                except json.JSONDecodeError:
-                    data = []
+        with open(self.filename, "r+", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = {}
 
-                data.append(session_id)
-                f.seek(0)
-                f.truncate()
-                json.dump(data, f, indent=4)
+            if not isinstance(data, dict):
+                data = {}
 
-        except FileNotFoundError:
-            with open(self.filename, "w", encoding="utf-8") as f:
-                json.dump([session_id], f, indent=4)
+            data[session_id] = False
+            f.seek(0)
+            f.truncate()
+            json.dump(data, f, indent=4)
+            self.sess_dta = data
 
         return session_id
 
-    def check(self, session_id):
+    def set(self, session_id, session_data):
         """
-        Checks if a session ID exists in the session file. If found, removes it and returns True.
+        Sets or updates session data for a given session ID in the session file.
 
         Args:
-            session_id (str): The session ID to check.
+            session_id (str): The unique identifier for the session.
+            session_data (dict): The data to be associated with the session.
 
         Returns:
-            bool: True if the session ID was found and removed, False otherwise.
+            bool: True if the session data was successfully set or updated, False otherwise.
+                  Returns False if the session file is corrupted or the session ID is not found.
         """
         with open(self.filename, "r+", encoding="utf-8") as f:
             try:
@@ -67,10 +67,79 @@ class Sessions:
                 return False
 
             if session_id in data:
-                data.remove(session_id)
+                data[session_id] = session_data
                 f.seek(0)
                 json.dump(data, f, indent=4)
                 f.truncate()
+                self.sess_dta = data
                 return True
 
-            return False
+        return False
+
+    def get(self, session_id):
+        """
+        Retrieves session data associated with a given session ID.
+
+        Args:
+            session_id (str): The ID of the session to retrieve.
+
+        Returns:
+            dict or False: The session data if the session ID exists, False otherwise.
+        """
+        if session_id in self.sess_dta:
+            return self.sess_dta[session_id]
+
+        return False
+
+    def remove(self, session_id):
+        """
+        Removes a session from the stored session data.
+
+        This method attempts to remove a session identified by `session_id` from the
+        JSON data stored in the file specified by `self.filename`.
+
+        Args:
+            session_id (str): The ID of the session to remove.
+
+        Returns:
+            bool: True if the session was successfully removed, False otherwise.
+                  Returns False if the session ID is not found or if the JSON file
+                  cannot be decoded.
+        """
+        with open(self.filename, "r+", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                return False
+
+            if session_id in data:
+                del data[session_id]
+                f.seek(0)
+                json.dump(data, f, indent=4)
+                f.truncate()
+                self.sess_dta = data
+                return True
+
+        return False
+
+    def check(self, session_id):
+        """
+        Checks if a session ID exists in the session file. If found, returns True.
+
+        Args:
+            session_id (str): The session ID to check.
+
+        Returns:
+            bool: True if the session ID was found, False otherwise.
+        """
+        with open(self.filename, "r+", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+                self.sess_dta = data
+            except json.JSONDecodeError:
+                return False
+
+            if session_id in data and not data[session_id]:
+                return True
+
+        return False
