@@ -743,9 +743,6 @@ if (username !== null) {
 
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
-            if (ws_data.board_id != board_id) {
-                return
-            }
             debugger;
             if (ws_data.type == 'connect_status') {
                 if (!ws_data.error) {
@@ -759,11 +756,10 @@ if (username !== null) {
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
                 $.each(ws_data.users_list, function (index, value) {
-                    console.log(`${user_id} && ${user_id} != ${index} && ${value.board_id} == ${board_id}`);
-                    if (user_id && user_id != index && value.board_id == board_id) {
+                    if (user_id && user_id != index && ws_data.board_id == board_id) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${value.username}</div></div>`)
                     }
-                    if (value.board_id == board_id) {
+                    if (ws_data.board_id == board_id) {
                         var $div_username = $(`#users div[data-username=${value.username}]`);
                         if ($($div_username).length > 0) {
                             var currentCount = parseInt($div_username.attr('data-count'));
@@ -780,7 +776,6 @@ if (username !== null) {
                     }
                 });
             } else if (ws_data.type == 'user_add') {
-                console.log(`${user_id} != ${ws_data.user_id} && ${ws_data.board_id} == ${board_id}`);
                 if (user_id != ws_data.user_id && ws_data.board_id == board_id) {
                     log(`< ${ws_data.username} > {{ translates.board_js_10 }}`, 'yellow');
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${ws_data.username}</div></div>`);
