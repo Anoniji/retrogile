@@ -88,7 +88,7 @@ def get_board_info_by_id(board_id, username_filter=False):
     if board_id:
         _tmps, _ = boards.get_board(board_id)
 
-        if "version" not in _tmps:
+        if not _tmps or "version" not in _tmps:
             return False
 
         if _tmps["version"] != BOARD_VERSION:
@@ -484,6 +484,23 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
     return send_list
 
 
+def send_list_multi(send_list, clients_lst, msg_data):
+    """
+    Appends a tuple of clients and message data to a send list.
+
+    Args:
+        send_list: A list to store tuples of clients and message data.
+        clients_lst: A list of clients to send the message to.
+        msg_data: The message data to be sent.
+
+    Returns:
+        list: send_list
+    """
+    for client in clients_lst:
+        send_list.append([client, msg_data])
+    return send_list
+
+
 def votes_manager_by_id(send_list, board_id, mode, websocket, data):
     """
     Manages votes for a specific board.
@@ -501,8 +518,10 @@ def votes_manager_by_id(send_list, board_id, mode, websocket, data):
     if mode == "start_vote":
         board_votes_reset_by_id(board_id, data.get("maxVote"))
         board_votes_init(board_id, data.get("maxVote"))
-        send_list.append(
-            send_list_multi(send_list, clients, data)
+        send_list = send_list_multi(
+            send_list,
+            clients,
+            data,
         )
 
     elif mode == "stats_vote":
@@ -637,24 +656,7 @@ def set_confetti_color(data):
     return data
 
 
-def send_list_multi(send_list, clients_lst, msg_data):
-    """
-    Appends a tuple of clients and message data to a send list.
-
-    Args:
-        send_list: A list to store tuples of clients and message data.
-        clients_lst: A list of clients to send the message to.
-        msg_data: The message data to be sent.
-
-    Returns:
-        list: send_list
-    """
-    for client in clients_lst:
-        send_list.append([client, msg_data])
-    return send_list
-
-
-def message_responce(send_list, websocket, board_id, client_id, data):
+def message_responce(send_list, websocket, token, client_id, data):
     """
     Processes a received message and builds a list of messages to send.
 
@@ -666,7 +668,7 @@ def message_responce(send_list, websocket, board_id, client_id, data):
     Args:
         send_list: A list to store tuples of target websockets and message.
         websocket: The websocket that sent the original message.
-        board_id: The ID of the board the message is related to.
+        token: The ID of the websocket session.
         client_id: The ID of the client who sent the message.
         data: The data payload of the received message.
 
@@ -676,13 +678,20 @@ def message_responce(send_list, websocket, board_id, client_id, data):
 
     message_type = data.get("type")
     if message_type == "connect":
-        boards.add_client(board_id)
+        board_id = data.get("board_id", False)
         message_username = data.get("username")
+
+        if board_id:
+            sesssdb.set(token, {
+                "board_id": board_id,
+                "username": message_username,
+            })
+
+        boards.add_client(board_id)
         color_username = usersdb.get_user_color(message_username)
         users[client_id] = {
             "username": message_username,
             "color": color_username,
-            "board_id": board_id,
         }
 
         send_list.append(
@@ -718,8 +727,16 @@ def message_responce(send_list, websocket, board_id, client_id, data):
         )
 
         add_user_to_board(board_id, message_username)
+        return send_list
 
-    elif message_type == "cursor_user":
+    sesss_data = sesssdb.get(token)
+    board_id = False
+    if sesss_data and "board_id" in sesss_data:
+        board_id = sesss_data["board_id"]
+        data["board_id"] = board_id
+        data["username"] = sesss_data["username"]
+
+    if message_type == "cursor_user":
         send_list = send_list_multi(
             send_list,
             clients,
@@ -880,9 +897,9 @@ async def handler(websocket):
     try:
         while True:
             data = json.loads(await websocket.recv())
-            board_id = data.get("board_id")
             send_list = message_responce(
-                send_list, websocket, board_id, client_id, data
+                send_list, websocket, token,
+                client_id, data
             )
 
             if len(send_list) > 0:
@@ -896,6 +913,7 @@ async def handler(websocket):
 
     finally:
         clients.remove(websocket)
+        sesssdb.remove(token)
 
         for ws in clients:
             if client_id in users:
