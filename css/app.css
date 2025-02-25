@@ -556,7 +556,7 @@ right: -37px;
 #board .col .card_icon div {
     display: inline-block;
     position: relative;
-    top: -3px;
+    top: -2px;
     cursor: pointer;
     font-size: 10px;
     line-height: 12px;
