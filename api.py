@@ -244,17 +244,21 @@ def jsi(path):
             - If the file doesn't exist, returns a JSON response
     """
     if os.path.isfile("js/" + path) and path_check(path):
-        lang = request.accept_languages.best_match(LIST_LANGS)
-        data = render_template(
-            "js/" + path,
-            translates=load_translate(lang),
-            ws_session=sesssdb.create(),
-        )
+        referer = request.headers.get('Referer')
+        if referer:
+            lang = request.accept_languages.best_match(LIST_LANGS)
+            data = render_template(
+                "js/" + path,
+                translates=load_translate(lang),
+                ws_session=sesssdb.create(),
+            )
 
-        response = make_response(data)
-        response.headers['Content-Type'] = 'application/javascript'
+            response = make_response(data)
+            response.headers['Content-Type'] = 'application/javascript'
 
-        return response
+            return response
+
+        return jsonify(["jsi_direct_access_blocked"])
 
     return jsonify(["jsi_not_found"])
 
