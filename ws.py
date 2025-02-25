@@ -22,7 +22,7 @@ sesssdb = sessions.Sessions()
 
 BOARD_VERSION = 5
 users = {}
-clients = set()
+clients = {}
 POS = 0
 
 
@@ -473,13 +473,17 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
             del board_info["data"][data.get("col_id")][data.get("card_uuid")]
 
     boards.update_board(board_id, board_info)
-    for ws in clients:
-        send_list.append(
-            board_manager_response(
-                (websocket, ws),
-                data, board_info,
-                (mode, board_id, card_uuid, card_votes))
-        )
+    for tk, ws in clients.items():
+        if (
+            sesssdb.get(tk) and
+            board_id == sesssdb.get(tk)['board_id']
+        ):
+            send_list.append(
+                board_manager_response(
+                    (websocket, ws),
+                    data, board_info,
+                    (mode, board_id, card_uuid, card_votes))
+            )
 
     return send_list
 
@@ -496,8 +500,13 @@ def send_list_multi(send_list, clients_lst, msg_data):
     Returns:
         list: send_list
     """
-    for client in clients_lst:
-        send_list.append([client, msg_data])
+    for tk, client in clients_lst.items():
+        if (
+            sesssdb.get(tk) and
+            msg_data['board_id'] == sesssdb.get(tk)['board_id']
+        ):
+            send_list.append([client, msg_data])
+
     return send_list
 
 
@@ -849,7 +858,7 @@ def ws_stats():
     num_users = len(users)
     print(f"> Total users  : {num_users}")
 
-    num_clients = len(clients)
+    num_clients = len(clients.keys())
     print(f"> Total clients: {num_clients}")
 
     print(f"> Next position: {POS}")
@@ -887,7 +896,7 @@ async def handler(websocket):
     if not token or not sesssdb.check(token):
         return False
 
-    clients.add(websocket)
+    clients[token] = websocket
     client_id = POS
     board_id = False
     send_list = []
@@ -912,10 +921,10 @@ async def handler(websocket):
         ws_stats()
 
     finally:
-        clients.remove(websocket)
+        del clients[token]
         sesssdb.remove(token)
 
-        for ws in clients:
+        for tk, ws in clients.items():
             if client_id in users:
                 await ws.send(
                     json.dumps(
