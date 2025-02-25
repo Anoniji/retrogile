@@ -330,6 +330,10 @@ if (username !== null) {
     let board_author;
     let user_id = false;
 
+    let timestamps = [];
+    const spamLimit = 5;
+    const spamWindow = 10000;
+
     let confettiActive = false;
     let confettiSpread = false;
     let confettiTimer = false;
@@ -641,12 +645,21 @@ if (username !== null) {
     }
 
     function viewCardToggle() {
-        ws.send(JSON.stringify({
-            type: 'card_view',
-            author: username,
-            board_id: board_id,
-            user_id: user_id,
-        }));
+        const now = Date.now();
+        timestamps = timestamps.filter(timestamp => now - timestamp < spamWindow);
+        timestamps.push(now);
+
+        if (timestamps.length > spamLimit) {
+            showNotification('limit', '🤔', '💬');
+            $('button').prop('disabled', true);
+        } else {
+            ws.send(JSON.stringify({
+                type: 'card_view',
+                author: username,
+                board_id: board_id,
+                user_id: user_id,
+            }));
+        }
     }
 
     function moveToChild(parentId, childId) {
