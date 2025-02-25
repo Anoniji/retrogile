@@ -687,7 +687,7 @@ def message_responce(send_list, websocket, token, data):
     Returns:
         The updated `send_list` containing messages to be sent to clients.
     """
-    users = {}
+    users_list = {}
     message_type = data.get("type")
     if message_type == "connect":
         board_id = data.get("board_id", False)
@@ -716,7 +716,7 @@ def message_responce(send_list, websocket, token, data):
 
         for sess_tk, sess_data in sesssdb.sess_dta.items():
             if sess_data["board_id"] == board_id:
-                users[sess_tk] = {
+                users_list[sess_tk] = {
                     "username": sess_data["username"],
                     "color": usersdb.get_user_color(sess_data["username"]),
                 }
@@ -724,7 +724,7 @@ def message_responce(send_list, websocket, token, data):
         send_list.append(
             [
                 websocket,
-                {"type": "users_list", "users_list": users, "board_id": board_id},
+                {"type": "users_list", "users_list": users_list, "board_id": board_id},
             ]
         )
 
