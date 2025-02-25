@@ -21,9 +21,7 @@ usersdb = users.Users()
 sesssdb = sessions.Sessions()
 
 BOARD_VERSION = 5
-users = {}
 clients = {}
-POS = 0
 
 
 def get_board_list_by_author(author):
@@ -146,7 +144,7 @@ def update_timer_in_board(board_id, new_timer_value):
     return False
 
 
-def board_votes_reset_by_id(board_id, max_vote):
+def board_votes_reset_by_id(board_id, data):
     """
     Resets the vote count for a specific board.
 
@@ -157,12 +155,16 @@ def board_votes_reset_by_id(board_id, max_vote):
     Returns:
         bool: True if the reset was successful, False otherwise.
     """
+    max_vote = data.get("maxVote")
     _tmps = get_board_info_by_id(board_id)
     if not _tmps:
         return False
 
     if not max_vote:
         _tmps["votes"] = False
+    elif int(max_vote) > 100:
+        max_vote = 100
+        data["maxVote"] = max_vote
     else:
         _tmps["votes"] = int(max_vote)
 
@@ -174,7 +176,9 @@ def board_votes_reset_by_id(board_id, max_vote):
             _tmps["data"][key] = 0
 
     boards.update_board(board_id, _tmps)
-    return True
+
+    print(data)
+    return data
 
 
 def board_votes_init(board_id, max_vote):
@@ -525,7 +529,7 @@ def votes_manager_by_id(send_list, board_id, mode, websocket, data):
         list: The updated send_list. Returns False if the board doesn't exist.
     """
     if mode == "start_vote":
-        board_votes_reset_by_id(board_id, data.get("maxVote"))
+        data = board_votes_reset_by_id(board_id, data)
         board_votes_init(board_id, data.get("maxVote"))
         send_list = send_list_multi(
             send_list,
@@ -665,7 +669,7 @@ def set_confetti_color(data):
     return data
 
 
-def message_responce(send_list, websocket, token, client_id, data):
+def message_responce(send_list, websocket, token, data):
     """
     Processes a received message and builds a list of messages to send.
 
@@ -678,7 +682,6 @@ def message_responce(send_list, websocket, token, client_id, data):
         send_list: A list to store tuples of target websockets and message.
         websocket: The websocket that sent the original message.
         token: The ID of the websocket session.
-        client_id: The ID of the client who sent the message.
         data: The data payload of the received message.
 
     Returns:
@@ -698,23 +701,26 @@ def message_responce(send_list, websocket, token, client_id, data):
 
         boards.add_client(board_id)
         color_username = usersdb.get_user_color(message_username)
-        users[client_id] = {
-            "username": message_username,
-            "color": color_username,
-        }
-
         send_list.append(
             [
                 websocket,
                 {
                     "type": "connect_status",
-                    "user_id": client_id,
+                    "user_id": token,
                     "user_color": color_username,
                     "error": False,
                     "board_id": board_id,
                 },
             ]
         )
+
+        users = {}
+        for sess_tk, sess_data in sesssdb.sess_dta.items():
+            if sess_data["board_id"] == board_id:
+                users[sess_tk] = {
+                    "username": sess_data["username"],
+                    "color": usersdb.get_user_color(sess_data["username"]),
+                }
 
         send_list.append(
             [
@@ -728,7 +734,7 @@ def message_responce(send_list, websocket, token, client_id, data):
             clients,
             {
                 "type": "user_add",
-                "user_id": client_id,
+                "user_id": token,
                 "username": message_username,
                 "board_id": board_id,
                 "color": usersdb.get_user_color(message_username),
@@ -751,7 +757,7 @@ def message_responce(send_list, websocket, token, client_id, data):
             clients,
             {
                 "type": "cursor_user",
-                "user_id": client_id,
+                "user_id": token,
                 "pos_x": data.get("pos_x"),
                 "pos_y": data.get("pos_y"),
                 "board_id": board_id,
@@ -777,7 +783,6 @@ def message_responce(send_list, websocket, token, client_id, data):
         timer_in_seconds = timer_in_minutes * 60
         delta = datetime.timedelta(seconds=timer_in_seconds)
         future_time_utc = datetime.datetime.now() + delta
-        users[client_id]["timer"] = int(future_time_utc.timestamp() * 1000)
         update_timer_in_board(board_id, future_time_utc)
         send_list = send_list_multi(
             send_list,
@@ -835,8 +840,8 @@ def message_responce(send_list, websocket, token, client_id, data):
             clients,
             {
                 "type": "message",
-                "user_id": client_id,
-                "username": users[client_id]["username"],
+                "user_id": token,
+                "username": sesss_data["username"],
                 "content": message_content,
                 "board_id": board_id,
             },
@@ -855,13 +860,8 @@ def ws_stats():
     num_boards = len(boards.boards)
     print(f"> Boards loaded: {num_boards}")
 
-    num_users = len(users)
-    print(f"> Total users  : {num_users}")
-
     num_clients = len(clients.keys())
     print(f"> Total clients: {num_clients}")
-
-    print(f"> Next position: {POS}")
 
 
 async def handler(websocket):
@@ -883,7 +883,7 @@ async def handler(websocket):
         Exception: Raised for any other unexpected errors during communication.
     """
     # pylint: disable=W0602
-    global users, clients, POS
+    global clients
 
     try:
         parsed_url = urlparse(websocket.request.path)
@@ -897,18 +897,15 @@ async def handler(websocket):
         return False
 
     clients[token] = websocket
-    client_id = POS
     board_id = False
     send_list = []
-    POS += 1
     ws_stats()
 
     try:
         while True:
             data = json.loads(await websocket.recv())
             send_list = message_responce(
-                send_list, websocket, token,
-                client_id, data
+                send_list, websocket, token, data
             )
 
             if len(send_list) > 0:
@@ -924,22 +921,23 @@ async def handler(websocket):
         del clients[token]
         sesssdb.remove(token)
 
-        for tk, ws in clients.items():
-            if client_id in users:
-                await ws.send(
+        for tk, sess in sesssdb.sess_dta.items():
+            if (
+                sesssdb.get(tk) and
+                sess["board_id"] == sesssdb.get(tk)["board_id"]
+            ):
+                await clients[tk].send(
                     json.dumps(
                         {
                             "type": "user_remove",
-                            "user_id": client_id,
-                            "username": users[client_id]["username"],
+                            "user_id": token,
+                            "username": sess["username"],
                             "board_id": board_id,
                         }
                     )
                 )
 
-        if client_id in users:
-            boards.remove_client(board_id)
-            del users[client_id]
+        boards.remove_client(board_id)
 
 
 async def main():
