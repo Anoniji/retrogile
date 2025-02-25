@@ -146,14 +146,16 @@ def update_timer_in_board(board_id, new_timer_value):
 
 def board_votes_reset_by_id(board_id, data):
     """
-    Resets the vote count for a specific board.
+    Resets the vote count and vote list for a specific board.
 
     Args:
         board_id (int): The ID of the board to reset.
-        max_vote (int): Board max Votes.
+        data (dict): A dictionary containing board data, including 'maxVote'.
 
     Returns:
-        bool: True if the reset was successful, False otherwise.
+        dict: The updated 'data' dictionary if the reset was successful,
+              False otherwise.
+
     """
     max_vote = data.get("maxVote")
     _tmps = get_board_info_by_id(board_id)
@@ -176,8 +178,6 @@ def board_votes_reset_by_id(board_id, data):
             _tmps["data"][key] = 0
 
     boards.update_board(board_id, _tmps)
-
-    print(data)
     return data
 
 
@@ -687,7 +687,7 @@ def message_responce(send_list, websocket, token, data):
     Returns:
         The updated `send_list` containing messages to be sent to clients.
     """
-
+    users = {}
     message_type = data.get("type")
     if message_type == "connect":
         board_id = data.get("board_id", False)
@@ -714,7 +714,6 @@ def message_responce(send_list, websocket, token, data):
             ]
         )
 
-        users = {}
         for sess_tk, sess_data in sesssdb.sess_dta.items():
             if sess_data["board_id"] == board_id:
                 users[sess_tk] = {
