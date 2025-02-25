@@ -756,6 +756,7 @@ if (username !== null) {
             if (ws_data.board_id != board_id) {
                 return
             }
+            debugger;
             if (ws_data.type == 'connect_status') {
                 if (!ws_data.error) {
                     user_id = ws_data.user_id;
