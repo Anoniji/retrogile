@@ -715,7 +715,7 @@ def message_responce(send_list, websocket, token, data):
         )
 
         for sess_tk, sess_data in sesssdb.sess_dta.items():
-            if sess_data["board_id"] == board_id:
+            if "board_id" in sess_data and sess_data["board_id"] == board_id:
                 users_list[sess_tk] = {
                     "username": sess_data["username"],
                     "color": usersdb.get_user_color(sess_data["username"]),
