@@ -887,7 +887,9 @@ async def handler(websocket):
     try:
         parsed_url = urlparse(websocket.request.path)
         query_params = parse_qs(parsed_url.query)
-        token = query_params.get("token", False)[0]
+        token = query_params.get("token", False)
+        if token:
+            token = token[0]
 
     except AttributeError:
         return False
