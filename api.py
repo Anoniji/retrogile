@@ -245,14 +245,10 @@ def jsi(path):
     """
     if os.path.isfile("js/" + path) and path_check(path):
         referer = request.headers.get('Referer', False)
-        user_agent = request.headers.get('User-Agent', False)
-        origin = request.headers.get('Origin', False)
+        fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
+        fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
 
-        print(f'referer   : {referer}')
-        print(f'user_agent: {user_agent}')
-        print(f'origin    : {origin}')
-
-        if referer:
+        if referer and fetch_mode == "no-cors" and fetch_dest == "script":
             lang = request.accept_languages.best_match(LIST_LANGS)
             data = render_template(
                 "js/" + path,
