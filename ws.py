@@ -812,6 +812,8 @@ def message_responce(send_list, websocket, token, data):
         "card_view",
         "card_vote",
         "card_delete",
+        "card_write_start",
+        "card_write_stop",
     ):
         send_list = card_manager_by_id(
             send_list, board_id, message_type, websocket, data
