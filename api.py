@@ -251,7 +251,7 @@ def jsi(path):
         print(f'referer   : {referer}')
         print(f'user_agent: {user_agent}')
         print(f'origin    : {origin}')
-        
+
         if referer:
             lang = request.accept_languages.best_match(LIST_LANGS)
             data = render_template(
