@@ -317,6 +317,16 @@ footer a {
     opacity: .6 !important;
 }
 
+#users .writing::after {
+    content: "...";
+    position: absolute;
+    right: 0;
+    bottom: 7px;
+    width: 36px;
+    height: 19px;
+    font-size: 12px;
+}
+
 #users_custom_color {
     box-shadow: 0 0 2px #333333;
     background-color: #333333;
