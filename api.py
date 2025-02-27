@@ -249,7 +249,10 @@ def jsi(path):
         fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
 
         if (
-            referer and (("https" in referer and fetch_mode == "no-cors" and fetch_dest == "script") or "https" not in referer)
+            referer and (
+                ("https" in referer and fetch_mode == "no-cors" and fetch_dest == "script") or
+                "https" not in referer
+            )
         ):
             lang = request.accept_languages.best_match(LIST_LANGS)
             data = render_template(
