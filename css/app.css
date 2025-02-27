@@ -856,8 +856,8 @@ right: -37px;
     position: fixed;
     top: 118px;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     background-color: transparent;
 }
 
@@ -904,6 +904,10 @@ right: -37px;
 
     .list_board .col {
         width: calc(100% - 32px) !important;
+    }
+
+    #confetti {
+        bottom: 49px !important;
     }
 }
 
