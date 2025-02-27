@@ -808,7 +808,7 @@ if (username !== null) {
             } else if (ws_data.type == 'cursor_user') {
                 if (user_id != ws_data.user_id) {
                     if (ws_data.pos_y && ws_data.pos_x) {
-                        $(`#cursor_${ws_data.user_id}`).animate({ top: `${ws_data.pos_y}px`, left: `${ws_data.pos_x}px` }, 300);
+                        $(`#cursor_${ws_data.user_id}`).animate({ top: `${ws_data.pos_y}px`, left: `${ws_data.pos_x}px` }, 2800);
                     }
                 }
             } else if (ws_data.type == 'user_color') {
@@ -1163,7 +1163,7 @@ if (username !== null) {
                     type: 'board_info',
                 }));
 
-                setInterval(function () { mouse_position() }, 2000);            
+                setInterval(function () { mouse_position() }, 3000);            
             }
         };
 
