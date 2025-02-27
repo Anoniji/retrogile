@@ -479,6 +479,7 @@ if (username !== null) {
     }
 
     function addCard(col_id) {
+        ws.send(JSON.stringify({type: 'card_write_start'}));
         customPrompt(col_id, '{{ translates.board_js_6 }}', '').then(cardContent => {
             if (cardContent) {
                 ws.send(JSON.stringify({
@@ -493,10 +494,9 @@ if (username !== null) {
             }
             if (waiting_unfreeze) {
                 waiting_unfreeze = false;
-                ws.send(JSON.stringify({
-                    type: 'board_info',
-                }));
+                ws.send(JSON.stringify({type: 'board_info'}));
             }
+            ws.send(JSON.stringify({type: 'card_write_stop'}));
         });
     }
 
@@ -526,6 +526,7 @@ if (username !== null) {
 
     function editCard(card_uuid) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
+        ws.send(JSON.stringify({type: 'card_write_start'}));
         customPrompt(col_id, '{{ translates.board_js_7 }}', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
             if (cardContent) {
                 ws.send(JSON.stringify({
@@ -539,10 +540,9 @@ if (username !== null) {
             }
             if (waiting_unfreeze) {
                 waiting_unfreeze = false;
-                ws.send(JSON.stringify({
-                    type: 'board_info',
-                }));
+                ws.send(JSON.stringify({type: 'board_info'}));
             }
+            ws.send(JSON.stringify({type: 'card_write_stop'}));
         });
     }
 
@@ -828,9 +828,7 @@ if (username !== null) {
                     $('button, #vote_progress').animate({ backgroundColor: ws_data.custom_color }, 300); 
                 }
 
-                ws.send(JSON.stringify({
-                    type: 'board_info',
-                }));
+                ws.send(JSON.stringify({type: 'board_info'}));
             } else if (ws_data.type == 'board_info') {
                 if (freeze_board) {
                     waiting_unfreeze = true;
@@ -1086,9 +1084,7 @@ if (username !== null) {
                     }
                 }
 
-                ws.send(JSON.stringify({
-                    type: 'board_info',
-                }));
+                ws.send(JSON.stringify({type: 'board_info'}));
             } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes`).html(ws_data.card_votes);
                 var elementsVotes = $('.votes');
@@ -1108,6 +1104,14 @@ if (username !== null) {
                 }
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
+            } else if (ws_data.type == 'card_write_start') {
+                if(ws_data.card_write_start.username != username) {
+                    $(`#users div[data-username=${ws_data.card_write_start.username}]`).addClass('writing');
+                }
+            } else if (ws_data.type == 'card_write_stop') {
+                if(ws_data.card_write_stop.username != username) {
+                    $(`#users div[data-username=${ws_data.card_write_stop.username}]`).removeClass('writing');
+                }
             } else if (ws_data.type == 'col_order') {
                 const sortableList = document.querySelector(`#col_${ws_data.col_order.colName} .sortable`);
                 const fragment = document.createDocumentFragment();
@@ -1116,9 +1120,7 @@ if (username !== null) {
                     if (li) {
                         fragment.appendChild(li);
                     } else {
-                        ws.send(JSON.stringify({
-                            type: 'board_info',
-                        }));
+                        ws.send(JSON.stringify({type: 'board_info'}));
                     }
                 });
 
@@ -1127,9 +1129,7 @@ if (username !== null) {
             } else if (ws_data.type == 'col_delete') {
                 $(`#col_${ws_data.col_delete.colName}`).remove();
             } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add'].includes(ws_data.type)) {
-                ws.send(JSON.stringify({
-                    type: 'board_info',
-                }));
+                ws.send(JSON.stringify({type: 'board_info'}));
             } else {
                 if (!$('#console h3').hasClass('ui-state-active') && ws_data.username != username) {
                     $('#console_dot').show('fade');
@@ -1159,9 +1159,7 @@ if (username !== null) {
                     username: localStorage.getItem('username'),
                 }));
 
-                ws.send(JSON.stringify({
-                    type: 'board_info',
-                }));
+                ws.send(JSON.stringify({type: 'board_info'}));
 
                 setInterval(function () { mouse_position() }, 3000);            
             }
