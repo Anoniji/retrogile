@@ -244,7 +244,14 @@ def jsi(path):
             - If the file doesn't exist, returns a JSON response
     """
     if os.path.isfile("js/" + path) and path_check(path):
-        referer = request.headers.get('Referer')
+        referer = request.headers.get('Referer', False)
+        user_agent = request.headers.get('User-Agent', False)
+        origin = request.headers.get('Origin', False)
+
+        print(f'referer   : {referer}')
+        print(f'user_agent: {user_agent}')
+        print(f'origin    : {origin}')
+        
         if referer:
             lang = request.accept_languages.best_match(LIST_LANGS)
             data = render_template(
