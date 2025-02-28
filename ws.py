@@ -920,6 +920,9 @@ async def handler(websocket):
     except websockets.exceptions.ConnectionClosedOK:
         ws_stats()
 
+    except websockets.exceptions.ConnectionClosedError:
+        ws_stats()
+
     finally:
         del clients[token]
         sesssdb.remove(token)
