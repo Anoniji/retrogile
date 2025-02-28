@@ -435,14 +435,11 @@ footer a {
 }
 
 #board .col {
-    background-color: #333333;
     color: #d3d3d3;
-    border-radius: 8px;
     display: inline-block;
     width: 20%;
-    margin: 32px 16px 0 16px;
+    margin: 24px 16px 0 16px;
     vertical-align: top;
-    box-shadow: 0 0 2px #333333;
 }
 
 #board .col_5 {
@@ -455,9 +452,10 @@ footer a {
     clear: both;
     text-align: left;
     font-size: 24px;
-    padding: 8px 0 12px 16px;
-    margin: 0;
-    border-bottom: 1px solid #d3d3d3;
+    padding: 8px 0 8px 16px;
+    margin: 0 0 -8px;
+    border-radius: 8px;
+    background-color: #333333;
 }
 
 #board .col .board_list {
@@ -470,9 +468,10 @@ footer a {
 
 #board .col .board_last_edit {
     font-size: 12px;
-    margin: 0 0 8px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, .6);
+    margin: -22px 0 8px;
+    padding: 10px 0 8px;
+    background-color: #333333;
+    border-radius: 0 0 8px 8px;
 }
 
 #board .col .drop_icon, #board .col .add_icon, #board .col .open_icon {
@@ -585,11 +584,9 @@ right: -37px;
 
 #board .col ul {
     list-style: none;
-    padding: 0 0 8px;
-    margin: -6px 0 12px;
+    padding: 0 0 16px;
     min-height: 85px;
-    max-height: calc(100vh - 163px - 114px);
-    background-color: #d3d3d3;
+    max-height: calc(100vh - 164px - 106px);
     scrollbar-width: thin;
     overflow-y: auto;
     overflow-x: hidden;
@@ -818,8 +815,6 @@ right: -37px;
 
 .ui-state-highlight {
     background-color: #333333 !important;
-    margin-left: -1px !important;
-    margin-right: -1px !important;
 }
 
 .child_drop li {
@@ -905,11 +900,13 @@ right: -37px;
         margin: 16px 16px 8px 16px !important;
         width: calc(100% - 34px) !important;
         flex: 0 0 auto !important;
+        background: transparent !important;
     }
     .main_board .col ul {
         min-height: initial !important;
         height: calc(100vh - 173px - 75px) !important;
         max-height: initial !important;
+        background: transparent !important;
     }
 
     .list_board .col {
@@ -917,7 +914,7 @@ right: -37px;
     }
 
     #confetti {
-        bottom: 49px !important;
+        display: none !important;
     }
 }
 
