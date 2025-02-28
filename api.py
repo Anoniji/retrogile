@@ -204,7 +204,7 @@ def board(board_id):
         lang = request.accept_languages.best_match(LIST_LANGS)
         return render_template(
             "./pages/board.html", current_year=current_year,
-            current_version=CURRENT_VERSION, board_id=board_id,
+            current_version=CURRENT_VERSION,
             translates=load_translate(lang),
         )
 
@@ -247,6 +247,7 @@ def jsi(path):
         referer = request.headers.get('Referer', False)
         fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
         fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
+        board_id = referer.split('/')[-1]
 
         if (
             referer and (
@@ -259,6 +260,7 @@ def jsi(path):
                 "js/" + path,
                 translates=load_translate(lang),
                 ws_session=sesssdb.create(),
+                board_id=board_id,
             )
 
             response = make_response(data)
