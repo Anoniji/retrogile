@@ -774,6 +774,7 @@ right: -37px;
     width: calc(100% - 12px);
     border: 2px solid #333;
     border-radius: 8px;
+    overflow-y: hidden;
     outline: none;
     resize: none;
 }
