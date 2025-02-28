@@ -89,7 +89,7 @@ $(function () { $('#console').accordion({ collapsible: true, active: false, heig
 function showNotification(type, user, message) {
     var notification = $(`<div class="notification notif_${type}">`);
     $(`.notif_${type}`).hide();
-    notification.append(`<b>${user}</b> ${message}`);
+    notification.append(`<i class="material-icons">circle_notifications</i> <span><b>${user}</b> ${message}</span>`);
     $('body #notifications').append(notification);
     notification.slideDown(300).delay(2000).slideUp(300, function () {
         $(this).remove();
