@@ -17,7 +17,7 @@ ______     _                   _ _
 Do not use the console ! |___/ \x1b[0m`);
 
 function detectDevTool(e){isNaN(+e)&&(e=100);var t=+new Date;debugger;var n=+new Date;(isNaN(t)||isNaN(n)||n-t>e)&&(localStorage.setItem("bad_user",!0),location.reload())}
-localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=console.error},1);
+localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=console.error;localStorage.setItem("bad_user",!0)},1);
 
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
 function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
