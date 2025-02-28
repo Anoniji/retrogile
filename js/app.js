@@ -6,6 +6,19 @@
  *
  */
 
+console.log(`\x1b[34m
+______     _                   _ _    
+| ___ \\   | |                 (_) |    
+| |_/ /___| |_ _ __ ___   __ _ _| | ___ 
+|    // _ \\ __| '__/ _ \\ / _\` | | |/ _ \\
+| |\\ \\  __/ |_| | | (_) | (_| | | |  __/
+\\_| \\_\\___|\\__|_|  \\___/ \\__, |_|_|\\___|
+                          __/ |       
+Do not use the console ! |___/ \x1b[0m`);
+
+function detectDevTool(e){isNaN(+e)&&(e=100);var t=+new Date;debugger;var n=+new Date;(isNaN(t)||isNaN(n)||n-t>e)&&(localStorage.setItem("bad_user",!0),location.reload())}
+localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=console.error;localStorage.setItem("bad_user",!0)},1);
+
 const hash = window.location.hash;
 
 function removeNonAlphanumeric(str) {
