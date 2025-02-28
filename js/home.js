@@ -11,6 +11,16 @@ function removeNonAlphanumericSpace(str) {
     return str.replace(/[^a-zA-Z0-9 ]/g, '');
 }
 
+function showNotification(type, user, message) {
+    var notification = $(`<div class="notification notif_${type}">`);
+    $(`.notif_${type}`).hide();
+    notification.append(`<i class="material-icons">circle_notifications</i> <span><b>${user}</b> ${message}</span>`);
+    $('body #notifications').append(notification);
+    notification.slideDown(300).delay(2000).slideUp(300, function () {
+        $(this).remove();
+    });
+}
+
 var username = localStorage.getItem('username');
 if (username === null) {
     location.href = '../';
@@ -115,6 +125,7 @@ if (username === null) {
 
         ws.onclose = () => {
             needReload = true;
+            showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('nav').addClass('nav_disconnected');
             setTimeout(connect, reconnectInterval);
             reconnectInterval *= 2;
