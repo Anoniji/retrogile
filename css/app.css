@@ -827,29 +827,33 @@ right: -37px;
 
 #notifications {
     position: fixed;
-    top: -6px;
-    left: 50vw;
-    width: 280px;
-    margin-left: -140px;
-    z-index: 3;
-    border: 1px solid #ccc;
-    border-radius: 0 0 0 3px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    bottom: 15px;
+    right: 15px;
+    z-index: 3;   
 }
 
 .notification {
     display: none;
-    text-align: center;
-    padding: 12px 6px 6px;
+    text-align: right;
+    padding: 5px 12px 6px;
     font-size: 12px;
-    background-color: #dce8f7;
-    border-color: #dce8f7;
+    background-color: #333333;;
+    color: #f2f2f2;
+    border: 1px solid #f2f2f2;
     overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(242, 242, 242, 0.3);
     user-select: none;
 }
 
 .notification .material-icons {
-    margin-right: 10px;
+    margin: 3px 10px 0 0;
+}
+
+.notification span {
+    position: relative;
+    top: -7px;
+    left: -6px;
 }
 
 .close {
