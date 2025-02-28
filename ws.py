@@ -930,7 +930,8 @@ async def handler(websocket):
         for tk, sess in sesssdb.sess_dta.items():
             if (
                 sesssdb.get(tk) and
-                sess["board_id"] == sesssdb.get(tk)["board_id"]
+                sess["board_id"] == sesssdb.get(tk)["board_id"] and
+                tk in clients
             ):
                 await clients[tk].send(
                     json.dumps(
