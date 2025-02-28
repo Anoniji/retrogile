@@ -197,6 +197,7 @@ nav #users div {
     border-radius: 2px;
     border: none !important;
     background-color: #dce8f7;
+    outline: none;
 }
 
 #board_access div button {
@@ -746,6 +747,7 @@ right: -37px;
     width: calc(100vw - 58px);
     padding: 6px;
     font-size: 12px;
+    outline: none;
 }
 
 .ui-tooltip {
