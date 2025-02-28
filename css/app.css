@@ -758,26 +758,22 @@ right: -37px;
 
 .custom-prompt {
     color: #333333;
-    background-color: #f2f2f2;
+    background-color: #333333;
     padding: 4px;
     border-top: 1px solid #333333;
     border-bottom: 1px solid #333333;
     text-align: center !important;
-    margin: 0 !important;
-    border-radius: 0 0 8px 8px !important;
 }
 
 .custom-prompt textarea {
     font-family: "Noto Sans", sans-serif;
     display: block;
     padding: 10px;
-    border-radius: 0 0 15px 15px;
-    width: calc(100% - 25px);
-    margin-top: -4px;
-    border-left: 2px solid #333333;
-    border-bottom: 2px solid #333333;
-    border-right: 2px solid #333333;
-    border-top: none;
+    margin-top: -5px;
+    margin-left: -6px;
+    width: calc(100% - 12px);
+    border: 2px solid #333;
+    border-radius: 8px;
     resize: none;
 }
 
