@@ -189,9 +189,12 @@ def home():
 
 
 @app.route("/board/<string:board_id>")
-def board(_):
+def board(board_id):
     """
     Retrieves and renders a specific board.
+
+    Args:
+        board_id (str): The unique identifier of the board.
 
     Returns:
         str: The rendered HTML template for the board if found,
@@ -205,7 +208,7 @@ def board(_):
             translates=load_translate(lang),
         )
 
-    return jsonify(["board_not_found"])
+    return jsonify([f"board_not_found_{board_id}"])
 
 
 @app.route("/js/<string:path>", methods=["GET"])
