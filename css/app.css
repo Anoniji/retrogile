@@ -758,7 +758,7 @@ right: -37px;
 
 .custom-prompt {
     color: #333333;
-    background-color: #333333;
+    background-color: #333333 !important;
     padding: 4px;
     border-top: 1px solid #333333;
     border-bottom: 1px solid #333333;
@@ -774,6 +774,7 @@ right: -37px;
     width: calc(100% - 12px);
     border: 2px solid #333;
     border-radius: 8px;
+    outline: none;
     resize: none;
 }
 
