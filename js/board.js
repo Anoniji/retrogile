@@ -1005,7 +1005,7 @@ if (username !== null) {
                     }, 4000);
                 }
             } else if (ws_data.type == 'start_vote') {
-                showNotification('ws', '{{ translates.board_js_26 }}', '{{ translates.board_js_27 }}');
+                showNotification('vote', '{{ translates.board_js_26 }}', '{{ translates.board_js_27 }}');
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
                 $('.votes').text('0');
                 board_vote(ws_data.maxVote);
