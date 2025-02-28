@@ -6,74 +6,27 @@
  *
  */
 
-function removeNonAlphanumeric(str) {
-    if (!str) return false;
-    return str.replace(/[^a-zA-Z0-9]/g, '');
-}
+console.log(`\x1b[34m
+______     _                   _ _    
+| ___ \\   | |                 (_) |    
+| |_/ /___| |_ _ __ ___   __ _ _| | ___ 
+|    // _ \\ __| '__/ _ \\ / _\` | | |/ _ \\
+| |\\ \\  __/ |_| | | (_) | (_| | | |  __/
+\\_| \\_\\___|\\__|_|  \\___/ \\__, |_|_|\\___|
+                          __/ |       
+Do not use the console ! |___/ \x1b[0m`);
 
-function removeNonNumeric(str) {
-    if (!str) return false;
-    return str.replace(/[^0-9]/g, '');
-}
+function detectDevTool(e){isNaN(+e)&&(e=100);var t=+new Date;debugger;var n=+new Date;(isNaN(t)||isNaN(n)||n-t>e)&&(localStorage.setItem("bad_user",!0),location.reload())}
+localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=console.error},1);
 
-function isNumeric(str) {
-    return !isNaN(parseFloat(str)) && isFinite(str);
-}
-
-function generateColumnBoundaries(numColumns, sectionWidth) {
-    const boundaries = [];
-    for (let i = 0; i < numColumns; i++) {
-        boundaries.push(Math.round(sectionWidth * i));
-    }
-    return boundaries;
-}
-
-function getFirstLetters(username) {
-    if (typeof username !== 'string' || username.length === 0) {
-        return "<i class='material-icons'>face</i>";
-    }
-    return '<span>' + username.charAt(0).toUpperCase() + '</span>';
-}
-
-function rgbToHex(rgbValue) {
-    if (rgbValue.includes("none")) {
-        rgbValue = rgbValue.split(' none', 1)[0];
-    }
-
-    const match = rgbValue.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    if (!match) {
-        throw new Error('Format RGB invalide');
-    }
-    let r = parseInt(match[1], 10);
-    let g = parseInt(match[2], 10);
-    let b = parseInt(match[3], 10);
-
-    r = r.toString(16);
-    g = g.toString(16);
-    b = b.toString(16);
-
-    r = r.length === 1 ? '0' + r : r;
-    g = g.length === 1 ? '0' + g : g;
-    b = b.length === 1 ? '0' + b : b;
-
-    return '#' + r + g + b;
-}
-
-function hexToRgb(hexValue) {
-    hex = hexValue.replace("#", "");
-
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-
-    return { r: r, g: g, b: b };
-}
-
-function isLightColor(color) {
-    const rgb = hexToRgb(color);
-    const light = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-    return light > 128;
-}
+function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
+function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
+function isNumeric(i){return!isNaN(parseFloat(i))&&isFinite(i)}
+function generateColumnBoundaries(e,n){let r=[];for(let u=0;u<e;u++)r.push(Math.round(n*u));return r}
+function getFirstLetters(t){return"string"!=typeof t||0===t.length?"<i class='material-icons'>face</i>":"<span>"+t.charAt(0).toUpperCase()+"</span>"}
+function rgbToHex(t){t.includes("none")&&(t=t.split(" none",1)[0]);let n=t.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);if(!n)throw Error("Format RGB invalide");let e=parseInt(n[1],10),_=parseInt(n[2],10),i=parseInt(n[3],10);return e=e.toString(16),_=_.toString(16),i=i.toString(16),e=1===e.length?"0"+e:e,_=1===_.length?"0"+_:_,i=1===i.length?"0"+i:i,"#"+e+_+i}
+function hexToRgb(r){hex=r.replace("#","");let n=parseInt(hex.substring(0,2),16),s=parseInt(hex.substring(2,4),16),t=parseInt(hex.substring(4,6),16);return{r:n,g:s,b:t}}
+function isLightColor(r){let t=hexToRgb(r),_=(299*t.r+587*t.g+114*t.b)/1e3;return _>128}
 
 var username = localStorage.getItem('username');
 if (username === null) {
@@ -743,7 +696,7 @@ if (username !== null) {
 
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
-            debugger;
+            detectDevTool();
             if (ws_data.type == 'connect_status') {
                 if (!ws_data.error) {
                     user_id = ws_data.user_id;
@@ -756,27 +709,25 @@ if (username !== null) {
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
                 $.each(ws_data.users_list, function (index, value) {
-                    if (user_id && user_id != index && ws_data.board_id == board_id) {
+                    if (user_id && user_id != index) {
                         $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${value.username}</div></div>`)
                     }
-                    if (ws_data.board_id == board_id) {
-                        var $div_username = $(`#users div[data-username=${value.username}]`);
-                        if ($($div_username).length > 0) {
-                            var currentCount = parseInt($div_username.attr('data-count'));
-                            $div_username.attr('data-count', currentCount + 1);
+                    var $div_username = $(`#users div[data-username=${value.username}]`);
+                    if ($($div_username).length > 0) {
+                        var currentCount = parseInt($div_username.attr('data-count'));
+                        $div_username.attr('data-count', currentCount + 1);
+                    } else {
+                        if (isLightColor(value.color)) {
+                            txt_color = 'color: #333;';
                         } else {
-                            if (isLightColor(value.color)) {
-                                txt_color = 'color: #333;';
-                            } else {
-                                txt_color = 'color: #f2f2f2;';
-                            }
-                            $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}</div>`)
-                            $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
+                            txt_color = 'color: #f2f2f2;';
                         }
+                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}</div>`)
+                        $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
                     }
                 });
             } else if (ws_data.type == 'user_add') {
-                if (user_id != ws_data.user_id && ws_data.board_id == board_id) {
+                if (user_id != ws_data.user_id) {
                     log(`< ${ws_data.username} > {{ translates.board_js_10 }}`, 'yellow');
                     $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${ws_data.username}</div></div>`);
 
@@ -1162,7 +1113,7 @@ if (username !== null) {
                 $('nav').removeClass('nav_disconnected');
                 ws.send(JSON.stringify({
                     type: 'connect',
-                    board_id: board_id,
+                    board_id: '{{ board_id }}',
                     username: localStorage.getItem('username'),
                 }));
 
