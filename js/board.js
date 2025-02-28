@@ -156,7 +156,7 @@ function customPrompt(col_id, message, defaultValue) {
 
     if (defaultValue) {
         input.style.height = 'auto';
-        input.style.height = (input.scrollHeight - 20) + 'px';
+        input.style.height = (input.scrollHeight - 18) + 'px';
     }
 
     return new Promise((resolve) => {
@@ -169,7 +169,7 @@ function customPrompt(col_id, message, defaultValue) {
 
         input.addEventListener('input', () => {
             input.style.height = 'auto';
-            input.style.height = (input.scrollHeight - 20) + 'px';
+            input.style.height = (input.scrollHeight - 18) + 'px';
         });
 
         input.addEventListener('keyup', (event) => {
