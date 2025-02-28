@@ -189,12 +189,9 @@ def home():
 
 
 @app.route("/board/<string:board_id>")
-def board(board_id):
+def board(_):
     """
     Retrieves and renders a specific board.
-
-    Args:
-        board_id (str): The unique identifier of the board.
 
     Returns:
         str: The rendered HTML template for the board if found,
