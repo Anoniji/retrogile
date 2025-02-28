@@ -841,6 +841,10 @@ if (username !== null) {
                 list_votes = ws_data.board_info.votes_list;
                 list_users = ws_data.board_info.users_list;
 
+                if (board_author == username) {
+                    $('#nav_main_logo').attr('onclick', "location.href = './';");
+                }
+
                 if (check_timer) {
                     const now = new Date();
                     difSecs = parseInt((check_timer - now.getTime()) / 1000);
