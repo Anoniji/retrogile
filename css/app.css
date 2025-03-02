@@ -83,6 +83,16 @@ button {
     user-select: none;
 }
 
+#nav_main_logo_mini {
+    position: fixed;
+    top: 21px;
+    left: 24px;
+    height: 42px;
+    cursor: pointer;
+    user-select: none;
+    display: none;
+}
+
 nav {
     position: relative;
     clear: both;
@@ -917,8 +927,16 @@ right: -37px;
         width: calc(100% - 32px) !important;
     }
 
-    #confetti {
+    #nav_main_logo_mini {
+        display: block;
+    }
+
+    #nav_main_logo , #confetti {
         display: none !important;
+    }
+
+    nav {
+        margin: 34px 16px 20px 64px;
     }
 }
 
