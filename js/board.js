@@ -793,7 +793,7 @@ if (username !== null) {
                 list_users = ws_data.board_info.users_list;
 
                 if (board_author == username) {
-                    $('#nav_main_logo').attr('onclick', "location.href = './';");
+                    $('#nav_main_logo, #nav_main_logo_mini').attr('onclick', "location.href = './';");
                 }
 
                 if (check_timer) {
