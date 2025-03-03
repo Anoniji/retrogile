@@ -16,6 +16,7 @@ ______     _                   _ _
                           __/ |       
 Do not use the console ! |___/ \x1b[0m`);
 
+document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e){isNaN(+e)&&(e=100);var t=+new Date;debugger;var n=+new Date;(isNaN(t)||isNaN(n)||n-t>e)&&(localStorage.setItem("bad_user",!0),location.reload())}
 localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=console.error;localStorage.setItem("bad_user",!0)},1);
 
