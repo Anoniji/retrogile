@@ -328,14 +328,42 @@ footer a {
     opacity: .6 !important;
 }
 
-#users .writing::after {
-    content: "...";
+#users .writing::before {
+    content: '';
     position: absolute;
-    right: 0;
-    bottom: 7px;
-    width: 36px;
-    height: 19px;
-    font-size: 12px;
+    top: -2px;
+    left: 10px;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #333;
+    box-shadow: 0 0 2px #333333;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+#users .writing::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 26px;
+    transform: translate(-50%, -50%) scale(0.4);
+    width: 6px;
+    height: 6px;
+    background-color: #333;
+    box-shadow: 0 0 2px #333333;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+    animation-delay: 0.2s;
+}
+
+@keyframes typing {
+    0%, 40%, 100% {
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    20% {
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 #users_custom_color {
