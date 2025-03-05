@@ -378,10 +378,11 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
 
                     if mode == "board_delete":
                         os.remove(board_path)
+
                     else:
                         board_info["board_name"] = tools.remove_symbols(
                             data.get("board_name"))
-                        boards.update_board(board_id, board_info)
+                        boards.update_board(board_uuid, board_info)
 
                     send_list.append(
                         [
