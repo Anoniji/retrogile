@@ -1137,6 +1137,10 @@ if (username !== null) {
         setTimeout(() => {
             $('#loader').hide('fade', 300);
         }, 300);
+    }).keydown(function(event) {
+        if (event.ctrlKey) {
+            startConfetti();
+        }
     });
 }
 
