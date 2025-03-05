@@ -836,7 +836,9 @@ if (username !== null) {
                     $('#board_timer, #board_vote').prop('disabled', true);
                 } else if (Object.keys(board_data).length < 5) {
                     $('#board_add_bloc, #board_merge_bloc').show();
-                } else {
+                }
+
+                if (Object.keys(board_data).length == 5) {
                     col_class += ' col_5';
                 }
 
@@ -1085,9 +1087,7 @@ if (username !== null) {
 
                 sortableList.innerHTML = '';
                 sortableList.appendChild(fragment);
-            } else if (ws_data.type == 'col_delete') {
-                $(`#col_${ws_data.col_delete.colName}`).remove();
-            } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add'].includes(ws_data.type)) {
+            } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add', 'col_delete'].includes(ws_data.type)) {
                 ws.send(JSON.stringify({type: 'board_info'}));
             } else {
                 if (!$('#console h3').hasClass('ui-state-active') && ws_data.username != username) {
