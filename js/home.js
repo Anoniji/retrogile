@@ -139,10 +139,12 @@ if (username === null) {
 
         ws.onclose = () => {
             needReload = true;
-            showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('nav').addClass('nav_disconnected');
-            setTimeout(connect, reconnectInterval);
-            reconnectInterval *= 2;
+            if(window.WebSocket) {
+              showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
+              setTimeout(connect, reconnectInterval);
+              reconnectInterval *= 2;
+            }
         };
     }
     connect();
