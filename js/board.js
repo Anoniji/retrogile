@@ -18,7 +18,7 @@ Do not use the console ! |___/ \x1b[0m`);
 
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e){isNaN(+e)&&(e=100);var t=+new Date;debugger;var n=+new Date;(isNaN(t)||isNaN(n)||n-t>e)&&(localStorage.setItem("bad_user",!0),location.reload())}
-localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=console.error;localStorage.setItem("bad_user",!0)},1);
+localStorage.getItem("bad_user")&&setInterval(function(){window.fetch=window.WebSocket=false;localStorage.setItem("bad_user",!0)},1);
 
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
 function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
@@ -1126,10 +1126,12 @@ if (username !== null) {
 
         ws.onclose = () => {
             needReload = true;
-            showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('nav').addClass('nav_disconnected');
-            setTimeout(connect, reconnectInterval);
-            reconnectInterval *= 2;
+            if(window.WebSocket) {
+              showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
+              setTimeout(connect, reconnectInterval);
+              reconnectInterval *= 2;
+            }
         };
     }
     connect();
