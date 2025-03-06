@@ -683,8 +683,8 @@ if (username !== null) {
         ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
 
         $(document).on('mousemove', function (event) {
-            pos_x = event.pageX;
-            pos_y = event.pageY;
+            pos_x = (event.pageX / $(window).width()) * 100;
+            pos_y = (event.pageY / $(window).height()) * 100;
         });
 
         function mouse_position() {
@@ -760,7 +760,7 @@ if (username !== null) {
             } else if (ws_data.type == 'cursor_user') {
                 if (user_id != ws_data.user_id) {
                     if (ws_data.pos_y && ws_data.pos_x) {
-                        $(`#cursor_${ws_data.user_id}`).animate({ top: `${ws_data.pos_y}px`, left: `${ws_data.pos_x}px` }, 2800);
+                        $(`#cursor_${ws_data.user_id}`).animate({ top: `${ws_data.pos_y}vh`, left: `${ws_data.pos_x}vw` }, 2800);
                     }
                 }
             } else if (ws_data.type == 'user_color') {
