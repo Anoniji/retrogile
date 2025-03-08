@@ -244,10 +244,13 @@ def jsi(path):
             - If the file doesn't exist, returns a JSON response
     """
     if os.path.isfile("js/" + path) and path_check(path):
-        referer = request.headers.get('Referer', False)
         fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
         fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
-        board_id = referer.split('/')[-1]
+        board_id = False
+
+        referer = request.headers.get('Referer', False)
+        if(referer):
+            board_id = referer.split('/')[-1]
 
         if (
             referer and (
