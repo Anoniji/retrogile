@@ -107,8 +107,8 @@ if (username === null) {
                     html += '   <ul>';
                     html += '       <li>';
                     html += `           <div class='edit_board'><i onclick='renameBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_6 }}'>edit_note</i></div>`;
-                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_7 }}'>folder_copy</i></div>`;
-                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_8 }}'>folder_delete</i></div>`;
+                    html += `           <div class='delete_board'><i onclick='deleteBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_8 }}'>delete_sweep</i></div>`;
+                    html += `           <div class='template_board'><i onclick='templateBoard("${value['board_uuid']}");' class='material-icons' title='{{ translates.home_js_7 }}'>library_add</i></div>`;
                     html += `           <div class='open_board'><i onclick='openBoard("${value['path']}");' class='material-icons' title='{{ translates.home_js_9 }}'>`;
                     if (value['board_version'] != value['current_version']) {
                         html += `sync_problem`;
