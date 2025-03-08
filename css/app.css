@@ -33,6 +33,12 @@ button {
     font-size: 10px;
 }
 
+#empty_list {
+    font-size: 64px;
+    margin-top: 32px;
+    color: #333333; 
+}
+
 .cursor {
     position: fixed;
     top: 50px;
