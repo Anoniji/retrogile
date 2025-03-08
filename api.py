@@ -249,7 +249,7 @@ def jsi(path):
         board_id = False
 
         referer = request.headers.get('Referer', False)
-        if(referer):
+        if referer:
             board_id = referer.split('/')[-1]
 
         if (
