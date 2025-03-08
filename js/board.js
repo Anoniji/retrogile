@@ -368,8 +368,9 @@ if (username !== null) {
         $('#board_confetti').prop('disabled', true);
     }
 
-    $('#confetti').on('mousedown', function(e) {
+    $('#confetti').on('mousedown touchstart', function(e) {
         if(!confettiActive) return;
+        e.preventDefault();
         isDrawing = true;
         startX = e.pageX - $(this).offset().left;
         startY = e.pageY - $(this).offset().top;
@@ -380,8 +381,9 @@ if (username !== null) {
         }).appendTo('#confetti');
     });
 
-    $('#confetti').on('mousemove', function(e) {
+    $('#confetti').on('mousemove touchmove', function(e) {
         if (!isDrawing) return;
+        e.preventDefault();
 
         let mouseX = e.pageX - $(this).offset().left;
         let mouseY = e.pageY - $(this).offset().top;
@@ -392,8 +394,9 @@ if (username !== null) {
         updateLine(startX, startY, mouseX, mouseY, line);
     });
 
-    $('#confetti').on('mouseup', function(e) {
+    $('#confetti').on('mouseup touchend touchcancel', function(e) {
         if (!isDrawing && !confettiSpread) return;
+        e.preventDefault();
         isDrawing = false;
 
         let endX = e.pageX - $(this).offset().left;
