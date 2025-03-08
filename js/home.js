@@ -101,6 +101,10 @@ if (username === null) {
             if (ws_data.type == 'board_list') {
                 $('#board').html('');
                 board_list = ws_data.board_list;
+                if(board_list.length == 0) {
+                    $('#board').append("<span id='empty_list' class='material-icons'>cancel</span>");
+                    return;
+                }
                 $.each(board_list, function (_, value) {
                     html = `<div id='col_${value['board_uuid']}' class='col col_board'>`;
                     html += `   <h1 class="board_list">${value['board_name']}</h1>`;
