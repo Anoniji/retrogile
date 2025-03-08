@@ -919,10 +919,10 @@ async def handler(websocket):
             send_list = []
 
     except websockets.exceptions.ConnectionClosedOK:
-        ws_stats()
+        print('ConnectionClosed[OK]', token)
 
     except websockets.exceptions.ConnectionClosedError:
-        ws_stats()
+        print('ConnectionClosed[Er]', token)
 
     finally:
         del clients[token]
