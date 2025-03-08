@@ -251,27 +251,24 @@ def jsi(path):
         referer = request.headers.get('Referer', False)
         if referer:
             board_id = referer.split('/')[-1]
-
-        if (
-            referer and (
+            if (
                 ("https" in referer and fetch_mode == "no-cors" and fetch_dest == "script") or
                 "https" not in referer
-            )
-        ):
-            lang = request.accept_languages.best_match(LIST_LANGS)
-            data = render_template(
-                "js/" + path,
-                translates=load_translate(lang),
-                ws_session=sesssdb.create(),
-                board_id=board_id,
-            )
+            ):
+                lang = request.accept_languages.best_match(LIST_LANGS)
+                data = render_template(
+                    "js/" + path,
+                    translates=load_translate(lang),
+                    ws_session=sesssdb.create(),
+                    board_id=board_id,
+                )
 
-            response = make_response(data)
-            response.headers['Content-Type'] = 'application/javascript'
+                response = make_response(data)
+                response.headers['Content-Type'] = 'application/javascript'
 
-            return response
+                return response
 
-        return jsonify(["jsi_direct_access_blocked"])
+            return jsonify(["jsi_direct_access_blocked"])
 
     return jsonify(["jsi_not_found"])
 
