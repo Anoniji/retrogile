@@ -228,10 +228,10 @@ def board_manager_response(ws_lst, data, board_info, card_data):
         message_data["cardContent"] = tools.remove_symbols(data["cardContent"])
         if (
             websocket != ws
-            and not board_info["users_list"].get(message_data["author"])["card_visibility"]
+            and not board_info["users_list"].get(message_data["username"])["card_visibility"]
         ):
             message_data["cardContent"] = "<div class='hide_content'></div>"
-        message_data["username_color"] = usersdb.get_user_color(message_data["author"])
+        message_data["username_color"] = usersdb.get_user_color(message_data["username"])
 
     return [
         ws,
@@ -425,7 +425,7 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
     if mode == "card_add":
         board_info["data"][data.get("col_id")][card_uuid] = {
             "pos": data.get("pos"),
-            "author": data.get("author"),
+            "author": data.get("username"),
             "author_id": data.get("user_id"),
             "content": data.get("cardContent"),
             "votes": 0,
@@ -445,25 +445,25 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
         board_info = children_manager_by_id(board_info, mode, card_uuid, data)
 
     elif mode == "card_view":
-        if data.get("author") in board_info["users_list"].keys():
-            if board_info["users_list"][data.get("author")]["card_visibility"]:
+        if data.get("username") in board_info["users_list"].keys():
+            if board_info["users_list"][data.get("username")]["card_visibility"]:
                 data["visibility"] = False
             else:
                 data["visibility"] = True
 
-            board_info["users_list"][data.get("author")]["card_visibility"] = data["visibility"]
+            board_info["users_list"][data.get("username")]["card_visibility"] = data["visibility"]
 
     elif mode == "card_vote":
         if (
             data.get("col_id") in board_info["data"]
             and data.get("card_uuid") in board_info["data"][data.get("col_id")]
         ):
-            if data.get("author") not in board_info["votes_list"]:
-                board_info["votes_list"][data.get("author")] = board_info["votes"] - 1
-            elif not board_info["votes_list"][data.get("author")]:
+            if data.get("username") not in board_info["votes_list"]:
+                board_info["votes_list"][data.get("username")] = board_info["votes"] - 1
+            elif not board_info["votes_list"][data.get("username")]:
                 return False
             else:
-                board_info["votes_list"][data.get("author")] -= 1
+                board_info["votes_list"][data.get("username")] -= 1
 
             board_info["data"][data.get("col_id")][data.get("card_uuid")]["votes"] += 1
             card_votes = board_info["data"][data.get("col_id")][data.get("card_uuid")][
@@ -579,6 +579,9 @@ def col_manager_by_board_id(board_id, mode, data):
     """
     board_info = get_board_info_by_id(board_id)
     if not board_info:
+        return False
+
+    if board_info['author'] != data.get('username', False):
         return False
 
     if mode == "col_add":
@@ -919,10 +922,10 @@ async def handler(websocket):
             send_list = []
 
     except websockets.exceptions.ConnectionClosedOK:
-        print('ConnectionClosed[OK]', token)
+        print('> ConnectionClosed[OK]', token)
 
     except websockets.exceptions.ConnectionClosedError:
-        print('ConnectionClosed[Er]', token)
+        print('> ConnectionClosed[Er]', token)
 
     finally:
         del clients[token]
