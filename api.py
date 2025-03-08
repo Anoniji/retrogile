@@ -268,7 +268,7 @@ def jsi(path):
 
                 return response
 
-            return jsonify(["jsi_direct_access_blocked"])
+        return jsonify(["jsi_direct_access_blocked"])
 
     return jsonify(["jsi_not_found"])
 
