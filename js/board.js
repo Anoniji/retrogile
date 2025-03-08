@@ -45,7 +45,7 @@ function showNotification(type, user, message) {
     $(`.notif_${type}`).hide();
     notification.append(`<i class="material-icons">circle_notifications</i> <span><b>${user}</b> ${message}</span>`);
     $('body #notifications').append(notification);
-    notification.slideDown(300).delay(2000).slideUp(300, function () {
+    notification.slideDown(300).delay(5000).slideUp(300, function () {
         $(this).remove();
     });
 }
@@ -189,7 +189,6 @@ function board_timer(seconds) {
 }
 
 function board_vote(maxVote) {
-
     if (maxVote == 0) {
         $('#board_vote .title').html('Vote');
         $('nav #vote_progress').hide();
@@ -442,7 +441,6 @@ if (username !== null) {
                 ws.send(JSON.stringify({
                     type: 'card_add',
                     pos: $(`#col_${col_id} ul`).children('li').length,
-                    author: username,
                     user_id: user_id,
                     col_id: col_id,
                     votes: 0,
@@ -473,7 +471,6 @@ if (username !== null) {
         if ($('#board_merge_bloc i').text() == 'call_merge') return;
         ws.send(JSON.stringify({
             type: 'card_unmerge',
-            author: username,
             user_id: user_id,
             col_id: col_id,
             card_uuid: parent,
@@ -488,7 +485,6 @@ if (username !== null) {
             if (cardContent) {
                 ws.send(JSON.stringify({
                     type: 'card_edit',
-                    author: username,
                     user_id: user_id,
                     col_id: col_id,
                     card_uuid: card_uuid,
@@ -513,7 +509,6 @@ if (username !== null) {
                 $('#board_vote .title').text(maxVote);
                 ws.send(JSON.stringify({
                     type: 'card_vote',
-                    author: username,
                     user_id: user_id,
                     col_id: col_id,
                     card_uuid: card_uuid,
@@ -527,7 +522,6 @@ if (username !== null) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col').toString();
         ws.send(JSON.stringify({
             type: 'card_delete',
-            author: username,
             user_id: user_id,
             col_id: col_id,
             card_uuid: card_uuid,
@@ -542,7 +536,6 @@ if (username !== null) {
         if (colName) {
             ws.send(JSON.stringify({
                 type: 'col_add',
-                author: username,
                 user_id: user_id,
                 colName: colName,
             }));
@@ -576,7 +569,6 @@ if (username !== null) {
         }
         ws.send(JSON.stringify({
             type: 'col_reorder',
-            author: username,
             user_id: user_id,
             colName: newOrder,
             uuidList: false,
@@ -594,7 +586,6 @@ if (username !== null) {
         } else {
             ws.send(JSON.stringify({
                 type: 'card_view',
-                author: username,
                 user_id: user_id,
             }));
         }
@@ -603,7 +594,6 @@ if (username !== null) {
     function moveToChild(parentId, childId) {
         ws.send(JSON.stringify({
             type: 'card_parent',
-            author: username,
             user_id: user_id,
             col_id: false,
             card_uuid: parentId,
@@ -623,7 +613,6 @@ if (username !== null) {
 
         ws.send(JSON.stringify({
             type: 'col_order',
-            author: username,
             user_id: user_id,
             colName: name.slice(4),
             uuidList: uuid_list,
@@ -639,7 +628,6 @@ if (username !== null) {
             }
             ws.send(JSON.stringify({
                 type: 'col_delete',
-                author: username,
                 user_id: user_id,
                 colName: col_id,
             }));
@@ -978,7 +966,7 @@ if (username !== null) {
                     $('nav #vote_progress').hide().css('width', '100%');
                 }
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.author}" data-uuid="${ws_data.card_uuid}" style="border-color: ${ws_data.card_add.username_color}">`;
+                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.username}" data-uuid="${ws_data.card_uuid}" style="border-color: ${ws_data.card_add.username_color}">`;
                 html += `<div class='card_icon' style='background-color: ${ws_data.card_add.username_color}`;
                 if (isLightColor(ws_data.card_add.username_color)) {
                     html += '; color: #333';
@@ -986,8 +974,8 @@ if (username !== null) {
                     html += '; border-color: #d3d3d3';
                 }
                 html += `'>`;
-                html += `<div class='info_author'>{{ translates.board_js_14 }} <b>${ws_data.card_add.author}</b></div>`;
-                if (ws_data.card_add.author == username) {
+                html += `<div class='info_author'>{{ translates.board_js_14 }} <b>${ws_data.card_add.username}</b></div>`;
+                if (ws_data.card_add.username == username) {
                     html += `<div class='edit_icon' onclick='editCard("${ws_data.card_uuid}");'>
                         <i class='material-icons'>edit</i>
                         <div class='type'>{{ translates.board_js_15 }}</div>
@@ -1035,8 +1023,8 @@ if (username !== null) {
                     notif_txt = '{{ translates.board_js_18 }}';
                 }
 
-                if (ws_data.card_view.author != username) {
-                    showNotification(notif_type, ws_data.card_view.author, notif_txt);
+                if (ws_data.card_view.username != username) {
+                    showNotification(notif_type, ws_data.card_view.username, notif_txt);
                 } else {
                     showNotification(notif_type, '{{ translates.board_js_23 }}', notif_txt.replace('{{ translates.board_js_24 }}', '{{ translates.board_js_25 }}'));
                     if (ws_data.card_view.hidden) {
