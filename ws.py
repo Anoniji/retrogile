@@ -14,14 +14,24 @@ from pathlib import Path
 from collections import OrderedDict
 from urllib.parse import urlparse, parse_qs
 import websockets
+import logging
 
 from libs import licence, tools, sessions, boards, users
+
+
+logging.basicConfig(filename="retrogile_ws.log", level=logging.DEBUG)
+
+
+# ///////////////////////////////////////////////////////////////////////
+
 boards = boards.Board()
 usersdb = users.Users()
 sesssdb = sessions.Sessions()
 
 BOARD_VERSION = 5
 clients = {}
+
+# ///////////////////////////////////////////////////////////////////////
 
 
 def get_board_list_by_author(author):
@@ -860,13 +870,13 @@ def ws_stats():
     Prints statistics about users, clients, and the current position.
     """
 
-    print("-"*25)
+    logging.info("-"*25)
 
     num_boards = len(boards.boards)
-    print(f"> Boards loaded: {num_boards}")
+    logging.info(f"> Boards loaded: {num_boards}")
 
     num_clients = len(clients.keys())
-    print(f"> Total clients: {num_clients}")
+    logging.info(f"> Total clients: {num_clients}")
 
 
 async def handler(websocket):
@@ -922,10 +932,10 @@ async def handler(websocket):
             send_list = []
 
     except websockets.exceptions.ConnectionClosedOK:
-        print('> ConnectionClosed[OK]', token)
+        logging.info(f"> ConnectionClosed[OK] {token}")
 
     except websockets.exceptions.ConnectionClosedError:
-        print('> ConnectionClosed[Er]', token)
+        logging.info(f"> ConnectionClosed[Er] {token}")
 
     finally:
         del clients[token]
@@ -960,7 +970,7 @@ async def main():
     The server runs indefinitely until it's manually stopped.
     """
     async with websockets.serve(handler, "0.0.0.0", 8009):
-        print("Websocket Started")
+        logging.info("Server WS started")
         await asyncio.Future()
 
 
