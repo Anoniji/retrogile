@@ -13,8 +13,8 @@ import datetime
 from pathlib import Path
 from collections import OrderedDict
 from urllib.parse import urlparse, parse_qs
-import websockets
 import logging
+import websockets
 
 from libs import licence, tools, sessions, boards, users
 
