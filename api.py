@@ -19,7 +19,12 @@ from libs import licence, sessions, tools
 
 monkey.patch_all()
 
-logging.basicConfig(filename="retrogile_api.log", level=logging.DEBUG)
+logging.basicConfig(
+    filename="retrogile_api.log",
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 
 # ///////////////////////////////////////////////////////////////////////
