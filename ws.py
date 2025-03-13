@@ -19,7 +19,12 @@ import websockets
 from libs import licence, tools, sessions, boards, users
 
 
-logging.basicConfig(filename="retrogile_ws.log", level=logging.DEBUG)
+logging.basicConfig(
+    filename="retrogile_ws.log",
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 
 # ///////////////////////////////////////////////////////////////////////
