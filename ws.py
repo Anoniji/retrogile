@@ -596,16 +596,7 @@ def col_manager_by_board_id(board_id, mode, data):
     if not board_info:
         return False
 
-    if board_info['author'] != data.get('username', False):
-        return False
-
-    if mode == "col_add":
-        if data.get("colName") in board_info["data"]:
-            return False
-
-        board_info["data"][tools.remove_symbols(data.get("colName"))] = {}
-
-    elif mode == "col_order":
+    if mode == "col_order":
         cnt = 0
         for uuidl in data.get("uuidList"):
             uuidl = uuidl[5:]
@@ -626,6 +617,15 @@ def col_manager_by_board_id(board_id, mode, data):
                 del board_info["tmps"][uuidl]
                 board_info["data"][data.get("colName")][uuidl]["pos"] = cnt
                 cnt += 1
+
+    elif board_info['author'] != data.get('username', False):
+        return False
+
+    if mode == "col_add":
+        if data.get("colName") in board_info["data"]:
+            return False
+
+        board_info["data"][tools.remove_symbols(data.get("colName"))] = {}
 
     elif mode == "col_reorder":
         board_info["data"] = OrderedDict(
