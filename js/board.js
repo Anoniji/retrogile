@@ -365,6 +365,7 @@ if (username !== null) {
     function startConfetti() {
         confettiActive = true;
         $('#board_confetti').prop('disabled', true);
+        $('#confetti').css('z-index', 0);
     }
 
     $('#confetti').on('mousedown touchstart', function(e) {
@@ -412,6 +413,7 @@ if (username !== null) {
             distance: parseInt(distance),
         }));
         $('.circle, .line').remove();
+        $('#confetti').css('z-index', -1);
         confettiActive = false;
     });
 
