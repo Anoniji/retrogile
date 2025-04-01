@@ -492,6 +492,10 @@ footer a {
     vertical-align: top;
 }
 
+#board .col::-webkit-scrollbar-thumb {
+    border-left: 5px solid transparent;
+}
+
 #board .col_5 {
     width: 17%;
     margin: 32px 10px 0 10px;
