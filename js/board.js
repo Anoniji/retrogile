@@ -198,15 +198,21 @@ function board_vote(maxVote) {
     }
 }
 
-function board_vote_order() {
-    $('.sortable').each(function () {
-        const $sortableList = $(this);
-        $sortableList.find('li').sort(function (a, b) {
-            const aVotes = parseInt($(a).find('.votes').text());
-            const bVotes = parseInt($(b).find('.votes').text());
-            return bVotes - aVotes;
-        }).appendTo($sortableList);
-    });
+var vote_order = false;
+function board_vote_order(force=false) {
+    if(!vote_order || force) {
+      $('.sortable').each(function () {
+          const $sortableList = $(this);
+          $sortableList.find('li').sort(function (a, b) {
+              const aVotes = parseInt($(a).find('.votes').text());
+              const bVotes = parseInt($(b).find('.votes').text());
+              return bVotes - aVotes;
+          }).appendTo($sortableList);
+      });
+      vote_order = true;
+    } else {
+      location.reload();
+    }
 }
 
 function randomBetweenZeroAndScreenWidth() {
@@ -922,6 +928,10 @@ if (username !== null) {
                     highlightUser(tmps_highlightUser);
                 }
 
+                if (vote_order) {
+                    board_vote_order(true);
+                }
+              
                 if (board_author == username && $('#board_merge_bloc i').text() == 'merge') {
                     $('.child_drop').show();
                 }
@@ -1013,6 +1023,11 @@ if (username !== null) {
                     curr_highlightUser = false;
                     highlightUser(tmps_highlightUser);
                 }
+
+                if (vote_order) {
+                    board_vote_order(true);
+                }
+
                 applySavedSize("info_content");
             } else if (ws_data.type == 'card_edit') {
                 $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
