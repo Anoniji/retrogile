@@ -1155,6 +1155,14 @@ if (username !== null) {
     });
 }
 
+$('#board').on('heightChange', '.col', function(){
+    if($(this).hasScrollBar()) {
+        $(this).css('padding-right', '8px');
+    } else {
+        $(this).css('padding-right', '0');
+    }
+});
+
 window.onload = () => {
     applySavedSize("info_content");
 };
