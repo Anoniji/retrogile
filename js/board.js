@@ -198,23 +198,6 @@ function board_vote(maxVote) {
     }
 }
 
-var vote_order = false;
-function board_vote_order(force=false) {
-    if(!vote_order || force) {
-      $('.sortable').each(function () {
-          const $sortableList = $(this);
-          $sortableList.find('li').sort(function (a, b) {
-              const aVotes = parseInt($(a).find('.votes').text());
-              const bVotes = parseInt($(b).find('.votes').text());
-              return bVotes - aVotes;
-          }).appendTo($sortableList);
-      });
-      vote_order = true;
-    } else {
-      location.reload();
-    }
-}
-
 function randomBetweenZeroAndScreenWidth() {
     return Math.floor(Math.random() * (window.innerWidth - 32));
 }
@@ -671,6 +654,24 @@ if (username !== null) {
                 $(this).css('display', 'block');
             });
             curr_highlightUser = false;
+        }
+    }
+
+    var vote_order = false;
+    function board_vote_order(force=false) {
+        if(!vote_order || force) {
+          $('.sortable').each(function () {
+              const $sortableList = $(this);
+              $sortableList.find('li').sort(function (a, b) {
+                  const aVotes = parseInt($(a).find('.votes').text());
+                  const bVotes = parseInt($(b).find('.votes').text());
+                  return bVotes - aVotes;
+              }).appendTo($sortableList);
+          });
+          vote_order = true;
+        } else {
+          vote_order = false;
+          ws.send(JSON.stringify({type: 'board_info'}));
         }
     }
 
