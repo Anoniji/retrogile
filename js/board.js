@@ -1157,7 +1157,7 @@ if (username !== null) {
                 window.location.reload();
             } else {
                 $('nav').removeClass('nav_disconnected');
-                sendWsMessage(ws, JSON.stringify({
+                ws.send(JSON.stringify({
                     type: 'connect',
                     board_id: '{{ board_id }}',
                     username: localStorage.getItem('username'),
