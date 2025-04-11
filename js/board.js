@@ -431,7 +431,7 @@ if (username !== null) {
         let distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
         let angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
 
-        sendWsMessage(ws, JSON.stringify({
+        ws.send(JSON.stringify({
             type: 'start_confetti',
             startX: parseInt(startX),
             startY: startY + parseInt($('#confetti').css('top')),
