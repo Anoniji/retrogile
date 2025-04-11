@@ -40,6 +40,43 @@ $(function () { $('#console').accordion({ collapsible: true, active: false, heig
     $('#console_dot').hide('fade');
 }}); });
 
+
+function storeWsMessages(message) {
+    const storedMessages = localStorage.getItem('unsentMessages');
+    let messagesArray = storedMessages ? JSON.parse(storedMessages) : [];
+    messagesArray.push(message);
+    localStorage.setItem('unsentMessages', JSON.stringify(messagesArray));
+}
+
+function sendWsMessage(websocket, message) {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        try {
+            websocket.send(message);
+        } catch (error) {
+            storeWsMessages(message);
+        }
+    } else {
+        storeWsMessages(message);
+    }
+}
+
+function resendWsMessages(websocket) {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        const storedMessages = localStorage.getItem('unsentMessages');
+        if (storedMessages) {
+            let messagesArray = JSON.parse(storedMessages);
+            messagesArray.forEach(message => {
+                try {
+                    websocket.send(message);
+                } catch (error) {
+                    console.error("Not resend:", error);
+                }
+            });
+            localStorage.removeItem('unsentMessages');
+        }
+    }
+}
+
 function showNotification(type, user, message) {
     var notification = $(`<div class="notification notif_${type}">`);
     $(`.notif_${type}`).hide();
@@ -311,7 +348,7 @@ if (username !== null) {
 
         timerInMinutes = removeNonNumeric(timerInMinutes);
         if (timerInMinutes && timerInMinutes != '') {
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'start_timer',
                 timerInMinutes: timerInMinutes,
             }));
@@ -324,7 +361,7 @@ if (username !== null) {
 
         maxVote = removeNonNumeric(maxVote);
         if (maxVote && maxVote != '') {
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'start_vote',
                 maxVote: maxVote,
             }));
@@ -333,7 +370,7 @@ if (username !== null) {
 
     $("#custom_color").change(function () {
         custom_color = $('#custom_color').val();
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'user_color',
             custom_color: custom_color,
         }));
@@ -394,7 +431,7 @@ if (username !== null) {
         let distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
         let angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
 
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'start_confetti',
             startX: parseInt(startX),
             startY: startY + parseInt($('#confetti').css('top')),
@@ -419,17 +456,17 @@ if (username !== null) {
     }
 
     function start_timer() {
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'start_timer',
             timerInSeconds: timerInSeconds,
         }));
     }
 
     function addCard(col_id) {
-        ws.send(JSON.stringify({type: 'card_write_start'}));
+        sendWsMessage(ws, JSON.stringify({type: 'card_write_start'}));
         customPrompt(col_id, '{{ translates.board_js_6 }}', '').then(cardContent => {
             if (cardContent) {
-                ws.send(JSON.stringify({
+                sendWsMessage(ws, JSON.stringify({
                     type: 'card_add',
                     pos: $(`#col_${col_id} ul`).children('li').length,
                     user_id: user_id,
@@ -440,9 +477,8 @@ if (username !== null) {
             }
             if (waiting_unfreeze) {
                 waiting_unfreeze = false;
-                ws.send(JSON.stringify({type: 'board_info'}));
             }
-            ws.send(JSON.stringify({type: 'card_write_stop'}));
+            sendWsMessage(ws, JSON.stringify({type: 'card_write_stop'}));
         });
     }
 
@@ -460,7 +496,7 @@ if (username !== null) {
     function unmergeCard(col_id, parent, cardPos) {
         if (board_author != username) return;
         if ($('#board_merge_bloc i').text() == 'call_merge') return;
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'card_unmerge',
             user_id: user_id,
             col_id: col_id,
@@ -471,10 +507,10 @@ if (username !== null) {
 
     function editCard(card_uuid) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
-        ws.send(JSON.stringify({type: 'card_write_start'}));
+        sendWsMessage(ws, JSON.stringify({type: 'card_write_start'}));
         customPrompt(col_id, '{{ translates.board_js_7 }}', $(`.uuid_${card_uuid} .info_content`).text()).then(cardContent => {
             if (cardContent) {
-                ws.send(JSON.stringify({
+                sendWsMessage(ws, JSON.stringify({
                     type: 'card_edit',
                     user_id: user_id,
                     col_id: col_id,
@@ -486,7 +522,7 @@ if (username !== null) {
                 waiting_unfreeze = false;
                 ws.send(JSON.stringify({type: 'board_info'}));
             }
-            ws.send(JSON.stringify({type: 'card_write_stop'}));
+            sendWsMessage(ws, JSON.stringify({type: 'card_write_stop'}));
         });
     }
 
@@ -498,7 +534,7 @@ if (username !== null) {
             maxVote -= 1
             if (maxVote >= 0) {
                 $('#board_vote .title').text(maxVote);
-                ws.send(JSON.stringify({
+                sendWsMessage(ws, JSON.stringify({
                     type: 'card_vote',
                     user_id: user_id,
                     col_id: col_id,
@@ -511,7 +547,7 @@ if (username !== null) {
 
     function deleteCard(card_uuid) {
         col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col').toString();
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'card_delete',
             user_id: user_id,
             col_id: col_id,
@@ -525,7 +561,7 @@ if (username !== null) {
         colName = removeNonAlphanumeric(colName);
         if (isNumeric(colName)) return;
         if (colName) {
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'col_add',
                 user_id: user_id,
                 colName: colName,
@@ -558,7 +594,7 @@ if (username !== null) {
                 [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
             }
         }
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'col_reorder',
             user_id: user_id,
             colName: newOrder,
@@ -575,7 +611,7 @@ if (username !== null) {
             showNotification('limit', '🤔', '💬');
             $('button').prop('disabled', true);
         } else {
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'card_view',
                 user_id: user_id,
             }));
@@ -583,7 +619,7 @@ if (username !== null) {
     }
 
     function moveToChild(parentId, childId) {
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'card_parent',
             user_id: user_id,
             col_id: false,
@@ -602,7 +638,7 @@ if (username !== null) {
             }
         });
 
-        ws.send(JSON.stringify({
+        sendWsMessage(ws, JSON.stringify({
             type: 'col_order',
             user_id: user_id,
             colName: name.slice(4),
@@ -617,7 +653,7 @@ if (username !== null) {
                 $('.col').removeClass('col_5');
                 $('#board_add_bloc').show();
             }
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'col_delete',
                 user_id: user_id,
                 colName: col_id,
@@ -688,7 +724,7 @@ if (username !== null) {
         });
 
         function mouse_position() {
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'cursor_user',
                 pos_x: pos_x,
                 pos_y: pos_y,
@@ -811,7 +847,7 @@ if (username !== null) {
                         if (list_votes[username]) {
                             $('nav #vote_progress').show();
                             maxVoteTotal = $('#users .user').length * check_votes;
-                            ws.send(JSON.stringify({
+                            sendWsMessage(ws, JSON.stringify({
                                 type: 'stats_vote',
                             }));
                         }
@@ -1109,7 +1145,7 @@ if (username !== null) {
         document.getElementById('form').onsubmit = ev => {
             ev.preventDefault();
             const textField = document.getElementById('chat_msg');
-            ws.send(JSON.stringify({
+            sendWsMessage(ws, JSON.stringify({
                 type: 'message',
                 content: escapeHtml(textField.value),
             }));
@@ -1117,17 +1153,18 @@ if (username !== null) {
         };
 
         ws.onopen = () => {
-            if(needReload) {
+            if(needReload && !freeze_board) {
                 window.location.reload();
             } else {
                 $('nav').removeClass('nav_disconnected');
-                ws.send(JSON.stringify({
+                sendWsMessage(ws, JSON.stringify({
                     type: 'connect',
                     board_id: '{{ board_id }}',
                     username: localStorage.getItem('username'),
                 }));
 
                 ws.send(JSON.stringify({type: 'board_info'}));
+                resendWsMessages(ws);
 
                 setInterval(function () { mouse_position() }, 3000);            
             }
