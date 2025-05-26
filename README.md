@@ -14,9 +14,13 @@ The version provided is currently in development and may have missing features o
 [Test server](https://retrogile.anoniji.dev)
 
 ## Dockerhub
+
+- [FULL Image Page](https://hub.docker.com/r/anoniji/retrogile)
+
+### Splitted services
 - [API Image Page](https://hub.docker.com/r/anoniji/retrogile_api)
 - [WS Image Page](https://hub.docker.com/r/anoniji/retrogile_ws)
-- [FULL Image Page](https://hub.docker.com/r/anoniji/retrogile)
+
 
 ## Podman Launch Example
 ```
