@@ -396,7 +396,7 @@ if __name__ == "__main__":
         licence_manager = licence.LicenceManager()
         licence_manager.validate_licence()
         logging.info("Server API started")
-        app.run(host="0.0.0.0", port=8008, debug=True)
+        app.run(host="0.0.0.0", port=8008, debug=False)
 
     except OSError as e:
         logging.error(f"Server API error: {e}")
