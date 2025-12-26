@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="{{ translates.lang }}">
+
+<head>
+    <title>Retrogile - Speed</title>
+
+    <!-- meta -->
+    <meta charset="utf-8">
+    <meta name="description" content="{{ translates.description }}">
+    <meta name="author" content="Niji Ano">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../img/favicon_speed.png" />
+
+    <!-- Dublin Core -->
+    <meta name="DC.Creator" content="niji, ano">
+    <meta name="DC.Language" content="{{ translates.lang }}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Retrogile">
+    <meta name="twitter:image" content="https://retrogile.anoniji.dev/img/favicon_speed.png">
+    <meta name="twitter:description" content="{{ translates.description }}">
+    <!-- Sociaux -->
+    <meta property="og:title" content="Retrogile">
+    <meta property="og:image" content="https://retrogile.anoniji.dev/img/favicon_speed.png">
+    <meta property="og:description" content="{{ translates.description }}">
+
+    <!-- links -->
+    <link rel="stylesheet" href="../css/materialicons.css">
+    <link rel="stylesheet" href="../css/jqueryui.css">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <section id="loader">
+        <div id="board_access" class="speed_animate">
+            <img alt="logo" src="../img/logo_speed.png" />
+            <div id="nav_logo"></div>
+            <div id="board_access_bloc">
+                <div>
+                    <ul id="speed_list">
+                        <li>{{ translates.speed_js_1 }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wallpaper"></div>
+    <div class="wallpaper2"></div>
+    <div class="login_effect"></div>
+
+    <section id="speed_access">
+        <div id="users_custom_color" title="{{ translates.board_1 }}">
+            <i class="material-icons" onclick="setColor()">palette</i>
+            <input type="hidden" id="custom_color" name="custom_color">
+        </div>
+        <div id="users"></div>
+    </section>
+
+    <section id="speed_board_name"></section>
+    <section id="speed_board_vote"></section>
+    <section id="board" class="main_board speed_board"></section>
+
+    <section class="emitter"></section>
+    <footer id="speed_footer">
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="../LICENSES">{{ translates.footer
+            }}</a>
+    </footer>
+
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery-ui.min.js"></script>
+    <script src="../js/jquery.ui.touch-punch.min.js"></script>
+    <script src="../jsi/speed.js?lang={{ translates.lang }}"></script>
+</body>
+
+</html>
+

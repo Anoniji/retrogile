@@ -1,0 +1,82 @@
+name: Docker Image API
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Tags
+        id: tags
+        run: |
+          git fetch --tags
+
+      - name: HTML/CSS/JS Minifier
+        uses: docker://devatherock/minify-js:3.1.0
+        with:
+          add_suffix: false
+          inclusions: |-
+            .*css.*
+            .*pages.*
+          exclusions: |-
+            .*js.*
+
+      - name: Setup Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Compile libraries to .pyc
+        run: |
+          python -m compileall -b libs/
+      
+      - name: Verify compilation
+        run: |
+          find libs/ -name "*.pyc" -type f
+
+      - name: Remove .py files where .pyc exists
+        run: |
+          python << 'EOF'
+          import os
+          from pathlib import Path
+          
+          libs_dir = Path('libs')
+          removed_count = 0
+          
+          # Parcourir tous les fichiers .pyc
+          for pyc_file in libs_dir.rglob('*.pyc'):
+              # Construire le chemin du fichier .py correspondant
+              py_file = pyc_file.with_suffix('.py')
+              
+              # Si le fichier .py existe, le supprimer
+              if py_file.exists():
+                  py_file.unlink()
+                  print(f"Supprimé : {py_file}")
+                  removed_count += 1
+          
+          print(f"\nTotal fichiers supprimés : {removed_count}")
+          EOF
+
+      - name: Build and Push the Docker image
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo ${latest_tag} > ./version
+          docker build --tag anoniji/retrogile_api:latest -f ./api.Dockerfile .
+          docker tag anoniji/retrogile_api:latest anoniji/retrogile_api:${latest_tag}
+          docker push anoniji/retrogile_api:${latest_tag}
+          docker push anoniji/retrogile_api:latest
+
+

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="{{ translates.lang }}">
+
+<head>
+    <title>Retrogile</title>
+
+    <!-- meta -->
+    <meta charset="utf-8">
+    <meta name="description" content="{{ translates.description }}">
+    <meta name="author" content="Niji Ano">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+    <!-- Dublin Core -->
+    <meta name="DC.Creator" content="niji, ano">
+    <meta name="DC.Language" content="{{ translates.lang }}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Retrogile">
+    <meta name="twitter:image" content="https://retrogile.anoniji.dev/img/favicon.png">
+    <meta name="twitter:description" content="{{ translates.description }}">
+    <!-- Sociaux -->
+    <meta property="og:title" content="Retrogile">
+    <meta property="og:image" content="https://retrogile.anoniji.dev/img/favicon.png">
+    <meta property="og:description" content="{{ translates.description }}">
+
+    <!-- links -->
+    <link rel="stylesheet" href="../css/materialicons.css">
+    <link rel="stylesheet" href="../css/jqueryui.css">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <section id="loader">
+        <div class="wallpaper"></div>
+        <div class="wallpaper2"></div>
+        <div class="login_effect"></div>
+        <div id="board_access" class="board_loader">
+            <img alt="logo" src="../img/logo.png" />
+            <div id="nav_logo"></div>
+            <div id="board_access_bloc">
+                <div>
+                    <ul id="loading_list">
+                        <li>{{ translates.loading }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="board_access" class="board_header">
+        <img alt="logo" src="../img/logo.png" onclick="location.href = '../';" />
+        <div id="nav_logo" class="nav_logo_board">
+            <nav>
+                <div id="users"></div>
+                <div id="vote_progress"></div>
+            </nav>
+        </div>
+    </section>
+
+    <section id="cursors"></section>
+    <section id="wallpaper"></section>
+    <section id="wallpaper2">
+        <div class="login_effect"></div>
+    </section>
+    <section id="confetti"></section>
+    <section id="board-params" class="board-color">
+        <div id="board_name"></div>
+        <button id="board_timer" onclick="startTimer()">
+            <i class="material-icons">timer</i>
+            <div class="title">{{ translates.board_2 }}</div>
+        </button>
+        <button id="board_vote" onclick="startVote()">
+            <i class="material-icons">how_to_vote</i>
+            <div class="title">{{ translates.board_3 }}</div>
+        </button>
+        <button id="board_confetti" onclick="startConfetti()">
+            <i class="material-icons">celebration</i>
+            <div class="title">{{ translates.board_4 }}</div>
+        </button>
+        <div id="r_menu">
+            <button id="board_text_decrease" onclick="cardTextSize('info_content', -1, true);"
+                title="{{ translates.board_5 }}">
+                <i class="material-icons">text_decrease</i>
+            </button>
+            <button id="board_text_increase" onclick="cardTextSize('info_content', 1, true);"
+                title="{{ translates.board_6 }}">
+                <i class="material-icons">text_increase</i>
+            </button>
+            <button id="board_add_bloc" onclick="addCol()" title="{{ translates.board_7 }}">
+                <i class="material-icons">post_add</i>
+            </button>
+            <button id="board_merge_bloc" onclick="mergeCard()" title="{{ translates.board_8 }}">
+                <i class="material-icons">call_merge</i>
+            </button>
+            <button id="board_cards_visibility" onclick="viewCardToggle()">
+                <i class="material-icons">visibility</i>
+                <div class="title">{{ translates.board_9 }}</div>
+            </button>
+            <button id="board_vote_order" onclick="board_vote_order()">
+                <i class="material-icons">filter_list</i>
+                <div class="title">{{ translates.board_10 }}</div>
+            </button>
+            <button id="board_copy_link" onclick="board_copy_link()">
+                <i class="material-icons">content_copy</i>
+                <div class="title">{{ translates.board_11 }}</div>
+            </button>
+        </div>
+    </section>
+    <section id="board" class="main_board"></section>
+    <section id="notifications"></section>
+    <section id="console">
+        <div id="board_log"></div>
+        <form id="form">
+            <input type="text" id="chat_msg" placeholder="{{ translates.board_13 }}">
+        </form>
+    </section>
+
+    <section id="board-user-menu">
+        <i id="toggle_chat" class="material-icons" title="{{ translates.board_12 }}">chat</i>
+        <div id="console_dot"></div>
+        <div id="users_custom_color" title="{{ translates.board_1 }}">
+            <i class="material-icons" onclick="setColor()">palette</i>
+            <input type="hidden" id="custom_color" name="custom_color">
+        </div>
+        <div id="click_cnt"></div>
+    </section>
+
+    <section id="board-votes-menu">
+        <i class="material-icons">how_to_vote</i>
+        <div id="votes-title">{{ translates.board_js_26 }}</div>
+        <ul id="votes-info">
+            <li>{{ translates.board_js_27 }}<span id="votes_remaining"></span></li>
+        </ul>
+    </section>
+
+    <section class="emitter"></section>
+    <footer>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="../LICENSES">{{ translates.footer
+            }}</a>
+    </footer>
+
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery-ui.min.js"></script>
+    <script src="../js/jquery.ui.touch-punch.min.js"></script>
+    <script src="../jsi/board.js?lang={{ translates.lang }}"></script>
+</body>
+
+</html>
+

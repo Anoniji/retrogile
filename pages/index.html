@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="{{ translates.lang }}">
+
+<head>
+    <title>Retrogile</title>
+
+    <!-- meta -->
+    <meta charset="utf-8">
+    <meta name="description" content="{{ translates.description }}">
+    <meta name="author" content="Niji Ano">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="./img/favicon.png" />
+
+    <!-- Dublin Core -->
+    <meta name="DC.Creator" content="niji, ano">
+    <meta name="DC.Language" content="{{ translates.lang }}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Retrogile">
+    <meta name="twitter:image" content="https://retrogile.anoniji.dev/img/favicon.png">
+    <meta name="twitter:description" content="{{ translates.description }}">
+    <!-- Sociaux -->
+    <meta property="og:title" content="Retrogile">
+    <meta property="og:image" content="https://retrogile.anoniji.dev/img/favicon.png">
+    <meta property="og:description" content="{{ translates.description }}">
+
+    <!-- links -->
+    <link rel="stylesheet" href="./css/materialicons.css">
+    <link rel="stylesheet" href="./css/jqueryui.css">
+    <link rel="stylesheet" href="./css/app.css">
+</head>
+
+<body>
+    <section id="wallpaper"></section>
+    <section id="wallpaper2"></section>
+    <section id="login_effect"></section>
+    <div id="board_access">
+        <img alt="logo" src="./img/logo.png" />
+        <div id="nav_logo"></div>
+        <div id="board_access_bloc">
+            <div id="username_bloc">
+                <input type="text" id="username" placeholder="{{ translates.index_1 }}" maxlength="32">
+                <i id="username_cleaner" class="material-icons">backspace</i>
+            </div>
+            <div>
+                <input type="text" id="boardname" placeholder="{{ translates.index_2 }}" maxlength="32">
+            </div>
+            <div class="right">
+                <button class="list_board_btn" onclick="list_board()" title="{{ translates.index_3 }}"><i
+                        class="material-icons">list</i></button>
+                <button class="start_board_bnt" onclick="start_board('board')">
+                    <div class="label_button">{{ translates.index_4 }}</div>
+                </button>
+                <button class="start_speed_bnt" onclick="start_board('speed')" title="{{ translates.index_5 }}">
+                    <i class="material-icons">speed</i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="./LICENSES">{{ translates.footer
+            }}</a>
+    </footer>
+
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/jquery-ui.min.js"></script>
+    <script src="./jsi/app.js?lang={{ translates.lang }}"></script>
+</body>
+
+</html>

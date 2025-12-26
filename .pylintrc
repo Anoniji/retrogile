@@ -1,0 +1,11 @@
+[main]
+max-branches=22
+
+[design]
+max-locals=22
+
+[FORMAT]
+max-module-lines=1032
+
+[MESSAGES CONTROL]
+disable=W1201,W1203,C0413,too-few-public-methods

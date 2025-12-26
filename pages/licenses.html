@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="{{ translates.lang }}">
+
+<head>
+    <title>Retrogile</title>
+
+    <!-- meta -->
+    <meta charset="utf-8">
+    <meta name="description" content="{{ translates.description }}">
+    <meta name="author" content="Niji Ano">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="./img/favicon.png" />
+
+    <!-- Dublin Core -->
+    <meta name="DC.Creator" content="niji, ano">
+    <meta name="DC.Language" content="{{ translates.lang }}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Retrogile">
+    <meta name="twitter:image" content="https://retrogile.anoniji.dev/img/favicon.png">
+    <meta name="twitter:description" content="{{ translates.description }}">
+    <!-- Sociaux -->
+    <meta property="og:title" content="Retrogile">
+    <meta property="og:image" content="https://retrogile.anoniji.dev/img/favicon.png">
+    <meta property="og:description" content="{{ translates.description }}">
+
+    <!-- links -->
+    <link rel="stylesheet" href="./css/materialicons.css">
+    <link rel="stylesheet" href="./css/jqueryui.css">
+    <link rel="stylesheet" href="./css/app.css">
+</head>
+
+<body>
+    <section id="wallpaper"></section>
+    <section id="wallpaper2"></section>
+    <section id="login_effect"></section>
+    <div id="board_access" class="board_license">
+        <img alt="logo" src="./img/logo.png" />
+        <div id="nav_logo"></div>
+        <div id="board_access_bloc">
+            <div>
+                <ul id="licenses_list">
+                    <li>jQuery v3.7.1 - Copyright OpenJS Foundation and other contributors | jquery.org/license</li>
+                    <li>jQuery UI v1.14.1 (2025-02-18) - Copyright OpenJS Foundation and other contributors; Licensed
+                        MIT</li>
+                    <li>jQuery UI Touch Punch 0.2.3 - Copyright 2011–2014, Dave Furfero; Dual licensed under the MIT or
+                        GPL
+                        Version 2</li>
+                    <li>tsParticles Confetti v3.0.3 - Copyright (c) 2020 Matteo Bruni, MIT License</li>
+                    <li>Material icons - Apache License Version 2.0</li>
+                    <li>Spanish translation by <a href="https://github.com/PedroMezquita"
+                            target="_blank">@PedroMezquita</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <button class="list_board_btn" onclick="location.href = '../';" title="{{ translates.board_js_13 }}"><i
+                        class="material-icons">home</i></button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        Copyright © {{ current_year }} - Retrogile {{ current_version }} - <a href="./LICENSES">{{ translates.footer
+            }}</a>
+    </footer>
+
+    <script type="text/javascript">
+        document.addEventListener("contextmenu", function(e) { e.preventDefault() });
+        function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (localStorage.setItem("bad_user", !0), location.reload()) }
+        localStorage.getItem("bad_user") && setInterval(function() { window.fetch = window.WebSocket = console.error; localStorage.setItem("bad_user", !0) }, 1);
+    </script>
+</body>
+
+</html>
