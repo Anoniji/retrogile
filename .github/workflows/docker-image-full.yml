@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -16,9 +20,15 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout Repository
         uses: actions/checkout@v4
-
 
       - name: Get Tags
         id: tags
@@ -43,7 +53,7 @@ jobs:
       - name: Compile libraries to .pyc
         run: |
           python -m compileall -b libs/
-      
+
       - name: Verify compilation
         run: |
           find libs/ -name "*.pyc" -type f
@@ -53,21 +63,21 @@ jobs:
           python << 'EOF'
           import os
           from pathlib import Path
-          
+
           libs_dir = Path('libs')
           removed_count = 0
-          
+
           # Parcourir tous les fichiers .pyc
           for pyc_file in libs_dir.rglob('*.pyc'):
               # Construire le chemin du fichier .py correspondant
               py_file = pyc_file.with_suffix('.py')
-              
+
               # Si le fichier .py existe, le supprimer
               if py_file.exists():
                   py_file.unlink()
                   print(f"Supprimé : {py_file}")
                   removed_count += 1
-          
+
           print(f"\nTotal fichiers supprimés : {removed_count}")
           EOF
 
@@ -79,3 +89,11 @@ jobs:
           docker tag anoniji/retrogile:latest anoniji/retrogile:${latest_tag}
           docker push anoniji/retrogile:${latest_tag}
           docker push anoniji/retrogile:latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
