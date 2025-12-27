@@ -14,19 +14,6 @@ jobs:
       packages: write
 
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -81,6 +68,12 @@ jobs:
           print(f"\nTotal fichiers supprimés : {removed_count}")
           EOF
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build the Docker image and Push into DockerHub
         run: |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
@@ -89,6 +82,13 @@ jobs:
           docker tag anoniji/retrogile:latest anoniji/retrogile:${latest_tag}
           docker push anoniji/retrogile:${latest_tag}
           docker push anoniji/retrogile:latest
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build the Docker image and Push into Github
         run: |
