@@ -81,6 +81,11 @@ jobs:
           print(f"\nTotal fichiers supprimés : {removed_count}")
           EOF
 
+      - name: Set lowercase repository name
+        id: lowercase_repo
+        run: echo "repo=${{ github.repository | tr '[:upper:]' '[:lower:]' }}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Build and Push the Docker image
         run: |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
@@ -96,4 +101,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository | lower }}:latest
+          tags: ghcr.io/${{ steps.lowercase_repo.outputs.repo }}:latest
