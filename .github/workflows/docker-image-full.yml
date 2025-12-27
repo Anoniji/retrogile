@@ -94,5 +94,7 @@ jobs:
         run: |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          docker build --tag ghcr.io/anoniji/retrogile:latest -f ./full.Dockerfile .
+          docker tag ghcr.io/anoniji/retrogile:latest ghcr.io/anoniji/retrogile:${latest_tag}
           docker push ghcr.io/anoniji/retrogile:${latest_tag}
           docker push ghcr.io/anoniji/retrogile:latest
