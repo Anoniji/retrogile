@@ -81,12 +81,7 @@ jobs:
           print(f"\nTotal fichiers supprimés : {removed_count}")
           EOF
 
-      - name: Set lowercase repository name
-        id: lowercase_repo
-        run: echo "repo=${{ github.repository | tr '[:upper:]' '[:lower:]' }}" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Build and Push the Docker image
+      - name: Build the Docker image and Push into DockerHub
         run: |
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo ${latest_tag} > ./version
@@ -95,10 +90,9 @@ jobs:
           docker push anoniji/retrogile:${latest_tag}
           docker push anoniji/retrogile:latest
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ghcr.io/${{ steps.lowercase_repo.outputs.repo }}:latest
+      - name: Build the Docker image and Push into Github
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          docker push ghcr.io/anoniji/retrogile:${latest_tag}
+          docker push ghcr.io/anoniji/retrogile:latest
