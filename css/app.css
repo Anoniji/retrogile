@@ -425,6 +425,9 @@ nav #users div .user_notif_status i {
 .board_license {
     height: 486px !important;
     top: calc(50vh - 233px) !important;
+
+    height: 404px !important;
+    top: calc(50vh - 202px) !important;
 }
 
 .board_loader {
