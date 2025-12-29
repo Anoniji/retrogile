@@ -269,10 +269,10 @@ if (username !== null) {
         goto_page('end_speed');
     }
 
-    function voteCard(card_uuid, act) {
+    function voteCard(card_uuid) {
         const now = Date.now();
         const lastExecution = voteCard.lastExecution || 0;
-        if (now - lastExecution < 1000) {
+        if (now - lastExecution < 600) {
             return;
         }
         voteCard.lastExecution = now;
