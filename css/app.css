@@ -332,6 +332,23 @@ nav #users div .user_notif_status i {
     vertical-align: top;
 }
 
+#speed_list #good_input, #speed_list #bad_input,
+#speed_list #stape_input,
+#speed_list #bad_lst, #speed_list #stape_lst {
+    height: 310px;
+}
+
+#speed_list #good_input, #speed_list #bad_input {
+    width: 240px;
+    border-right: 6px solid #333333;
+}
+
+#speed_list #bad_lst {
+    width: 236px;
+    border-right: 2px solid #dce8f7;
+    margin-right: 8px;
+}
+
 #speed_list li .timer {
     font-size: 64px;
     margin-top: 50px;
