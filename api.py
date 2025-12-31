@@ -52,7 +52,7 @@ logging.basicConfig(
 sesssdb = sessions.Sessions()
 app = Flask(__name__, template_folder="./")
 current_year = datetime.datetime.now().year
-ws_subdomain = False
+WS_SUBDOMAIN = False
 CURRENT_VERSION = "1.0dev"
 LIST_LANGS = ['fr', 'es',  'en']
 
@@ -319,7 +319,7 @@ def jsi(path):
                 data = render_template(
                     "js/" + path,
                     translates=load_translate(lang),
-                    ws_subdomain=ws_subdomain,
+                    ws_subdomain=WS_SUBDOMAIN,
                     ws_session=sesssdb.create(),
                     board_id=board_id,
                 )
@@ -399,7 +399,7 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser()
         parser.add_argument('--ws_subdomain', default='')
         args = parser.parse_args()
-        ws_subdomain = args.ws_subdomain
+        WS_SUBDOMAIN = args.ws_subdomain
 
         licence_manager = licence.LicenceManager()
         licence_manager.validate_licence()
