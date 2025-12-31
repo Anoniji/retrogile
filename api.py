@@ -23,6 +23,7 @@ Version 3, 29 June 2007
 """
 
 import os
+import argparse
 import json
 import uuid
 import datetime
@@ -317,6 +318,7 @@ def jsi(path):
                 data = render_template(
                     "js/" + path,
                     translates=load_translate(lang),
+                    ws_subdomain=ws_subdomain,
                     ws_session=sesssdb.create(),
                     board_id=board_id,
                 )
@@ -393,6 +395,11 @@ def i18n(path):
 
 if __name__ == "__main__":
     try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--ws_subdomain', default='')
+        args = parser.parse_args()
+        ws_subdomain = args.ws_subdomain
+
         licence_manager = licence.LicenceManager()
         licence_manager.validate_licence()
         logging.info("Server API started")
