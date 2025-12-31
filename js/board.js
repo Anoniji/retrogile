@@ -819,7 +819,7 @@ if (username !== null) {
     function connect() {
         ws_path = `ws://${location.hostname}:8009`;
         if (window.location.protocol === 'https:') {
-            ws_path = `wss://wss-${location.hostname}`;
+            ws_path = `wss://wss.${location.hostname}`;
         }
         ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
 
