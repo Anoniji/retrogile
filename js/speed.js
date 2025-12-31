@@ -305,9 +305,15 @@ if (username !== null) {
     }
 
     function connect() {
-        ws_path = `ws://${location.hostname}:8009`;
+        ws_path = 'ws://';
         if (window.location.protocol === 'https:') {
-            ws_path = `wss://wss.${location.hostname}`;
+            ws_path = 'wss://';
+        }
+
+        if ("{{ ws_subdomain }}" != "") {
+            ws_path = `${ws_path}{{ ws_subdomain }}${location.hostname}`;
+        } else {
+            ws_path = `${ws_path}${location.hostname}:8009`;
         }
         ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
         ws.addEventListener('message', ev => {
