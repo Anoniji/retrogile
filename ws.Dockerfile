@@ -9,4 +9,6 @@ COPY ./ ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-CMD [ "python", "./ws.py", "--ws_subdomain", "\"wss.\"" ]
+ENV WS_SUBDOMAIN="wss."
+
+ENTRYPOINT ["sh", "-c", "python ./ws.py --ws_subdomain \"${WS_SUBDOMAIN}\""]
