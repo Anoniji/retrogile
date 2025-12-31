@@ -52,6 +52,7 @@ logging.basicConfig(
 sesssdb = sessions.Sessions()
 app = Flask(__name__, template_folder="./")
 current_year = datetime.datetime.now().year
+ws_subdomain = False
 CURRENT_VERSION = "1.0dev"
 LIST_LANGS = ['fr', 'es',  'en']
 
