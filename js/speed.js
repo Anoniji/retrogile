@@ -16,8 +16,9 @@ ______     _                   _ _
                           __/ |
 Do not use the console ! |___/ \x1b[0m`);
 
-document.addEventListener("contextmenu",function(e){e.preventDefault()});
-function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
+// document.addEventListener("contextmenu",function(e){e.preventDefault()});
+// function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
+function detectDevTool(e) { return; }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
 function getFirstLetters(t) { return "string" != typeof t || 0 === t.length ? "<i class='material-icons'>face</i>" : "<span>" + t.charAt(0).toUpperCase() + "</span>" }
 function rgbToHex(t) { t.includes("none") && (t = t.split(" none", 1)[0]); let n = t.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/); if (!n) throw Error("Format RGB invalide"); let e = parseInt(n[1], 10), _ = parseInt(n[2], 10), i = parseInt(n[3], 10); return e = e.toString(16), _ = _.toString(16), i = i.toString(16), e = 1 === e.length ? "0" + e : e, _ = 1 === _.length ? "0" + _ : _, i = 1 === i.length ? "0" + i : i, "#" + e + _ + i }
@@ -306,7 +307,7 @@ if (username !== null) {
     function connect() {
         ws_path = `ws://${location.hostname}:8009`;
         if (window.location.protocol === 'https:') {
-            ws_path = `wss://wss-${location.hostname}`;
+            ws_path = `wss://wss.${location.hostname}`;
         }
         ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
         ws.addEventListener('message', ev => {
