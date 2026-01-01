@@ -400,6 +400,8 @@ if __name__ == "__main__":
         parser.add_argument('--ws_subdomain', default='')
         args = parser.parse_args()
         WS_SUBDOMAIN = args.ws_subdomain
+        if WS_SUBDOMAIN != '':
+            print(f' * Ws(s) set: {WS_SUBDOMAIN}')
 
         licence_manager = licence.LicenceManager()
         licence_manager.validate_licence()
