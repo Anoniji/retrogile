@@ -21,6 +21,21 @@ button {
     background-color: #dce8f7;
 }
 
+#github {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 16px;
+    background-color: #333333;
+    box-shadow: 0 0 2px #333333;
+    border-radius: 0 0 8px 0;
+    font-weight: bold;
+    font-size: 12px;
+    color: #dce8f7;
+    user-select: none;
+}
+
 #loader {
     position: fixed;
     top: 0;
