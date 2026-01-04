@@ -26,6 +26,7 @@ function getFirstLetters(t) { return "string" != typeof t || 0 === t.length ? "<
 function rgbToHex(t) { t.includes("none") && (t = t.split(" none", 1)[0]); let n = t.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/); if (!n) throw Error("Format RGB invalide"); let e = parseInt(n[1], 10), _ = parseInt(n[2], 10), i = parseInt(n[3], 10); return e = e.toString(16), _ = _.toString(16), i = i.toString(16), e = 1 === e.length ? "0" + e : e, _ = 1 === _.length ? "0" + _ : _, i = 1 === i.length ? "0" + i : i, "#" + e + _ + i }
 function hexToRgb(r) { hex = r.replace("#", ""); let n = parseInt(hex.substring(0, 2), 16), s = parseInt(hex.substring(2, 4), 16), t = parseInt(hex.substring(4, 6), 16); return { r: n, g: s, b: t } }
 function isLightColor(r) { let t = hexToRgb(r), _ = (299 * t.r + 587 * t.g + 114 * t.b) / 1e3; return _ > 128 }
+function getRootDomain() { const hostname = window.location.hostname; const parts = hostname.split('.'); if (parts.length <= 2) return hostname; return parts.slice(-2).join('.'); }
 
 var username = localStorage.getItem('username');
 if (username === null) {
@@ -817,16 +818,15 @@ if (username !== null) {
     }
 
     function connect() {
-        const hostname = location.hostname.replace(/^www\./, '');
         ws_path = 'ws://';
         if (window.location.protocol === 'https:') {
             ws_path = 'wss://';
         }
 
         if ("{{ ws_subdomain }}" != "") {
-            ws_path = `${ws_path}{{ ws_subdomain }}${hostname}`;
+            ws_path = `${ws_path}{{ ws_subdomain }}${getRootDomain()}`;
         } else {
-            ws_path = `${ws_path}${hostname}:8009`;
+            ws_path = `${ws_path}${getRootDomain()}:8009`;
         }
         ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
 
