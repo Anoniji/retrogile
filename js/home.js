@@ -18,11 +18,8 @@ Do not use the console ! |___/ \x1b[0m`);
 
 document.addEventListener("contextmenu", function (e) { e.preventDefault() });
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
-
-function removeNonAlphanumericSpace(str) {
-    if (!str) return false;
-    return str.replace(/[^a-zA-Z0-9 ]/g, '');
-}
+function removeNonAlphanumericSpace(str) { if (!str) return false; return str.replace(/[^a-zA-Z0-9 ]/g, ''); }
+function getRootDomain() { const hostname = window.location.hostname; const parts = hostname.split('.'); if (parts.length <= 2) return hostname; return parts.slice(-2).join('.'); }
 
 function showNotification(type, user, message) {
     if(!$('.notification').length) {
@@ -90,16 +87,15 @@ if (username === null) {
     }
 
     function connect() {
-        const hostname = location.hostname.replace(/^www\./, '');
         ws_path = 'ws://';
         if (window.location.protocol === 'https:') {
             ws_path = 'wss://';
         }
 
         if ("{{ ws_subdomain }}" != "") {
-            ws_path = `${ws_path}{{ ws_subdomain }}${hostname}`;
+            ws_path = `${ws_path}{{ ws_subdomain }}${getRootDomain()}`;
         } else {
-            ws_path = `${ws_path}${hostname}:8009`;
+            ws_path = `${ws_path}${getRootDomain()}:8009`;
         }
         ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
         ws.addEventListener('message', ev => {
