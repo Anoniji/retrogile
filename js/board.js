@@ -1006,7 +1006,12 @@ if (username !== null) {
                 }
 
                 $.each(board_data, function (index, value) {
-                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${index}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
+                    var h1_name = index;
+                    if (h1_name.length > 20) {
+                        h1_name = h1_name.substring(0, 20) + '...';
+                    }
+
+                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${h1_name}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
                         html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
