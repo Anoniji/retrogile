@@ -1,7 +1,7 @@
 [![Pylint](https://github.com/Anoniji/retrogile/actions/workflows/pylint.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/pylint.yml)
 [![Docker Image API](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-api.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-api.yml)
 [![Docker Image WS](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-ws.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-ws.yml)
-[![Docker Image Full](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-full.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-full.yml)
+[![Docker Image Full](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-aio.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-aio.yml)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-green?style=square)](https://www.python.org/)
 
 ![alt text](https://github.com/Anoniji/retrogile/blob/main/img/favicon.png?raw=true)
