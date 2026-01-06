@@ -72,6 +72,10 @@ button {
     user-select: none;
 }
 
+.cursor_pointer {
+    cursor: pointer !important;
+}
+
 #wallpaper,
 .wallpaper {
     position: fixed;
