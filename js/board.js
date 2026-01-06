@@ -1016,8 +1016,8 @@ if (username !== null) {
                 var board_total_idx = Object.keys(board_data).length - 1;
                 $.each(board_data, function (index, value) {
                     var h1_name = index;
-                    if (h1_name.length > 18) {
-                        h1_name = h1_name.substring(0, 18) + '...';
+                    if (h1_name.length > 14) {
+                        h1_name = h1_name.substring(0, 14) + '...';
                     }
 
                     html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${h1_name}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
