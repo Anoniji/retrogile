@@ -4,7 +4,7 @@
 """
 Script Name: Retrogile WS
 Author: Niji Ano
-Date: 2025-08-18
+Date: 2026-01-06
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -412,7 +412,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
 
                     if mode == "board_delete":
                         os.remove(board_path)
-                    if mode == "board_type":
+                    elif mode == "board_type":
                         board_info["type"] = "board"
                         boards.update_board(board_uuid, board_info)
                     else:
