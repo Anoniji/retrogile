@@ -1007,6 +1007,8 @@ if (username !== null) {
                     }
                 }
 
+                var board_col_idx = 0;
+                var board_total_idx = Object.keys(board_data).length - 1;
                 $.each(board_data, function (index, value) {
                     var h1_name = index;
                     if (h1_name.length > 18) {
@@ -1016,8 +1018,12 @@ if (username !== null) {
                     html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${h1_name}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
                     if (board_author == username) {
                         html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
-                        html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
-                        html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
+                        if (board_col_idx != 0) {
+                            html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
+                        }
+                        if (board_col_idx != board_total_idx) {
+                            html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
+                        }
                     }
                     html += `</h1><ul class='sortable'></ul></div>`;
                     $('#board').append(html);
@@ -1092,6 +1098,7 @@ if (username !== null) {
                         connectWith: '.sortable, .child_drop',
                         update: function (e, u) { $('.child_drop').each(function (_, e) { if ($(e).children().length) { $(e).children().each(function (_, c) { moveToChild($(e).attr('data-parentId'), $(c).attr('data-uuid')); return; }) } }) }
                     });
+                    board_col_idx += 1;
                 });
 
                 colLst = generateColumnBoundaries(Object.keys(board_data).length, $('.col').width() + 32);
