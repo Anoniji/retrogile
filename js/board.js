@@ -415,6 +415,7 @@ if (username !== null) {
     var pos_y;
     var curr_highlightUser;
     var maxVoteTotal;
+    var mergeEnable = false;
 
     $('#board').scroll(function () {
         scrollFix();
@@ -575,12 +576,16 @@ if (username !== null) {
 
     function mergeCard() {
         if (board_author != username) return;
-        if ($('#board_merge_bloc i').text() == 'call_merge') {
+        if (!mergeEnable) {
             $('#board_merge_bloc i').text('merge')
             $('.child_drop').show();
+            $('.card_child i').addClass('cursor_pointer');
+            mergeEnable = true;
         } else {
             $('#board_merge_bloc i').text('call_merge')
             $('.child_drop').hide();
+            $('.card_child i').removeClass('cursor_pointer');
+            mergeEnable = false;
         }
     }
 
