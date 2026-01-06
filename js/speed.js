@@ -16,15 +16,16 @@ ______     _                   _ _
                           __/ |
 Do not use the console ! |___/ \x1b[0m`);
 
-// document.addEventListener("contextmenu",function(e){e.preventDefault()});
-// function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
-function detectDevTool(e) { return; }
+document.addEventListener("contextmenu",function(e){e.preventDefault()});
+function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
 function getFirstLetters(t) { return "string" != typeof t || 0 === t.length ? "<i class='material-icons'>face</i>" : "<span>" + t.charAt(0).toUpperCase() + "</span>" }
 function rgbToHex(t) { t.includes("none") && (t = t.split(" none", 1)[0]); let n = t.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/); if (!n) throw Error("Format RGB invalide"); let e = parseInt(n[1], 10), _ = parseInt(n[2], 10), i = parseInt(n[3], 10); return e = e.toString(16), _ = _.toString(16), i = i.toString(16), e = 1 === e.length ? "0" + e : e, _ = 1 === _.length ? "0" + _ : _, i = 1 === i.length ? "0" + i : i, "#" + e + _ + i }
 function hexToRgb(r) { hex = r.replace("#", ""); let n = parseInt(hex.substring(0, 2), 16), s = parseInt(hex.substring(2, 4), 16), t = parseInt(hex.substring(4, 6), 16); return { r: n, g: s, b: t } }
 function isLightColor(r) { let t = hexToRgb(r), _ = (299 * t.r + 587 * t.g + 114 * t.b) / 1e3; return _ > 128 }
-function getRootDomain() { const hostname = window.location.hostname; const parts = hostname.split('.'); if (parts.length <= 2) return hostname; return parts.slice(-2).join('.'); }
+const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+function getRootDomain() { const hostname = window.location.hostname; if (ipv4Regex.test(hostname)) { const parts = hostname.split('.'); if (parts.every(part => { const num = parseInt(part, 10); return num >= 0 && num <= 255; })) { return hostname; } } if (ipv6Regex.test(hostname)) { return hostname; } const parts = hostname.split('.'); if (parts.length <= 2) return hostname; return parts.slice(-2).join('.'); }
 
 var username = localStorage.getItem('username');
 if (username === null) {
