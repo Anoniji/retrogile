@@ -28,6 +28,7 @@ import argparse
 import json
 import uuid
 import asyncio
+import time
 import datetime
 from pathlib import Path
 from collections import OrderedDict
@@ -1033,6 +1034,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     ACCOUNT_EMAIL = args.account_email
 
+    time.sleep(3)
     license_manager = lic.LicenseManager(ACCOUNT_EMAIL)
     license_manager.validate_license(['ws'])
     asyncio.run(main())
