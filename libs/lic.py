@@ -135,9 +135,8 @@ class LicenseManager:
             gen_datetime_naive = gen_datetime.replace(tzinfo=None)
             diff = abs((now_utc - gen_datetime_naive).total_seconds())
             tolerance = 20
-            is_within_tolerance = diff <= tolerance
 
-            if not is_within_tolerance:
+            if not diff <= tolerance:
                 print("Error: The license was not loaded quickly enough")
                 sys.exit(1)
 
