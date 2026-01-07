@@ -26,7 +26,7 @@ Version 3, 29 June 2007
 import sys
 import os
 import json
-# from datetime import datetime, timezone
+from datetime import datetime, timezone
 import gevent.monkey
 
 gevent.monkey.patch_all()
@@ -131,17 +131,17 @@ class LicenseManager:
                 print("Error: Schema verification failed")
                 sys.exit(1)
 
-            # gen_datetime = datetime.fromisoformat(
-            #     jwt_data.get('last_accessed_at').replace('Z', '+00:00'))
-            # now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
-            # gen_datetime_naive = gen_datetime.replace(tzinfo=None)
-            # diff = abs((now_utc - gen_datetime_naive).total_seconds())
-            # tolerance = 30
-            # is_within_tolerance = diff <= tolerance
+            gen_datetime = datetime.fromisoformat(
+                jwt_data.get('last_accessed_at').replace('Z', '+00:00'))
+            now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+            gen_datetime_naive = gen_datetime.replace(tzinfo=None)
+            diff = abs((now_utc - gen_datetime_naive).total_seconds())
+            tolerance = 20
+            is_within_tolerance = diff <= tolerance
 
-            # if not is_within_tolerance:
-            #     print("Error: The license was not loaded quickly enough")
-            #     sys.exit(1)
+            if not is_within_tolerance:
+                print("Error: The license was not loaded quickly enough")
+                sys.exit(1)
 
             for type_check in type_lst:
                 if type_check not in jwt_decoded.get('permits'):
