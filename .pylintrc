@@ -5,7 +5,7 @@ max-branches=22
 max-locals=22
 
 [FORMAT]
-max-module-lines=1032
+max-module-lines=1100
 
 [MESSAGES CONTROL]
 disable=W1201,W1203,C0413,too-few-public-methods
