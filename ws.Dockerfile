@@ -9,4 +9,5 @@ COPY ./ ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-CMD [ "python", "./ws.py" ]
+ENV ACCOUNT_EMAIL=""
+CMD [ "python", "./ws.py", "--account_email", "\"${ACCOUNT_EMAIL}\"" ]
