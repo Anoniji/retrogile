@@ -122,10 +122,8 @@ class LicenseManager:
             jwt_decoded = jwt.decode(jwt_key, encryption_key, algorithms=["HS256"])
 
             if (
-                not jwt_decoded.get('type', False) or
-                not jwt_decoded.get('type') == 'license' or
-                not jwt_decoded.get('version', False) or
-                not jwt_decoded.get('version') == '2' or
+                not jwt_decoded.get('type', False) == 'license' or
+                not jwt_decoded.get('version', False) == '2' or
                 not isinstance(jwt_decoded.get('permits', False), list)
             ):
                 print("Error: Schema verification failed")
