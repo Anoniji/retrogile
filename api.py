@@ -35,7 +35,7 @@ from flask import (
 from flask_jsonpify import jsonify
 
 from gevent import monkey
-from libs import license, sessions, tools
+from libs import lic, sessions, tools
 
 monkey.patch_all()
 
@@ -405,10 +405,10 @@ if __name__ == "__main__":
         if WS_SUBDOMAIN != '':
             print(f' * Ws(s) set: {WS_SUBDOMAIN}')
 
-        license_manager = license.LicenseManager(ACCOUNT_EMAIL)
+        license_manager = lic.LicenseManager(ACCOUNT_EMAIL)
         license_manager.validate_license(['api'])
         logging.info("Server API started")
-        app.run(host="0.0.0.0", port=8008, debug=True)
+        app.run(host="0.0.0.0", port=8008, debug=False)
 
     except OSError as e:
         logging.error(f"Server API error: {e}")
