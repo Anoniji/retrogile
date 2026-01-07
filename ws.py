@@ -24,6 +24,7 @@ Version 3, 29 June 2007
 """
 
 import os
+import argparse
 import json
 import uuid
 import asyncio
@@ -34,7 +35,7 @@ from urllib.parse import urlparse, parse_qs
 import logging
 import websockets
 
-from libs import licence, tools, sessions, boards, users
+from libs import license, tools, sessions, boards, users
 
 
 logging.basicConfig(
@@ -1027,6 +1028,11 @@ async def main():
 
 
 if __name__ == "__main__":
-    licence_manager = licence.LicenceManager()
-    licence_manager.validate_licence()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--account_email', default=False)
+    args = parser.parse_args()
+    ACCOUNT_EMAIL = args.account_email
+
+    license_manager = license.LicenseManager(ACCOUNT_EMAIL)
+    license_manager.validate_license(['ws'])
     asyncio.run(main())
