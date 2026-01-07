@@ -81,10 +81,13 @@ class LicenseManager:
 
         return False
 
-    def validate_license(self, type_lst = []):
+    def validate_license(self, type_lst = None):
         """
         Validates the license by contacting the remote server.
         """
+        if type_lst is None:
+            type_lst = []
+
         url = "https://license.retrogile.com/jwt?mail="
         if not self.jwt_license:
             url += self.account_email
