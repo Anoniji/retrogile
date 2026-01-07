@@ -35,7 +35,7 @@ from urllib.parse import urlparse, parse_qs
 import logging
 import websockets
 
-from libs import license, tools, sessions, boards, users
+from libs import lic, tools, sessions, boards, users
 
 
 logging.basicConfig(
@@ -1033,6 +1033,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     ACCOUNT_EMAIL = args.account_email
 
-    license_manager = license.LicenseManager(ACCOUNT_EMAIL)
+    license_manager = lic.LicenseManager(ACCOUNT_EMAIL)
     license_manager.validate_license(['ws'])
     asyncio.run(main())
