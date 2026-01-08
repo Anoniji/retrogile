@@ -9,6 +9,6 @@ COPY ./ ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-ENV WS_SUBDOMAIN="wss."
+ENV WS_SUBDOMAIN=""
 ENV ACCOUNT_EMAIL=""
 CMD [ "python", "./api.py", "--ws_subdomain", "\"${WS_SUBDOMAIN}\"", "--account_email", "\"${ACCOUNT_EMAIL}\"" ]
