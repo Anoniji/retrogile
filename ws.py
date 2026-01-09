@@ -196,8 +196,8 @@ def board_votes_reset_by_id(board_id, data):
 
     if max_vote == "0":
         _tmps["votes"] = False
-    elif int(max_vote) > 100:
-        max_vote = 100
+    elif int(max_vote) > 20:
+        max_vote = 20
         _tmps["votes"] = max_vote
         data["maxVote"] = max_vote
     else:
