@@ -402,6 +402,10 @@ if __name__ == "__main__":
         args = parser.parse_args()
         WS_SUBDOMAIN = args.ws_subdomain
         ACCOUNT_EMAIL = args.account_email
+
+        if WS_SUBDOMAIN in ['""', "''"]:
+            WS_SUBDOMAIN = ''
+
         if WS_SUBDOMAIN != '':
             print(f' * Ws(s) set: {WS_SUBDOMAIN}')
 
