@@ -1312,8 +1312,6 @@ if (username !== null) {
             } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add', 'col_delete'].includes(ws_data.type)) {
                 ws.send(JSON.stringify({ type: 'board_info' }));
             } else if (ws_data.type == 'user_mood') {
-                console.log(ws_data);
-
                 if(ws_data.user_mood.mood == 2) {
                     mgs_icon = 'sentiment_satisfied';
                     mgs_text = '{{ translates.board_js_29 }}';
