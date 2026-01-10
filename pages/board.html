@@ -123,6 +123,12 @@
             <i class="material-icons" onclick="setColor()">palette</i>
             <input type="hidden" id="custom_color" name="custom_color">
         </div>
+        <i id="toggle_mood" class="material-icons" title="{{ translates.board_14 }}">mood</i>
+        <div id="users_custom_mood">
+            <i title="{{ translates.board_15 }}" onclick="userMood(1);" class="material-icons dissatisfied">sentiment_dissatisfied</i>
+            <i title="{{ translates.board_16 }}" onclick="userMood(2);" class="material-icons satisfied">sentiment_satisfied</i>
+            <i title="{{ translates.board_17 }}" onclick="userMood(3);" class="material-icons very_satisfied">sentiment_very_satisfied</i>
+        </div>
         <div id="click_cnt"></div>
     </section>
 
