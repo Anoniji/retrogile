@@ -49,7 +49,7 @@ logging.basicConfig(
 # ///////////////////////////////////////////////////////////////////////
 
 boards, usersdb, sesssdb = [boards.Board(), users.Users(), sessions.Sessions()]
-BOARD_VERSION, clients = (7, {})
+BOARD_VERSION, clients = (8, {})
 
 # ///////////////////////////////////////////////////////////////////////
 
@@ -537,6 +537,10 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
         ):
             del board_info["data"][data.get("col_id")][data.get("card_uuid")]
 
+    elif mode == "user_mood":
+        if (data.get("username")):
+            board_info["users_list"][data.get("username")]["mood"] = data.get("mood", False)
+
     boards.update_board(board_id, board_info)
     for tk, ws in clients.items():
         if (
@@ -887,6 +891,7 @@ def message_responce(send_list, websocket, token, data):
         "card_delete",
         "card_write_start",
         "card_write_stop",
+        "user_mood",
     ):
         send_list = card_manager_by_id(
             send_list, board_id, message_type, websocket, data
