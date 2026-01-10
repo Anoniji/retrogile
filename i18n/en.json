@@ -26,8 +26,12 @@
 	"board_9": "Show my cards",
 	"board_10": "Sort votes",
 	"board_11": "Copy Board link",
-	"board_12": " Discussion",
+	"board_12": "Discussion",
 	"board_13": "Post message on Board discussion",
+	"board_14": "My current mood",
+	"board_15": "Dissatisfied",
+	"board_16": "Satisfied",
+	"board_17": "Very satisfied",
 
 	"board_js_1": "Timer",
 	"board_js_2": "dbclicks",
@@ -56,6 +60,9 @@
 	"board_js_25": "your",
 	"board_js_26": "Voting session",
 	"board_js_27": "Total remaining:",
+	"board_js_28": "is unhappy",
+	"board_js_29": "is satisfied",
+	"board_js_30": "is very satisfied",
 
 	"speed_js_1": "Waiting for the organizer...",
 	"speed_js_2": "Launch the retrospective",
