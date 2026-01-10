@@ -28,6 +28,10 @@
 	"board_11": "Copier le lien du board",
 	"board_12": "Discussion",
 	"board_13": "Publier un message sur la discussion du board",
+	"board_14": "Mon humeur actuel",
+	"board_15": "Mécontent(e)",
+	"board_16": "Satisfait(e)",
+	"board_17": "Très satisfait(e)",
 
 	"board_js_1": "Minuteur",
 	"board_js_2": "dbclicks",
@@ -56,6 +60,9 @@
 	"board_js_25": "z vos",
 	"board_js_26": "Session de vote",
 	"board_js_27": "Total restant:",
+	"board_js_28": "est mécontent(e)",
+	"board_js_29": "est satisfait(e)",
+	"board_js_30": "est très satisfait(e)",
 
 	"speed_js_1": "En attente de l'organisateur...",
 	"speed_js_2": "Lancer la rétrospective",
