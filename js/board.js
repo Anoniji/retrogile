@@ -81,10 +81,10 @@ function resendWsMessages(websocket) {
     }
 }
 
-function showNotification(type, user, message) {
+function showNotification(type, icon, user, message) {
     var notification = $(`<div class="notification notif_${type}">`);
     $(`.notif_${type}`).hide();
-    notification.append(`<i class="material-icons">circle_notifications</i> <span><b>${user}</b> ${message}</span>`);
+    notification.append(`<i class="material-icons">${icon}</i> <span><b>${user}</b> ${message}</span>`);
     $('body #notifications').append(notification);
     notification.slideDown(300).delay(5000).slideUp(300, function () {
         $(this).remove();
@@ -425,7 +425,7 @@ if (username !== null) {
         try {
             navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
                 if (result.state == 'granted' || result.state == 'prompt') {
-                    showNotification('link', '(!)', '{{ translates.board_js_3 }}');
+                    showNotification('link', 'circle_notifications', '(!)', '{{ translates.board_js_3 }}');
                     navigator.clipboard.writeText(window.location.href);
                 }
             });
@@ -821,6 +821,17 @@ if (username !== null) {
         } else {
             vote_order = false;
             ws.send(JSON.stringify({ type: 'board_info' }));
+        }
+    }
+
+    function userMood(val) {
+        if(val) {
+            sendWsMessage(ws, JSON.stringify({
+                type: 'user_mood',
+                user_id: user_id,
+                mood: val,
+            }));
+            $('#users_custom_mood').hide();
         }
     }
 
@@ -1300,6 +1311,21 @@ if (username !== null) {
                 sortableList.appendChild(fragment);
             } else if (['force_reload', 'col_reorder', 'card_parent', 'card_unmerge', 'col_add', 'col_delete'].includes(ws_data.type)) {
                 ws.send(JSON.stringify({ type: 'board_info' }));
+            } else if (ws_data.type == 'user_mood') {
+                console.log(ws_data);
+
+                if(ws_data.user_mood.mood == 2) {
+                    mgs_icon = 'sentiment_satisfied';
+                    mgs_text = '{{ translates.board_js_29 }}';
+                } else if(ws_data.user_mood.mood == 3) {
+                    mgs_icon = 'sentiment_very_satisfied';
+                    mgs_text = '{{ translates.board_js_30 }}';
+                } else {
+                    mgs_icon = 'sentiment_dissatisfied';
+                    mgs_text = '{{ translates.board_js_28 }}';
+                }
+
+                showNotification('mood', mgs_icon, ws_data.user_mood.username, mgs_text);
             } else {
                 if ($("#console").css("display") !== "block" && ws_data.username != username) {
                     $('#console_dot').show('fade');
@@ -1362,7 +1388,7 @@ if (username !== null) {
         };
 
         ws.onclose = () => {
-            showNotification('ws', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
+            showNotification('ws', 'circle_notifications', '{{ translates.ws_1 }}', '{{ translates.ws_2 }}');
             $('#nav_logo').addClass('nav_disconnected');
             if (window.WebSocket) {
                 setTimeout(connect, reconnectInterval);
@@ -1384,6 +1410,10 @@ if (username !== null) {
         }
     });
 }
+
+$('#toggle_mood').click(function () {
+    $('#users_custom_mood').toggle();
+});
 
 $('#board').on('heightChange', '.col', function () {
     if ($(this).hasScrollBar()) {
