@@ -537,9 +537,8 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
         ):
             del board_info["data"][data.get("col_id")][data.get("card_uuid")]
 
-    elif mode == "user_mood":
-        if (data.get("username")):
-            board_info["users_list"][data.get("username")]["mood"] = data.get("mood", False)
+    elif mode == "user_mood" and data.get("username"):
+        board_info["users_list"][data.get("username")]["mood"] = data.get("mood", False)
 
     boards.update_board(board_id, board_info)
     for tk, ws in clients.items():
