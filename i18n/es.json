@@ -28,6 +28,10 @@
 	"board_11": "Copiar el enlace de la tabla",
 	"board_12": "Discusión",
 	"board_13": "Publicar un mensaje en la discusión de la tabla",
+	"board_14": "Mi estado de ánimo actual",
+	"board_15": "Insatisfecho(a)",
+	"board_16": "Satisfecho(a)",
+	"board_17": "Muy satisfecho(a)",
 
 	"board_js_1": "Cronómetro",
 	"board_js_2": "dbclicks",
@@ -56,6 +60,9 @@
 	"board_js_25": "sus",
 	"board_js_26": "Sesión de votación",
 	"board_js_27": "Total restante:",
+	"board_js_28": "es infeliz",
+	"board_js_29": "está satisfecho",
+	"board_js_30": "está muy satisfecho",
 
 	"speed_js_1": "Esperando al organizador...",
 	"speed_js_2": "Lanzamiento de la retrospectiva",
