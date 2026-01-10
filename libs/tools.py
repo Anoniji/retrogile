@@ -91,6 +91,11 @@ def update_board(board_data_old):
         board_data_old["version"] = 7
         board_data_old["type"] = "board"
 
+    if board_data_old["version"] <= 7:
+        board_data_old["version"] = 8
+        for user in board_data_old["users_list"]:
+            board_data_old["users_list"][user]['mood'] = False
+
     return board_data_old
 
 
