@@ -814,6 +814,30 @@ footer a {
     cursor: pointer;
 }
 
+#users_custom_mood {
+    display: none;
+    position: fixed;
+    bottom: 64px;
+    left: 16px;
+    padding: 8px;
+    border-radius: 8px;
+    color: #f2f2f2;
+    background-color: #333333;
+    box-shadow: 0 0 2px #333333;
+    z-index: 3;
+    user-select: none;
+
+}
+
+#users_custom_mood i {
+    font-size: 64px;
+    width: 64px;
+}
+
+#users_custom_mood .dissatisfied { color: #E91E63; }
+#users_custom_mood .satisfied { color: #00BCD4; }
+#users_custom_mood .very_satisfied { color: #8BC34A; }
+
 #click_cnt {
     text-align: center;
     font-size: 10px;
@@ -1350,7 +1374,7 @@ footer a {
     display: none;
     position: fixed;
     bottom: 14px;
-    left: 126px;
+    left: 156px;
     right: 16px;
     z-index: 2;
     background-color: #333333;
@@ -1404,6 +1428,10 @@ footer a {
     padding: 6px;
     font-size: 12px;
     outline: none;
+}
+
+#toggle_mood {
+    margin-left: -3px;
 }
 
 .ui-tooltip {
@@ -1560,7 +1588,7 @@ footer a {
 
     #console,
     #board-params button div {
-        display: none;
+        display: none !important;
     }
 
     .main_board {
