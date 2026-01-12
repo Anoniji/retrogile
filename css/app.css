@@ -1546,6 +1546,20 @@ footer a {
     cursor: pointer;
 }
 
+#mood {
+    display: none;
+    position: fixed;
+    left: calc(50vw - 200px);
+    bottom: 60px;
+    user-select: none;
+    z-index: -1;
+}
+
+#mood i {
+    font-size: 400px;
+    opacity: .3;
+}
+
 #confetti {
     position: fixed;
     top: 118px;
