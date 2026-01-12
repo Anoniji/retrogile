@@ -478,7 +478,7 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
                 data.get("cardContent")
             )
 
-    elif mode in ["card_parent", "card_unmerge"]:
+    elif mode in ("card_parent", "card_unmerge"):
         board_info = children_manager_by_id(board_info, mode, card_uuid, data)
 
     elif mode == "card_view":
