@@ -793,6 +793,14 @@ if (username !== null) {
                     $li.css('display', 'none');
                 }
             });
+
+            if (board_author == username) {
+                sendWsMessage(ws, JSON.stringify({
+                    type: 'get_mood',
+                    username: Husername,
+                }));
+            }
+
             curr_highlightUser = Husername;
         } else {
             $('#users div').each(function () {
@@ -802,6 +810,8 @@ if (username !== null) {
             $('.col li').each(function () {
                 $(this).css('display', 'block');
             });
+
+            $("#mood").html("").hide();
             curr_highlightUser = false;
         }
     }
@@ -1324,6 +1334,23 @@ if (username !== null) {
                 }
 
                 showNotification('mood', mgs_icon, ws_data.user_mood.username, mgs_text);
+            } else if (ws_data.type == 'get_mood') {
+                if (board_author == username) {
+                    user_selected_color = ws_data.get_mood.user_selected_color
+                    user_selected_mood = ws_data.get_mood.user_selected_mood
+                    if(user_selected_mood) {
+                        if(user_selected_mood == 2) {
+                            mgs_icon = 'sentiment_satisfied';
+                        } else if(user_selected_mood == 3) {
+                            mgs_icon = 'sentiment_very_satisfied';
+                        } else {
+                            mgs_icon = 'sentiment_dissatisfied';
+                        }
+                        $("#mood").html(`<i class="material-icons" style="color: ${user_selected_color}">${mgs_icon}</i>`).show();
+                    } else {
+                        $("#mood").html("").hide();
+                    }
+                }
             } else {
                 if ($("#console").css("display") !== "block" && ws_data.username != username) {
                     $('#console_dot').show('fade');
