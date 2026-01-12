@@ -540,6 +540,10 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
     elif mode == "user_mood" and data.get("username"):
         board_info["users_list"][data.get("username")]["mood"] = data.get("mood", False)
 
+    elif mode == "get_mood" and data.get("username"):
+        data["user_selected_color"] = usersdb.get_user_color(data.get('username'))
+        data["user_selected_mood"] = board_info["users_list"][data.get("username")]["mood"]
+
     boards.update_board(board_id, board_info)
     for tk, ws in clients.items():
         if (
@@ -891,6 +895,7 @@ def message_responce(send_list, websocket, token, data):
         "card_write_start",
         "card_write_stop",
         "user_mood",
+        "get_mood",
     ):
         send_list = card_manager_by_id(
             send_list, board_id, message_type, websocket, data
