@@ -12,7 +12,7 @@ Agile Retrospective Management Tool
 The version provided is currently in development and may have missing features or even operational issues.
 
 ## Demo
-[Test server](https://www.retrogile.com)
+[Test server](https://demo.retrogile.com)
 
 ## Dockerhub
 
@@ -35,4 +35,4 @@ podman run -d --restart=always -p "0.0.0.0:8008:8008" -p "0.0.0.0:8009:8009" -v 
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `WS_SUBDOMAIN` | WebSocket subdomain for connection | `-e WS_SUBDOMAIN="wss."` |
-| `ACCOUNT_EMAIL` | Account email address | `-e ACCOUNT_EMAIL="my@account.test"` |
+| `DEBUG` | Container debugging | `-e DEBUG=True` |
