@@ -12,7 +12,7 @@ Agile Retrospective Management Tool
 The version provided is currently in development and may have missing features or even operational issues.
 
 ## Demo
-[Test server](https://www.retrogile.com)
+[Test server](https://demo.retrogile.com)
 
 ## Dockerhub
 
