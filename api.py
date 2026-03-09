@@ -23,6 +23,7 @@ Version 3, 29 June 2007
 """
 
 import os
+import sys
 import argparse
 import json
 import uuid
@@ -35,7 +36,7 @@ from flask import (
 from flask_jsonpify import jsonify
 
 from gevent import monkey
-from libs import lic, sessions, tools
+from libs import sessions, tools
 
 monkey.patch_all()
 
@@ -398,10 +399,20 @@ if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('--ws_subdomain', default='')
-        parser.add_argument('--account_email', default=False)
+        parser.add_argument('--debug', default=False)
         args = parser.parse_args()
         WS_SUBDOMAIN = args.ws_subdomain
-        ACCOUNT_EMAIL = args.account_email
+        DEBUG = args.debug
+        api_debug = False
+
+        if DEBUG and DEBUG not in ('', '""', "''", False, "False"):
+            api_debug = True
+            logging.basicConfig(
+                stream=sys.stdout,
+                level=logging.DEBUG,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S'
+            )
 
         if WS_SUBDOMAIN in ['""', "''", '.', '-']:
             WS_SUBDOMAIN = ''
@@ -409,10 +420,8 @@ if __name__ == "__main__":
         if WS_SUBDOMAIN != '':
             print(f' * Ws(s) set: {WS_SUBDOMAIN}')
 
-        license_manager = lic.LicenseManager(ACCOUNT_EMAIL)
-        license_manager.validate_license(['api'])
         logging.info("Server API started")
-        app.run(host="0.0.0.0", port=8008, debug=False)
+        app.run(host="0.0.0.0", port=8008, debug=api_debug)
 
     except OSError as e:
         logging.error(f"Server API error: {e}")

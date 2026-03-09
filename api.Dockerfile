@@ -10,4 +10,4 @@ COPY ./ ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-CMD [ "sh", "-c", "python ./api.py --ws_subdomain \"${WS_SUBDOMAIN}\" --account_email \"${ACCOUNT_EMAIL}\"" ]
+CMD [ "sh", "-c", "python ./api.py --ws_subdomain \"${WS_SUBDOMAIN}\" --debug \"${DEBUG}\"" ]
