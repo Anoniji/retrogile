@@ -403,10 +403,10 @@ if __name__ == "__main__":
         args = parser.parse_args()
         WS_SUBDOMAIN = args.ws_subdomain
         DEBUG = args.debug
-        API_DEBUG = False
+        api_debug = False
 
         if DEBUG and DEBUG not in ('', '""', "''", False, "False"):
-            API_DEBUG = True
+            api_debug = True
             logging.basicConfig(
                 stream=sys.stdout,
                 level=logging.DEBUG,
@@ -421,7 +421,7 @@ if __name__ == "__main__":
             print(f' * Ws(s) set: {WS_SUBDOMAIN}')
 
         logging.info("Server API started")
-        app.run(host="0.0.0.0", port=8008, debug=API_DEBUG)
+        app.run(host="0.0.0.0", port=8008, debug=api_debug)
 
     except OSError as e:
         logging.error(f"Server API error: {e}")
