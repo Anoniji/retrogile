@@ -362,9 +362,8 @@ def jsi(path):
         return jsonify(["jsi_not_found"])
 
     rel_path = os.path.relpath(safe_path, js_base)
-    resolved_path = os.path.join(js_base, rel_path)
 
-    if os.path.isfile(resolved_path) and path_check(path):
+    if os.path.isfile(safe_path) and path_check(path):
         fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
         fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
         board_id = False
