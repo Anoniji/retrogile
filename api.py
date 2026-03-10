@@ -427,16 +427,9 @@ def png(path):
             - If the image is found, returns the image content.
             - If the image is not found, returns a JSON response
     """
-    base_dir = os.path.abspath("img")
-    requested = os.path.normpath(os.path.join(base_dir, path))
-
-    # Ensure the requested path is within the img directory
-    if not (requested == base_dir or requested.startswith(base_dir + os.sep)):
-        return jsonify(["png_not_found"])
-
-    if os.path.isfile(requested):
-        safe_relpath = os.path.relpath(requested, base_dir)
-        return send_from_directory("img", safe_relpath, mimetype="image/png")
+    safe_rel_path = safe_static_path("img", path, allowed_extensions={".png"})
+    if safe_rel_path and os.path.isfile(os.path.join("img", safe_rel_path)):
+        return send_from_directory("img", safe_rel_path, mimetype="image/png")
 
     return jsonify(["png_not_found"])
 
