@@ -1180,11 +1180,11 @@ if (username !== null) {
             } else if (ws_data.type == 'stats_vote') {
                 votes_set = ws_data.votes;
                 votes_remaining = ws_data.votes_remaining;
-                votes_total = ws_data.votes_total;
+                votes_total = parseInt(ws_data.votes_total, 10) || 0;
                 votes_percentage = ws_data.votes_percentage;
                 $('nav #vote_progress').css('width', `${votes_percentage}%`);
                 $('#board_vote .title').html(votes_remaining);
-                $('#votes_remaining').html(votes_total);
+                $('#votes_remaining').text(votes_total);
 
                 if (votes_total == 0 && votes_set != 0) {
                     $('nav #vote_progress').hide().css('width', '100%');
