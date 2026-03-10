@@ -1346,7 +1346,22 @@ if (username !== null) {
                         } else {
                             mgs_icon = 'sentiment_dissatisfied';
                         }
-                        $("#mood").html(`<i class="material-icons" style="color: ${user_selected_color}">${mgs_icon}</i>`).show();
+                        // Sanitize the user-selected color to a safe CSS color value
+                        var safeColor = '#000000';
+                        if (typeof user_selected_color === 'string') {
+                            // allow standard 3/4/6/8-digit hex colors
+                            var colorTrimmed = user_selected_color.trim();
+                            if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(colorTrimmed)) {
+                                safeColor = colorTrimmed;
+                            }
+                        }
+
+                        var $icon = $('<i></i>')
+                            .addClass('material-icons')
+                            .css('color', safeColor)
+                            .text(mgs_icon);
+
+                        $("#mood").empty().append($icon).show();
                     } else {
                         $("#mood").html("").hide();
                     }
