@@ -36,3 +36,5 @@ podman run -d --restart=always -p "0.0.0.0:8008:8008" -p "0.0.0.0:8009:8009" -v 
 |----------|-------------|---------|
 | `WS_SUBDOMAIN` | WebSocket subdomain for connection | `-e WS_SUBDOMAIN="wss."` |
 | `DEBUG` | Container debugging | `-e DEBUG="True/False"` |
+| `API_PORT` | API Web Server Port | `-e API_PORT="8008"` |
+
