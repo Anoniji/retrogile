@@ -1260,7 +1260,7 @@ if (username !== null) {
 
                 applySavedSize("info_content");
             } else if (ws_data.type == 'card_edit') {
-                $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
+                $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).text(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
                 notif_type = 'hide';
                 notif_ico = 'visibility_off';
