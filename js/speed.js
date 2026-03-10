@@ -495,40 +495,57 @@ if (username !== null) {
                     goto_page('votes_end')
                 }
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.username}" data-uuid="${ws_data.card_uuid}" style="background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color}">`;
-                html += `<div class='card_icon' style='`;
+                // Build card element safely using jQuery to avoid XSS via unescaped HTML.
+                var $li = $(
+                    `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' ` +
+                    `data-uuid='${ws_data.card_uuid}' ` +
+                    `style='background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color};'></li>`
+                );
+                $li.attr('data-username', ws_data.card_add.username);
+
+                var cardIconStyle = '';
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    html += 'color: #333';
+                    cardIconStyle = 'color: #333';
                 } else {
-                    html += 'border-color: #d3d3d3';
+                    cardIconStyle = 'border-color: #d3d3d3';
                 }
-                html += `'>`;
-                html += `<div class='info_author'><i class="material-icons">person</i><b>${ws_data.card_add.username}</b></div>`;
-                html += `</div>`;
+                var $cardIcon = $(`<div class='card_icon' style='${cardIconStyle}'></div>`);
+                var $infoAuthor = $(
+                    "<div class='info_author'><i class=\"material-icons\">person</i><b></b></div>"
+                );
+                $infoAuthor.find('b').text(ws_data.card_add.username);
+                $cardIcon.append($infoAuthor);
+                $li.append($cardIcon);
 
-                html += `<div class="card_content`;
-
+                var cardContentClasses = 'card_content';
                 if (ws_data.card_add.username == username && !user_card_visibility) {
-                    html += ' card_not_visible';
+                    cardContentClasses += ' card_not_visible';
                 }
+                var $cardContent = $(`<div class='${cardContentClasses}'></div>`);
 
-                html += `">`;
-
-                html += `<div class='votes' style='background-color: ${ws_data.card_add.username_color}`;
+                var votesStyle = `background-color: ${ws_data.card_add.username_color}`;
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    html += '; color: #333';
+                    votesStyle += '; color: #333';
                 } else {
-                    html += '; border-color: #d3d3d3';
+                    votesStyle += '; border-color: #d3d3d3';
                 }
-                html += `'><span>${parseInt(ws_data.card_add.votes)}</span>
-                        <div class='vote_actions'>
-                            <div onclick='voteCard("${ws_data.card_uuid}");'>{{ translates.board_3 }}</div>
-                        </div>
-                    </div>
-                    <div class='info_content'>${ws_data.card_add.cardContent}</div>
-                    </div>`;
-                html += `</li>`;
-                $(`#col_${ws_data.card_add.col_id} ul`).append(html);
+                var $votes = $(
+                    `<div class='votes' style='${votesStyle}'>` +
+                    `<span>${parseInt(ws_data.card_add.votes)}</span>` +
+                    `<div class='vote_actions'>` +
+                    `<div onclick='voteCard("${ws_data.card_uuid}");'>{{ translates.board_3 }}</div>` +
+                    `</div>` +
+                    `</div>`
+                );
+                $cardContent.append($votes);
+
+                var $infoContent = $("<div class='info_content'></div>");
+                $infoContent.text(ws_data.card_add.cardContent);
+                $cardContent.append($infoContent);
+
+                $li.append($cardContent);
+
+                $(`#col_${ws_data.card_add.col_id} ul`).append($li);
 
             } else if (ws_data.type == 'card_vote') {
                 $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).html(ws_data.card_votes);
