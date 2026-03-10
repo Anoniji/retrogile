@@ -200,7 +200,8 @@ const log = (text, color) => {
     const minute = now.getMinutes();
     const second = now.getSeconds();
     var board_log = $('#board_log');
-    board_log.append(`[${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}.${second.toString().padStart(2, '0')}] <span style='color: ${color}'>${text}</span><br>`);
+    const safeText = escapeHtml(String(text));
+    board_log.append(`[${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}.${second.toString().padStart(2, '0')}] <span style='color: ${color}'>${safeText}</span><br>`);
     var log_height = board_log[0].scrollHeight;
     board_log.animate({ scrollTop: log_height }, 200);
 };
