@@ -1183,8 +1183,8 @@ if (username !== null) {
                 votes_total = ws_data.votes_total;
                 votes_percentage = ws_data.votes_percentage;
                 $('nav #vote_progress').css('width', `${votes_percentage}%`);
-                $('#board_vote .title').html(votes_remaining);
-                $('#votes_remaining').html(votes_total);
+                $('#board_vote .title').text(votes_remaining);
+                $('#votes_remaining').text(votes_total);
 
                 if (votes_total == 0 && votes_set != 0) {
                     $('nav #vote_progress').hide().css('width', '100%');
