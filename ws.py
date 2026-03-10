@@ -4,7 +4,7 @@
 """
 Script Name: Retrogile WS
 Author: Niji Ano
-Date: 2026-01-06
+Date: 2026-03-10
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ Version 3, 29 June 2007
 
 import os
 import sys
-import argparse
 import json
 import uuid
 import asyncio
@@ -1039,10 +1038,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--debug', default=False)
-    args = parser.parse_args()
-    DEBUG = args.debug
+    DEBUG = os.getenv('DEBUG', False)    
 
     if DEBUG and DEBUG not in ('', '""', "''", False, "False"):
         logging.basicConfig(
