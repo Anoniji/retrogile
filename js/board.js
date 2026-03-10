@@ -1179,10 +1179,11 @@ if (username !== null) {
                                     </div>
                             </div>`;
                         html += `</li>`;
-                        $(`#col_${index} .sortable`).append(html);
+                        const safeIndex = removeNonAlphanumeric(String(index));
+                        $(`#col_${safeIndex} .sortable`).append(html);
                     });
-                    $(`#col_${index} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
-                    $(`#col_${index} .child_drop`).sortable({
+                    $(`#col_${safeIndex} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
+                    $(`#col_${safeIndex} .child_drop`).sortable({
                         items: 'li:not(.unsortable)',
                         placeholder: 'ui-state-highlight',
                         connectWith: '.sortable, .child_drop',
