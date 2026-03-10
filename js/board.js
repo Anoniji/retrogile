@@ -1118,6 +1118,7 @@ if (username !== null) {
                 var board_col_idx = 0;
                 var board_total_idx = Object.keys(board_data).length - 1;
                 $.each(board_data, function (index, value) {
+                    const safeIndex = removeNonAlphanumeric(String(index));
                     var h1_name = index;
                     if (h1_name.length > 14) {
                         h1_name = h1_name.substring(0, 14) + '...';
@@ -1208,7 +1209,6 @@ if (username !== null) {
                                     </div>
                             </div>`;
                         html += `</li>`;
-                        const safeIndex = removeNonAlphanumeric(String(index));
                         $(`#col_${safeIndex} .sortable`).append(html);
                     });
                     $(`#col_${safeIndex} .sortable`).sortable({ items: 'li:not(.unsortable)', placeholder: 'ui-state-highlight', connectWith: '.sortable, .child_drop', update: function (e, u) { var l = []; $(this).children().each(function (i, e) { l.push($(e).attr('class')) }); orderCol($(this).parent().attr('id'), l) } });
