@@ -397,14 +397,11 @@ def i18n(path):
 if __name__ == "__main__":
     try:
         WS_SUBDOMAIN = os.getenv('WS_SUBDOMAIN', '')
-        DEBUG = os.getenv('DEBUG', False)
-        API_PORT = os.getenv('API_PORT', 8008)
+        DEBUG = os.getenv('DEBUG', 'False')
+        API_PORT =  int(os.getenv('API_PORT', '8008'))
         api_debug = False
 
-        if isinstance(API_PORT, str):
-            API_PORT = int(API_PORT)
-
-        if DEBUG and DEBUG not in ('', '""', "''", False, "False"):
+        if DEBUG and DEBUG != 'False':
             api_debug = True
             logging.basicConfig(
                 stream=sys.stdout,
