@@ -550,20 +550,21 @@ if (username !== null) {
                 }
                 var $cardContent = $(`<div class='${cardContentClasses}'></div>`);
 
-                var votesStyle = `background-color: ${ws_data.card_add.username_color}`;
+                var $votes = $("<div class='votes'></div>");
+                $votes.css('background-color', ws_data.card_add.username_color);
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    votesStyle += '; color: #333';
+                    $votes.css('color', '#333');
                 } else {
-                    votesStyle += '; border-color: #d3d3d3';
+                    $votes.css('border-color', '#d3d3d3');
                 }
-                var $votes = $(
-                    `<div class='votes' style='${votesStyle}'>` +
-                    `<span>${parseInt(ws_data.card_add.votes)}</span>` +
-                    `<div class='vote_actions'>` +
-                    `<div onclick='voteCard("${ws_data.card_uuid}");'>{{ translates.board_3 }}</div>` +
-                    `</div>` +
-                    `</div>`
-                );
+                var $votesCount = $("<span></span>");
+                $votesCount.text(parseInt(ws_data.card_add.votes));
+                $votes.append($votesCount);
+                var $voteActions = $("<div class='vote_actions'></div>");
+                var $voteButton = $("<div>{{ translates.board_3 }}</div>");
+                $voteButton.on('click', function () { voteCard(ws_data.card_uuid); });
+                $voteActions.append($voteButton);
+                $votes.append($voteActions);
                 $cardContent.append($votes);
 
                 var $infoContent = $("<div class='info_content'></div>");
