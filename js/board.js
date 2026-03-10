@@ -1293,7 +1293,7 @@ if (username !== null) {
 
                 ws.send(JSON.stringify({ type: 'board_info' }));
             } else if (ws_data.type == 'card_vote') {
-                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).html(ws_data.card_votes);
+                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).text(ws_data.card_votes);
                 ws.send(JSON.stringify({ type: 'stats_vote' }));
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
