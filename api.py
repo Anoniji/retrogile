@@ -282,8 +282,8 @@ def js(path):
             - If the file doesn't exist, returns a JSON response
     """
     base_path = os.path.abspath("js")
-    # Normalize the full path and ensure it stays within base_path
-    full_path = os.path.normpath(os.path.join(base_path, path))
+    # Resolve the requested path against base_path and normalize it
+    full_path = os.path.realpath(os.path.join(base_path, path))
 
     # Reject if the resolved path escapes the js directory
     if os.path.commonpath([base_path, full_path]) != base_path:
