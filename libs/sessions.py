@@ -56,7 +56,7 @@ class Sessions:
                 json.dump({}, f)
 
         deleted = self.cleanup_old_sessions()
-        print(f"{deleted} sessions deleted")
+        print(f" * {deleted} sessions deleted")
 
     def cleanup_old_sessions(self, days=7):
         """

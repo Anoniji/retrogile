@@ -1020,13 +1020,6 @@ async def handler(websocket):
         del clients[token]
 
         for tk, sess in sesssdb.sess_dta.items():
-
-            print('-'*50)
-            print('tk', tk)
-            print('sess', sess.get(tk))
-            print('sesssdb', sesssdb.get(tk))
-            print('-'*50)
-
             if (
                 sesssdb.get(tk) and
                 sess.get("board_id", False) and
