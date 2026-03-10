@@ -19,6 +19,15 @@ Do not use the console ! |___/ \x1b[0m`);
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
 function isNumeric(i) { return !isNaN(parseFloat(i)) && isFinite(i) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
@@ -887,7 +896,7 @@ if (username !== null) {
                 $('#users, #cursors').html('');
                 $.each(ws_data.users_list, function (index, value) {
                     if (user_id && user_id != index) {
-                        $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${value.username}</div></div>`)
+                        $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${escapeHtml(value.username)}</div></div>`)
                     }
                     var $div_username = $(`#users div[data-username=${value.username}]`);
                     if ($($div_username).length > 0) {
@@ -900,7 +909,7 @@ if (username !== null) {
                             txt_color = 'color: #f2f2f2;';
                         }
 
-                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}<div class='user_notif_status'></div></div>`);
+                        $('#users').append(`<div id='user_${index}' class='user' title='${escapeHtml(value.username)}' data-username='${escapeHtml(value.username)}' data-count='1' onclick='highlightUser("${escapeHtml(value.username)}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}<div class='user_notif_status'></div></div>`);
                         $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
                     }
                 });
@@ -918,7 +927,7 @@ if (username !== null) {
                         } else {
                             txt_color = 'color: #f2f2f2;';
                         }
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' onclick='highlightUser("${ws_data.username}");' style='${txt_color}background: ${ws_data.color}'></div>`);
+                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${escapeHtml(ws_data.username)}' data-username='${escapeHtml(ws_data.username)}' data-count='1' onclick='highlightUser("${escapeHtml(ws_data.username)}");' style='${txt_color}background: ${ws_data.color}'></div>`);
                         $(`#user_${ws_data.user_id}`).hide().html(getFirstLetters(ws_data.username) + "<div class='user_notif_status'></div>").slideDown(300, function () {
                             if (curr_highlightUser) {
                                 let tmps_highlightUser = curr_highlightUser;
