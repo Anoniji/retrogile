@@ -19,6 +19,30 @@ Do not use the console ! |___/ \x1b[0m`);
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
+
+// Safely escape text for inclusion in HTML content or attribute values
+function escapeHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// Safely escape text for inclusion inside JavaScript string literals in attributes (e.g., onclick)
+function escapeJsString(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, "\\\"")
+        .replace(/'/g, "\\'")
+        .replace(/\r/g, "\\r")
+        .replace(/\n/g, "\\n")
+        .replace(/\u2028/g, "\\u2028")
+        .replace(/\u2029/g, "\\u2029");
+}
 function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
 function isNumeric(i) { return !isNaN(parseFloat(i)) && isFinite(i) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
@@ -1107,11 +1131,11 @@ if (username !== null) {
 
                         child_cnt = 0;
                         $.each(value.children, function (_, child) {
-                            html += `<div class="card_child"><i class='material-icons' onclick='unmergeCard("${index}", "${uuid}", "${child_cnt}");'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
+                            html += `<div class="card_child"><i class='material-icons' onclick='unmergeCard("${escapeJsString(String(index))}", "${escapeJsString(String(uuid))}", "${escapeJsString(String(child_cnt))}");'>radio_button_checked</i> ${escapeHtml(child.author)}: ${escapeHtml(child.content)}</div>`;
                             child_cnt += 1;
                         });
 
-                        html += `    <div class='child_drop' data-parentId='${uuid}'>
+                        html += `    <div class='child_drop' data-parentId='${escapeHtml(uuid)}'>
                                     </div>
                             </div>`;
                         html += `</li>`;
@@ -1196,7 +1220,7 @@ if (username !== null) {
                     $('#cursors').fadeOut(300);
                 }
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.username}" data-uuid="${ws_data.card_uuid}" style="background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color}">`;
+                html = `<li class='ui-state-default uuid_${escapeHtml(ws_data.card_uuid)} pos_${escapeHtml(ws_data.card_add.pos)}' data-username="${escapeHtml(ws_data.card_add.username)}" data-uuid="${escapeHtml(ws_data.card_uuid)}" style="background-color: ${escapeHtml(ws_data.card_add.username_color)}; border-color: ${escapeHtml(ws_data.card_add.username_color)}">`;
                 html += `<div class='card_icon' style='`;
                 if (isLightColor(ws_data.card_add.username_color)) {
                     html += 'color: #333';
