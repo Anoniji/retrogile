@@ -16,6 +16,15 @@ ______     _                   _ _
                           __/ |
 Do not use the console ! |___/ \x1b[0m`);
 
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
@@ -429,7 +438,7 @@ if (username !== null) {
                 }
 
                 $.each(board_data, function (index, value) {
-                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${index}</h1><ul></ul></div>`;
+                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${escapeHtml(index)}</h1><ul></ul></div>`;
                     $('#board').append(html);
 
                     const entries = Object.entries(value);
@@ -439,7 +448,7 @@ if (username !== null) {
                     $.each(sortedData, function (uuid, value) {
                         html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}`
 
-                        html += `' data-username="${value.author}" data-uuid="${uuid}" style="background-color: ${value.username_color}; border-color: ${value.username_color}">`;
+                        html += `' data-username="${escapeHtml(value.author)}" data-uuid="${escapeHtml(uuid)}" style="background-color: ${value.username_color}; border-color: ${value.username_color}">`;
                         html += `<div class='card_icon' style='`;
                         if (isLightColor(value.username_color)) {
                             html += 'color: #333';
@@ -447,7 +456,7 @@ if (username !== null) {
                             html += 'color: #f2f2f2';
                         }
                         html += `'>`;
-                        html += `<div class='info_author'><i class="material-icons">person</i><b>${value.author}</b></div>`;
+                        html += `<div class='info_author'><i class="material-icons">person</i><b>${escapeHtml(value.author)}</b></div>`;
                         html += `</div>`;
 
                         html += `<div class="card_content`;
@@ -466,12 +475,12 @@ if (username !== null) {
                         }
                         html += `'><span>${value.votes}</span>
                                 <div class='vote_actions'>
-                                    <div onclick='voteCard("${uuid}");'>{{ translates.board_3 }}</div>
+                                    <div onclick='voteCard("${escapeHtml(uuid)}");'>{{ translates.board_3 }}</div>
                                 </div>
                             </div>
                             <div class='info_content' `
 
-                        html += `>${value.content}</div>`
+                        html += `>${escapeHtml(value.content)}</div>`
                         html += `</div></div>`;
                         html += `</div></li>`;
                         $(`#col_${index} ul`).append(html);
@@ -495,7 +504,7 @@ if (username !== null) {
                     goto_page('votes_end')
                 }
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.username}" data-uuid="${ws_data.card_uuid}" style="background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color}">`;
+                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${escapeHtml(ws_data.card_add.username)}" data-uuid="${ws_data.card_uuid}" style="background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color}">`;
                 html += `<div class='card_icon' style='`;
                 if (isLightColor(ws_data.card_add.username_color)) {
                     html += 'color: #333';
@@ -503,7 +512,7 @@ if (username !== null) {
                     html += 'border-color: #d3d3d3';
                 }
                 html += `'>`;
-                html += `<div class='info_author'><i class="material-icons">person</i><b>${ws_data.card_add.username}</b></div>`;
+                html += `<div class='info_author'><i class="material-icons">person</i><b>${escapeHtml(ws_data.card_add.username)}</b></div>`;
                 html += `</div>`;
 
                 html += `<div class="card_content`;
