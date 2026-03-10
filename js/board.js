@@ -84,7 +84,15 @@ function resendWsMessages(websocket) {
 function showNotification(type, icon, user, message) {
     var notification = $(`<div class="notification notif_${type}">`);
     $(`.notif_${type}`).hide();
-    notification.append(`<i class="material-icons">${icon}</i> <span><b>${user}</b> ${message}</span>`);
+
+    var iconEl = $('<i class="material-icons"></i>').text(icon);
+    var spanEl = $('<span></span>');
+    var userEl = $('<b></b>').text(user);
+
+    spanEl.append(userEl).append(' ').append(document.createTextNode(message));
+
+    notification.append(iconEl).append(' ').append(spanEl);
+
     $('body #notifications').append(notification);
     notification.slideDown(300).delay(5000).slideUp(300, function () {
         $(this).remove();
