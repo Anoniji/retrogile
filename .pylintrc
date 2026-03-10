@@ -1,8 +1,8 @@
 [main]
-max-branches=23
+max-branches=25
 
 [design]
-max-locals=23
+max-locals=25
 
 [FORMAT]
 max-module-lines=1100

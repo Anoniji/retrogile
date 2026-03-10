@@ -39,17 +39,31 @@ import websockets
 from libs import tools, sessions, boards, users
 
 
-logging.basicConfig(
-    filename="retrogile_ws.log", level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+# ///////////////////////////////////////////////////////////////////////
+
+
+DEBUG = os.getenv('DEBUG', 'False')
+if DEBUG and DEBUG != 'False':
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+else:
+    logging.basicConfig(
+        filename="retrogile_ws.log", level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
 
 # ///////////////////////////////////////////////////////////////////////
 
+
 boards, usersdb, sesssdb = [boards.Board(), users.Users(), sessions.Sessions()]
 BOARD_VERSION, clients = (8, {})
+
 
 # ///////////////////////////////////////////////////////////////////////
 
@@ -542,6 +556,10 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
 
     elif mode == "get_mood" and data.get("username"):
         data["user_selected_color"] = usersdb.get_user_color(data.get('username'))
+        user_mood = board_info["users_list"][data.get("username")].get("mood", None)
+        if user_mood is None:
+            board_info["users_list"][data.get("username")]["mood"] = False
+
         data["user_selected_mood"] = board_info["users_list"][data.get("username")]["mood"]
 
     boards.update_board(board_id, board_info)
@@ -1002,8 +1020,16 @@ async def handler(websocket):
         del clients[token]
 
         for tk, sess in sesssdb.sess_dta.items():
+
+            print('-'*50)
+            print('tk', tk)
+            print('sess', sess.get(tk))
+            print('sesssdb', sesssdb.get(tk))
+            print('-'*50)
+
             if (
                 sesssdb.get(tk) and
+                sess.get("board_id", False) and
                 sess["board_id"] == sesssdb.get(tk)["board_id"] and
                 tk in clients
             ):
@@ -1038,14 +1064,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    DEBUG = os.getenv('DEBUG', 'False')
-    if DEBUG and DEBUG != 'False':
-        logging.basicConfig(
-            stream=sys.stdout,
-            level=logging.DEBUG,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
-
     time.sleep(3)
     asyncio.run(main())

@@ -4,7 +4,7 @@
 """
 Script Name: Retrogile Sessions Manager
 Author: Niji Ano
-Date: 2025-08-05
+Date: 2026-03-10
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -55,6 +55,47 @@ class Sessions:
             with open(self.filename, "w", encoding="utf-8") as f:
                 json.dump({}, f)
 
+        deleted = self.cleanup_old_sessions()
+        print(f"{deleted} sessions deleted")
+
+    def cleanup_old_sessions(self, days=7):
+        """
+        Removes sessions created more than 'days' days ago.
+
+        Args:
+            days (int): Number of days after which to delete sessions (default: 7).
+
+        Returns:
+            int: Number of sessions deleted.
+        """
+        seven_days_ago = time.time() - (days * 24 * 3600)
+        deleted_count = 0
+
+        with open(self.filename, "r+", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = {}
+
+            if not isinstance(data, dict):
+                data = {}
+
+            sessions_to_delete = [
+                sid for sid, info in data.items()
+                if isinstance(info, dict) and "created" in info
+                and info["created"] < seven_days_ago
+            ]
+
+            for session_id in sessions_to_delete:
+                del data[session_id]
+                deleted_count += 1
+
+            f.seek(0)
+            f.truncate()
+            json.dump(data, f, indent=4)
+            self.sess_dta = data
+
+        return deleted_count
 
     def create(self):
         """

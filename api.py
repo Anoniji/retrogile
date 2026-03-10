@@ -41,52 +41,26 @@ from libs import sessions, tools
 monkey.patch_all()
 
 
-def safe_static_path(base_dir, requested_path, allowed_extensions=None):
-    """
-    Safely resolve a user-provided path under a given base directory.
+# ///////////////////////////////////////////////////////////////////////
 
-    Args:
-        base_dir (str): Base directory under which files are allowed.
-        requested_path (str): User-supplied relative path.
-        allowed_extensions (Optional[Collection[str]]): If provided,
-            only paths with one of these file extensions are allowed.
 
-    Returns:
-        str | None: A safe relative path (relative to base_dir) if valid,
-            otherwise None.
-    """
-    if not requested_path:
-        return None
-
-    # Disallow absolute paths outright
-    if os.path.isabs(requested_path):
-        return None
-
-    base_dir_abs = os.path.abspath(base_dir)
-    candidate_abs = os.path.normpath(
-        os.path.join(base_dir_abs, requested_path)
+api_debug = False
+DEBUG = os.getenv('DEBUG', 'False')
+if DEBUG and DEBUG != 'False':
+    api_debug = True
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
     )
-
-    # Ensure the candidate resides within base_dir
-    if not candidate_abs.startswith(base_dir_abs + os.sep):
-        return None
-
-    # Optionally enforce an extension allow list
-    if allowed_extensions is not None:
-        _, ext = os.path.splitext(candidate_abs)
-        if ext not in allowed_extensions:
-            return None
-
-    # Return a path relative to base_dir for send_from_directory
-    _rel_path = os.path.relpath(candidate_abs, base_dir_abs)
-    return _rel_path
-
-logging.basicConfig(
-    filename="retrogile_api.log",
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+else:
+    logging.basicConfig(
+        filename="retrogile_api.log",
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
 
 # ///////////////////////////////////////////////////////////////////////
@@ -101,6 +75,7 @@ LIST_LANGS = ['fr', 'es',  'en']
 if os.path.isfile("version"):
     with open("version", "r", encoding="utf-8") as file_version:
         CURRENT_VERSION = file_version.read().strip()
+
 
 # ///////////////////////////////////////////////////////////////////////
 
@@ -142,6 +117,46 @@ def load_translate(lang):
 
 # ///////////////////////////////////////////////////////////////////////
 
+
+def safe_static_path(base_dir, requested_path, allowed_extensions=None):
+    """
+    Safely resolve a user-provided path under a given base directory.
+
+    Args:
+        base_dir (str): Base directory under which files are allowed.
+        requested_path (str): User-supplied relative path.
+        allowed_extensions (Optional[Collection[str]]): If provided,
+            only paths with one of these file extensions are allowed.
+
+    Returns:
+        str | None: A safe relative path (relative to base_dir) if valid,
+            otherwise None.
+    """
+    if not requested_path:
+        return None
+
+    # Disallow absolute paths outright
+    if os.path.isabs(requested_path):
+        return None
+
+    base_dir_abs = os.path.abspath(base_dir)
+    candidate_abs = os.path.normpath(
+        os.path.join(base_dir_abs, requested_path)
+    )
+
+    # Ensure the candidate resides within base_dir
+    if not candidate_abs.startswith(base_dir_abs + os.sep):
+        return None
+
+    # Optionally enforce an extension allow list
+    if allowed_extensions is not None:
+        _, ext = os.path.splitext(candidate_abs)
+        if ext not in allowed_extensions:
+            return None
+
+    # Return a path relative to base_dir for send_from_directory
+    _rel_path = os.path.relpath(candidate_abs, base_dir_abs)
+    return _rel_path
 
 def path_check(path):
     """Checks if a path is safe, disallowing relative paths and separators."""
@@ -468,19 +483,7 @@ def i18n(path):
 if __name__ == "__main__":
     try:
         WS_SUBDOMAIN = os.getenv('WS_SUBDOMAIN', '')
-        DEBUG = os.getenv('DEBUG', 'False')
-        API_PORT =  int(os.getenv('API_PORT', '8008'))
-        api_debug = False
-
-        if DEBUG and DEBUG != 'False':
-            api_debug = True
-            logging.basicConfig(
-                stream=sys.stdout,
-                level=logging.DEBUG,
-                format='%(asctime)s - %(levelname)s - %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S'
-            )
-
+        API_PORT = int(os.getenv('API_PORT', '8008'))
         if WS_SUBDOMAIN in ['""', "''", '.', '-']:
             WS_SUBDOMAIN = ''
 
