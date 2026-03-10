@@ -1177,7 +1177,7 @@ if (username !== null) {
                 });
 
                 colLst = generateColumnBoundaries(Object.keys(board_data).length, $('.col').width() + 32);
-                $('#board_name').html(ws_data.board_info.board_name);
+                $('#board_name').text(ws_data.board_info.board_name);
                 if (curr_highlightUser) {
                     let tmps_highlightUser = curr_highlightUser;
                     curr_highlightUser = false;
