@@ -281,16 +281,18 @@ def js(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    base_path = "js"
-    safe_path = os.path.normpath(path)
-    # Reject absolute paths or directory traversal attempts
-    if os.path.isabs(safe_path) or ".." in safe_path.split(os.path.sep):
+    base_path = os.path.abspath("js")
+    # Normalize the full path and ensure it stays within base_path
+    full_path = os.path.normpath(os.path.join(base_path, path))
+
+    # Reject if the resolved path escapes the js directory
+    if os.path.commonpath([base_path, full_path]) != base_path:
         return jsonify(["js_not_found"])
 
-    full_path = os.path.join(base_path, safe_path)
     if os.path.isfile(full_path):
+        rel_path = os.path.relpath(full_path, base_path)
         return send_from_directory(
-            base_path, safe_path, mimetype="application/javascript")
+            base_path, rel_path, mimetype="application/javascript")
 
     return jsonify(["js_not_found"])
 
