@@ -39,6 +39,47 @@ from libs import sessions, tools
 
 monkey.patch_all()
 
+
+def safe_static_path(base_dir, requested_path, allowed_extensions=None):
+    """
+    Safely resolve a user-provided path under a given base directory.
+
+    Args:
+        base_dir (str): Base directory under which files are allowed.
+        requested_path (str): User-supplied relative path.
+        allowed_extensions (Optional[Collection[str]]): If provided,
+            only paths with one of these file extensions are allowed.
+
+    Returns:
+        str | None: A safe relative path (relative to base_dir) if valid,
+            otherwise None.
+    """
+    if not requested_path:
+        return None
+
+    # Disallow absolute paths outright
+    if os.path.isabs(requested_path):
+        return None
+
+    base_dir_abs = os.path.abspath(base_dir)
+    candidate_abs = os.path.normpath(
+        os.path.join(base_dir_abs, requested_path)
+    )
+
+    # Ensure the candidate resides within base_dir
+    if not candidate_abs.startswith(base_dir_abs + os.sep):
+        return None
+
+    # Optionally enforce an extension allow list
+    if allowed_extensions is not None:
+        _, ext = os.path.splitext(candidate_abs)
+        if ext not in allowed_extensions:
+            return None
+
+    # Return a path relative to base_dir for send_from_directory
+   _rel_path = os.path.relpath(candidate_abs, base_dir_abs)
+    return _rel_path
+
 logging.basicConfig(
     filename="retrogile_api.log",
     level=logging.DEBUG,
@@ -281,9 +322,18 @@ def js(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("js/" + path):
+    base_path = os.path.abspath("js")
+    # Resolve the requested path against base_path and normalize it
+    full_path = os.path.realpath(os.path.join(base_path, path))
+
+    # Reject if the resolved path escapes the js directory
+    if os.path.commonpath([base_path, full_path]) != base_path:
+        return jsonify(["js_not_found"])
+
+    if os.path.isfile(full_path):
+        rel_path = os.path.relpath(full_path, base_path)
         return send_from_directory(
-            "js", path, mimetype="application/javascript")
+            base_path, rel_path, mimetype="application/javascript")
 
     return jsonify(["js_not_found"])
 
@@ -301,7 +351,16 @@ def jsi(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("js/" + path) and path_check(path):
+    js_base = os.path.join(app.root_path, "js")
+    safe_path = os.path.normpath(os.path.join(js_base, path))
+
+    # Ensure the resolved path stays within the js directory
+    if os.path.commonpath([js_base, safe_path]) != js_base:
+        return jsonify(["jsi_not_found"])
+
+    rel_path = os.path.relpath(safe_path, js_base)
+
+    if os.path.isfile(safe_path) and path_check(path):
         fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
         fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
         board_id = False
@@ -317,7 +376,7 @@ def jsi(path):
             ):
                 lang = request.accept_languages.best_match(LIST_LANGS)
                 data = render_template(
-                    "js/" + path,
+                    "js/" + rel_path,
                     translates=load_translate(lang),
                     ws_subdomain=WS_SUBDOMAIN,
                     ws_session=sesssdb.create(),
@@ -347,8 +406,9 @@ def css(path):
             - If the file exists, returns the CSS file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("css/" + path):
-        return send_from_directory("css", path, mimetype="text/css")
+    safe_rel_path = safe_static_path("css", path, allowed_extensions={".css"})
+    if safe_rel_path and os.path.isfile(os.path.join("css", safe_rel_path)):
+        return send_from_directory("css", safe_rel_path, mimetype="text/css")
 
     return jsonify(["css_not_found"])
 
@@ -366,8 +426,16 @@ def png(path):
             - If the image is found, returns the image content.
             - If the image is not found, returns a JSON response
     """
-    if os.path.isfile("img/" + path):
-        return send_from_directory("img", path, mimetype="image/png")
+    base_dir = os.path.abspath("img")
+    requested = os.path.normpath(os.path.join(base_dir, path))
+
+    # Ensure the requested path is within the img directory
+    if not (requested == base_dir or requested.startswith(base_dir + os.sep)):
+        return jsonify(["png_not_found"])
+
+    if os.path.isfile(requested):
+        safe_relpath = os.path.relpath(requested, base_dir)
+        return send_from_directory("img", safe_relpath, mimetype="image/png")
 
     return jsonify(["png_not_found"])
 
@@ -385,8 +453,17 @@ def i18n(path):
             - If the i18n is found, returns the i18n content.
             - If the i18n is not found, returns a JSON response
     """
-    if os.path.isfile("i18n/" + path):
-        return send_from_directory("i18n", path, mimetype="application/json")
+    base_path = os.path.join(app.root_path, "i18n")
+    full_path = os.path.normpath(os.path.join(base_path, path))
+
+    # Ensure the requested path stays within the i18n directory
+    if os.path.commonpath([base_path, full_path]) != base_path:
+        return jsonify(["i18n_not_found"])
+
+    if os.path.isfile(full_path):
+        # Compute the path relative to the i18n directory for send_from_directory
+        safe_rel_path = os.path.relpath(full_path, base_path)
+        return send_from_directory("i18n", safe_rel_path, mimetype="application/json")
 
     return jsonify(["i18n_not_found"])
 
