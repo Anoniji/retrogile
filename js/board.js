@@ -20,6 +20,22 @@ document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
 
+// Sanitize a value so it is safe to use as an HTML id/class fragment or data-* identifier.
+// Only allows alphanumeric characters and enforces a reasonable maximum length.
+function sanitizeIdentifier(value) {
+    var str = String(value || "");
+    str = str.replace(/[^a-zA-Z0-9]/g, "");
+    // limit length to avoid excessively long attribute values
+    if (str.length > 64) {
+        str = str.substring(0, 64);
+    }
+    // provide a safe fallback if nothing remains after sanitization
+    if (!str) {
+        return "unknown";
+    }
+    return str;
+}
+
 // Basic HTML-escaping helper to prevent XSS when inserting text into the DOM
 function escapeHtml(str) {
     if (!str && str !== 0) return "";
@@ -1265,9 +1281,10 @@ if (username !== null) {
                 const safeUsername = escapeHtml(ws_data.card_add.username || "");
                 const safeCardContent = escapeHtml(ws_data.card_add.cardContent || "");
                 const safeUserColor = sanitizeColor(ws_data.card_add.username_color || "");
-                const safeCardUuid = removeNonAlphanumeric(ws_data.card_uuid || "");
+                const safeCardUuid = sanitizeIdentifier(ws_data.card_uuid);
+                const safePos = sanitizeIdentifier(ws_data.card_add.pos);
 
-                html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${ws_data.card_add.pos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
+                html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${safePos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
                 html += `<div class='card_icon' style='`;
                 if (isLightColor(ws_data.card_add.username_color)) {
                     html += 'color: #333';
