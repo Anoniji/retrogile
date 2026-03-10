@@ -253,12 +253,16 @@ function board_timer(seconds) {
 }
 
 function board_vote(maxVote) {
+    maxVote = parseInt(maxVote, 10);
+    if (isNaN(maxVote)) {
+        maxVote = 0;
+    }
     if (maxVote == 0) {
-        $('#board_vote .title').html('Vote');
+        $('#board_vote .title').text('Vote');
         $('nav #vote_progress, #board-votes-menu, .vote_actions').fadeOut(300);
         $('#cursors').fadeIn(300);
     } else {
-        $('#board_vote .title, #votes_remaining').html(maxVote);
+        $('#board_vote .title, #votes_remaining').text(maxVote);
         $('nav #vote_progress, #board-votes-menu, .vote_actions').fadeIn(300);
         $('#cursors').fadeOut(300);
     }
@@ -1228,8 +1232,8 @@ if (username !== null) {
                 votes_total = ws_data.votes_total;
                 votes_percentage = ws_data.votes_percentage;
                 $('nav #vote_progress').css('width', `${votes_percentage}%`);
-                $('#board_vote .title').html(votes_remaining);
-                $('#votes_remaining').html(votes_total);
+                $('#board_vote .title').text(votes_remaining);
+                $('#votes_remaining').text(votes_total);
 
                 if (votes_total == 0 && votes_set != 0) {
                     $('nav #vote_progress').hide().css('width', '100%');
