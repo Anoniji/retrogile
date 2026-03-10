@@ -33,6 +33,7 @@ from flask import (
     Flask, render_template, send_from_directory, request, make_response
 )
 from flask_jsonpify import jsonify
+from werkzeug.exceptions import NotFound
 
 from gevent import monkey
 from libs import sessions, tools
@@ -332,13 +333,12 @@ def js(path):
         return jsonify(["js_not_found"])
 
     rel_path = os.path.relpath(full_path, base_path)
-    candidate_path = os.path.join(base_path, rel_path)
 
-    if os.path.isfile(candidate_path):
+    try:
         return send_from_directory(
             base_path, rel_path, mimetype="application/javascript")
-
-    return jsonify(["js_not_found"])
+    except NotFound:
+        return jsonify(["js_not_found"])
 
 
 @app.route("/jsi/<string:path>", methods=["GET"])
