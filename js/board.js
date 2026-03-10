@@ -1039,7 +1039,7 @@ if (username !== null) {
 
                 if (check_votes) {
                     if (username in list_votes) {
-                        $('#board_vote .title').html(list_votes[username]);
+                        $('#board_vote .title').text(list_votes[username]);
                         sendWsMessage(ws, JSON.stringify({
                             type: 'stats_vote',
                         }));
