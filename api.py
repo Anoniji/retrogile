@@ -355,13 +355,16 @@ def jsi(path):
             - If the file doesn't exist, returns a JSON response
     """
     js_base = os.path.abspath(os.path.join(app.root_path, "js"))
-    safe_path = os.path.realpath(os.path.join(js_base, path))
+    # Normalize the base directory and the requested path
+    js_base_real = os.path.realpath(js_base)
+    safe_path = os.path.realpath(os.path.join(js_base_real, path))
 
     # Ensure the resolved path stays within the js directory
-    if os.path.commonpath([js_base, safe_path]) != js_base:
+    common = os.path.commonpath([js_base_real, safe_path])
+    if os.path.normcase(common) != os.path.normcase(js_base_real):
         return jsonify(["jsi_not_found"])
 
-    rel_path = os.path.relpath(safe_path, js_base)
+    rel_path = os.path.relpath(safe_path, js_base_real)
 
     if os.path.isfile(safe_path) and path_check(path):
         fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
