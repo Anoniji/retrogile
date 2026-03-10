@@ -1041,18 +1041,29 @@ if (username !== null) {
                         h1_name = h1_name.substring(0, 14) + '...';
                     }
 
-                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${h1_name}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
+                    const $col = $(`<div id='col_${index}' data-col='${index}' class='${col_class}'></div>`);
+                    const $h1 = $('<h1></h1>').text(h1_name);
+                    const $addIcon = $('<i class="add_icon material-icons">add</i>')
+                        .attr('onclick', `addCard("${index}");`);
+                    $h1.append($addIcon);
                     if (board_author == username) {
-                        html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
+                        const $deleteIcon = $('<i class="drop_icon material-icons">delete</i>')
+                            .attr('onclick', `deleteCol("${index}");`);
+                        $h1.append($deleteIcon);
                         if (board_col_idx != 0) {
-                            html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
+                            const $leftIcon = $('<i class="left_icon material-icons">keyboard_double_arrow_left</i>')
+                                .attr('onclick', `moveCol("left", "${index}");`);
+                            $h1.append($leftIcon);
                         }
                         if (board_col_idx != board_total_idx) {
-                            html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
+                            const $rightIcon = $('<i class="right_icon material-icons">keyboard_double_arrow_right</i>')
+                                .attr('onclick', `moveCol("right", "${index}");`);
+                            $h1.append($rightIcon);
                         }
                     }
-                    html += `</h1><ul class='sortable'></ul></div>`;
-                    $('#board').append(html);
+                    $col.append($h1);
+                    $col.append("<ul class='sortable'></ul>");
+                    $('#board').append($col);
 
                     const entries = Object.entries(value);
                     entries.sort((a, b) => a[1].pos - b[1].pos);
