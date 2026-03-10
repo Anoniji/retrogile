@@ -327,11 +327,14 @@ def js(path):
     full_path = os.path.realpath(os.path.join(base_path, path))
 
     # Reject if the resolved path escapes the js directory
-    if os.path.commonpath([base_path, full_path]) != base_path:
+    common = os.path.commonpath([base_path, full_path])
+    if os.path.normcase(common) != os.path.normcase(base_path):
         return jsonify(["js_not_found"])
 
-    if os.path.isfile(full_path):
-        rel_path = os.path.relpath(full_path, base_path)
+    rel_path = os.path.relpath(full_path, base_path)
+    candidate_path = os.path.join(base_path, rel_path)
+
+    if os.path.isfile(candidate_path):
         return send_from_directory(
             base_path, rel_path, mimetype="application/javascript")
 
