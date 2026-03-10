@@ -39,6 +39,47 @@ from libs import sessions, tools
 
 monkey.patch_all()
 
+
+def safe_static_path(base_dir, requested_path, allowed_extensions=None):
+    """
+    Safely resolve a user-provided path under a given base directory.
+
+    Args:
+        base_dir (str): Base directory under which files are allowed.
+        requested_path (str): User-supplied relative path.
+        allowed_extensions (Optional[Collection[str]]): If provided,
+            only paths with one of these file extensions are allowed.
+
+    Returns:
+        str | None: A safe relative path (relative to base_dir) if valid,
+            otherwise None.
+    """
+    if not requested_path:
+        return None
+
+    # Disallow absolute paths outright
+    if os.path.isabs(requested_path):
+        return None
+
+    base_dir_abs = os.path.abspath(base_dir)
+    candidate_abs = os.path.normpath(
+        os.path.join(base_dir_abs, requested_path)
+    )
+
+    # Ensure the candidate resides within base_dir
+    if not candidate_abs.startswith(base_dir_abs + os.sep):
+        return None
+
+    # Optionally enforce an extension allow list
+    if allowed_extensions is not None:
+        _, ext = os.path.splitext(candidate_abs)
+        if ext not in allowed_extensions:
+            return None
+
+    # Return a path relative to base_dir for send_from_directory
+   _rel_path = os.path.relpath(candidate_abs, base_dir_abs)
+    return _rel_path
+
 logging.basicConfig(
     filename="retrogile_api.log",
     level=logging.DEBUG,
@@ -347,8 +388,9 @@ def css(path):
             - If the file exists, returns the CSS file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("css/" + path):
-        return send_from_directory("css", path, mimetype="text/css")
+    safe_rel_path = safe_static_path("css", path, allowed_extensions={".css"})
+    if safe_rel_path and os.path.isfile(os.path.join("css", safe_rel_path)):
+        return send_from_directory("css", safe_rel_path, mimetype="text/css")
 
     return jsonify(["css_not_found"])
 
