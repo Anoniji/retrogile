@@ -447,16 +447,8 @@ def i18n(path):
             - If the i18n is found, returns the i18n content.
             - If the i18n is not found, returns a JSON response
     """
-    base_path = os.path.join(app.root_path, "i18n")
-    full_path = os.path.normpath(os.path.join(base_path, path))
-
-    # Ensure the requested path stays within the i18n directory
-    if os.path.commonpath([base_path, full_path]) != base_path:
-        return jsonify(["i18n_not_found"])
-
-    if os.path.isfile(full_path):
-        # Compute the path relative to the i18n directory for send_from_directory
-        safe_rel_path = os.path.relpath(full_path, base_path)
+    safe_rel_path = safe_static_path("i18n", path, allowed_extensions={".json"})
+    if safe_rel_path and os.path.isfile(os.path.join("i18n", safe_rel_path)):
         return send_from_directory("i18n", safe_rel_path, mimetype="application/json")
 
     return jsonify(["i18n_not_found"])
