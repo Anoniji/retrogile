@@ -19,6 +19,24 @@ Do not use the console ! |___/ \x1b[0m`);
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
+
+// Basic HTML-escaping helper to prevent XSS when inserting text into the DOM
+function escapeHtml(str) {
+    if (!str && str !== 0) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// Allow only safe characters for CSS color values (e.g., #RRGGBB or named colors)
+function sanitizeColor(str) {
+    if (!str) return "";
+    // Keep only letters, digits, and '#'; this removes characters that could break out of style context
+    return String(str).replace(/[^#a-zA-Z0-9]/g, "");
+}
 function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
 function isNumeric(i) { return !isNaN(parseFloat(i)) && isFinite(i) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
@@ -1196,7 +1214,13 @@ if (username !== null) {
                     $('#cursors').fadeOut(300);
                 }
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${ws_data.card_add.username}" data-uuid="${ws_data.card_uuid}" style="background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color}">`;
+                // Sanitize user-controlled fields before inserting into HTML
+                const safeUsername = escapeHtml(ws_data.card_add.username || "");
+                const safeCardContent = escapeHtml(ws_data.card_add.cardContent || "");
+                const safeUserColor = sanitizeColor(ws_data.card_add.username_color || "");
+                const safeCardUuid = removeNonAlphanumeric(ws_data.card_uuid || "");
+
+                html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${ws_data.card_add.pos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
                 html += `<div class='card_icon' style='`;
                 if (isLightColor(ws_data.card_add.username_color)) {
                     html += 'color: #333';
@@ -1204,12 +1228,12 @@ if (username !== null) {
                     html += 'border-color: #d3d3d3';
                 }
                 html += `'>`;
-                html += `<div class='info_author'><i class="material-icons">person</i><b>${ws_data.card_add.username}</b></div>`;
+                html += `<div class='info_author'><i class="material-icons">person</i><b>${safeUsername}</b></div>`;
                 if (ws_data.card_add.username == username) {
-                    html += `<div class='edit_icon' onclick='editCard("${ws_data.card_uuid}");' title='{{ translates.board_js_15 }}'>
+                    html += `<div class='edit_icon' onclick='editCard("${safeCardUuid}");' title='{{ translates.board_js_15 }}'>
                         <i class='material-icons'>edit</i>
                     </div>
-                    <div class='delete_icon' onclick='deleteCard("${ws_data.card_uuid}");' title='{{ translates.board_js_16 }}'>
+                    <div class='delete_icon' onclick='deleteCard("${safeCardUuid}");' title='{{ translates.board_js_16 }}'>
                         <i class='material-icons'>delete</i>
                     </div>`;
                 }
@@ -1223,7 +1247,7 @@ if (username !== null) {
 
                 html += `">`;
 
-                html += `<div class='votes' style='background-color: ${ws_data.card_add.username_color}`;
+                html += `<div class='votes' style='background-color: ${safeUserColor}`;
                 if (isLightColor(ws_data.card_add.username_color)) {
                     html += '; color: #333';
                 } else {
@@ -1231,12 +1255,12 @@ if (username !== null) {
                 }
                 html += `'><span>${parseInt(ws_data.card_add.votes)}</span>
                         <div class='vote_actions'>
-                            <div onclick='voteCard("${ws_data.card_uuid}", "remove");'>-</div>
-                            <div onclick='voteCard("${ws_data.card_uuid}", "add");'>+</div>
+                            <div onclick='voteCard("${safeCardUuid}", "remove");'>-</div>
+                            <div onclick='voteCard("${safeCardUuid}", "add");'>+</div>
                         </div>
                     </div>
-                    <div class='info_content'>${ws_data.card_add.cardContent}</div>
-                    <div class='child_drop' data-parentId='${ws_data.card_uuid}'></div>
+                    <div class='info_content'>${safeCardContent}</div>
+                    <div class='child_drop' data-parentId='${safeCardUuid}'></div>
                     </div>`;
                 html += `</li>`;
                 $(`#col_${ws_data.card_add.col_id} .sortable`).append(html);
