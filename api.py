@@ -281,9 +281,18 @@ def js(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("js/" + path):
+    js_base = os.path.join(app.root_path, "js")
+    safe_path = os.path.normpath(os.path.join(js_base, path))
+
+    # Ensure the resolved path stays within the js directory
+    if os.path.commonpath([js_base, safe_path]) != js_base:
+        return jsonify(["js_not_found"])
+
+    rel_path = os.path.relpath(safe_path, js_base)
+
+    if os.path.isfile(safe_path):
         return send_from_directory(
-            "js", path, mimetype="application/javascript")
+            "js", rel_path, mimetype="application/javascript")
 
     return jsonify(["js_not_found"])
 
@@ -301,7 +310,16 @@ def jsi(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    if os.path.isfile("js/" + path) and path_check(path):
+    js_base = os.path.join(app.root_path, "js")
+    safe_path = os.path.normpath(os.path.join(js_base, path))
+
+    # Ensure the resolved path stays within the js directory
+    if os.path.commonpath([js_base, safe_path]) != js_base:
+        return jsonify(["jsi_not_found"])
+
+    rel_path = os.path.relpath(safe_path, js_base)
+
+    if os.path.isfile(safe_path) and path_check(path):
         fetch_mode = request.headers.get('Sec-Fetch-Mode', False)
         fetch_dest = request.headers.get('Sec-Fetch-Dest', False)
         board_id = False
@@ -317,7 +335,7 @@ def jsi(path):
             ):
                 lang = request.accept_languages.best_match(LIST_LANGS)
                 data = render_template(
-                    "js/" + path,
+                    "js/" + rel_path,
                     translates=load_translate(lang),
                     ws_subdomain=WS_SUBDOMAIN,
                     ws_session=sesssdb.create(),
