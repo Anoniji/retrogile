@@ -77,7 +77,7 @@ def safe_static_path(base_dir, requested_path, allowed_extensions=None):
             return None
 
     # Return a path relative to base_dir for send_from_directory
-   _rel_path = os.path.relpath(candidate_abs, base_dir_abs)
+    _rel_path = os.path.relpath(candidate_abs, base_dir_abs)
     return _rel_path
 
 logging.basicConfig(
