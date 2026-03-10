@@ -523,20 +523,21 @@ if (username !== null) {
                 }
             } else if (ws_data.type == 'card_add') {
                 // Build card element safely using jQuery to avoid XSS via unescaped HTML.
-                var $li = $(
-                    `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' ` +
-                    `data-uuid='${ws_data.card_uuid}' ` +
-                    `style='background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color};'></li>`
-                );
+                var $li = $('<li></li>');
+                $li.addClass('ui-state-default');
+                $li.addClass('uuid_' + ws_data.card_uuid);
+                $li.addClass('pos_' + ws_data.card_add.pos);
+                $li.attr('data-uuid', ws_data.card_uuid);
                 $li.attr('data-username', ws_data.card_add.username);
+                $li.css('background-color', ws_data.card_add.username_color);
+                $li.css('border-color', ws_data.card_add.username_color);
 
-                var cardIconStyle = '';
+                var $cardIcon = $("<div class='card_icon'></div>");
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    cardIconStyle = 'color: #333';
+                    $cardIcon.css('color', '#333');
                 } else {
-                    cardIconStyle = 'border-color: #d3d3d3';
+                    $cardIcon.css('border-color', '#d3d3d3');
                 }
-                var $cardIcon = $(`<div class='card_icon' style='${cardIconStyle}'></div>`);
                 var $infoAuthor = $(
                     "<div class='info_author'><i class=\"material-icons\">person</i><b></b></div>"
                 );
