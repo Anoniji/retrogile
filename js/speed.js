@@ -366,7 +366,19 @@ if (username !== null) {
                         } else {
                             txt_color = 'color: #f2f2f2;';
                         }
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' style='${txt_color}background: ${ws_data.color}'></div>`);
+                        var $newUser = $('<div></div>')
+                            .attr('id', `user_${ws_data.user_id}`)
+                            .addClass('user')
+                            .attr('title', ws_data.username)
+                            .attr('data-username', ws_data.username)
+                            .attr('data-count', '1');
+                        if (isLightColor(ws_data.color)) {
+                            $newUser.css('color', '#333');
+                        } else {
+                            $newUser.css('color', '#f2f2f2');
+                        }
+                        $newUser.css('background', ws_data.color);
+                        $('#users').append($newUser);
                         $(`#user_${ws_data.user_id}`).hide().html(getFirstLetters(ws_data.username)).slideDown(300, function () {
                         });
                         $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
@@ -399,7 +411,7 @@ if (username !== null) {
 
                 if (check_votes) {
                     if (username in list_votes) {
-                        $('#board_vote .title').html(list_votes[username]);
+                        $('#board_vote .title').text(String(list_votes[username]));
                         sendWsMessage(ws, JSON.stringify({
                             type: 'stats_vote',
                         }));
@@ -438,8 +450,14 @@ if (username !== null) {
                 }
 
                 $.each(board_data, function (index, value) {
-                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${escapeHtml(index)}</h1><ul></ul></div>`;
-                    $('#board').append(html);
+                    const $col = $('<div></div>')
+                        .attr('id', 'col_' + index)
+                        .attr('data-col', index)
+                        .addClass(col_class);
+                    const $header = $('<h1></h1>').text(index);
+                    const $list = $('<ul></ul>');
+                    $col.append($header).append($list);
+                    $('#board').append($col);
 
                     const entries = Object.entries(value);
                     entries.sort((a, b) => a[1].pos - b[1].pos);
@@ -504,43 +522,65 @@ if (username !== null) {
                     goto_page('votes_end')
                 }
             } else if (ws_data.type == 'card_add') {
-                html = `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' data-username="${escapeHtml(ws_data.card_add.username)}" data-uuid="${ws_data.card_uuid}" style="background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color}">`;
-                html += `<div class='card_icon' style='`;
+                const $li = $('<li></li>')
+                    .addClass('ui-state-default')
+                    .addClass('uuid_' + ws_data.card_uuid)
+                    .addClass('pos_' + ws_data.card_add.pos)
+                    .attr('data-username', ws_data.card_add.username)
+                    .attr('data-uuid', ws_data.card_uuid)
+                    .css({
+                        'background-color': ws_data.card_add.username_color,
+                        'border-color': ws_data.card_add.username_color
+                    });
+
+                const $cardIcon = $('<div></div>').addClass('card_icon');
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    html += 'color: #333';
+                    $cardIcon.css('color', '#333');
                 } else {
-                    html += 'border-color: #d3d3d3';
+                    $cardIcon.css('border-color', '#d3d3d3');
                 }
-                html += `'>`;
-                html += `<div class='info_author'><i class="material-icons">person</i><b>${escapeHtml(ws_data.card_add.username)}</b></div>`;
-                html += `</div>`;
 
-                html += `<div class="card_content`;
+                const $infoAuthor = $('<div></div>').addClass('info_author');
+                const $icon = $('<i></i>').addClass('material-icons').text('person');
+                const $authorName = $('<b></b>').text(ws_data.card_add.username);
+                $infoAuthor.append($icon).append($authorName);
+                $cardIcon.append($infoAuthor);
 
+                const $cardContent = $('<div></div>').addClass('card_content');
                 if (ws_data.card_add.username == username && !user_card_visibility) {
-                    html += ' card_not_visible';
+                    $cardContent.addClass('card_not_visible');
                 }
 
-                html += `">`;
-
-                html += `<div class='votes' style='background-color: ${ws_data.card_add.username_color}`;
+                const $votes = $('<div></div>').addClass('votes').css('background-color', ws_data.card_add.username_color);
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    html += '; color: #333';
+                    $votes.css('color', '#333');
                 } else {
-                    html += '; border-color: #d3d3d3';
+                    $votes.css('border-color', '#d3d3d3');
                 }
-                html += `'><span>${parseInt(ws_data.card_add.votes)}</span>
-                        <div class='vote_actions'>
-                            <div onclick='voteCard("${ws_data.card_uuid}");'>{{ translates.board_3 }}</div>
-                        </div>
-                    </div>
-                    <div class='info_content'>${ws_data.card_add.cardContent}</div>
-                    </div>`;
-                html += `</li>`;
-                $(`#col_${ws_data.card_add.col_id} ul`).append(html);
+
+                const $votesSpan = $('<span></span>').text(parseInt(ws_data.card_add.votes, 10));
+                const $voteActions = $('<div></div>').addClass('vote_actions');
+                const $voteButton = $('<div></div>').text('{{ translates.board_3 }}');
+                $voteButton.on('click', function () {
+                    voteCard(ws_data.card_uuid);
+                });
+                $voteActions.append($voteButton);
+
+                $votes.append($votesSpan).append($voteActions);
+
+                const $infoContent = $('<div></div>').addClass('info_content').text(ws_data.card_add.cardContent);
+
+                $cardContent.append($votes).append($infoContent);
+
+                $li.append($cardIcon).append($cardContent);
+
+                $('#col_' + ws_data.card_add.col_id + ' ul').append($li);
 
             } else if (ws_data.type == 'card_vote') {
-                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).html(ws_data.card_votes);
+                const safeCardVotes = parseInt(ws_data.card_votes, 10);
+                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).text(
+                    Number.isNaN(safeCardVotes) ? 0 : safeCardVotes
+                );
                 ws.send(JSON.stringify({ type: 'stats_vote' }));
             } else {
                 if (ws_data.content == 'start_speed') {
@@ -657,7 +697,9 @@ if (username !== null) {
                                 const elements = $(`#col_${id} .info_content`);
                                 if(elements.length > 0){
                                     elements.each(function() {
-                                        $(`#${lst} ul`).append(`<li>● ${$(this).text()}</li>`);
+                                        const text = $(this).text();
+                                        const $li = $('<li></li>').text(`● ${text}`);
+                                        $(`#${lst} ul`).append($li);
                                     });
                                 } else {
                                     $(`#${lst} ul`).html('<li>● {{ translates.speed_js_4 }}</li>');
