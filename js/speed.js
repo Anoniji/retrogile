@@ -648,7 +648,9 @@ if (username !== null) {
                                 const elements = $(`#col_${id} .info_content`);
                                 if(elements.length > 0){
                                     elements.each(function() {
-                                        $(`#${lst} ul`).append(`<li>● ${$(this).text()}</li>`);
+                                        const text = $(this).text();
+                                        const $li = $('<li></li>').text(`● ${text}`);
+                                        $(`#${lst} ul`).append($li);
                                     });
                                 } else {
                                     $(`#${lst} ul`).html('<li>● {{ translates.speed_js_4 }}</li>');

@@ -137,6 +137,6 @@ $('#username_cleaner').click(function () {
 	$(this).hide();
 });
 
-if(location.hostname.includes("retrogile.com")) {
+if (location.hostname === 'retrogile.com' || location.hostname.endsWith('.retrogile.com')) {
 	$('#github').slideDown(300);
 }
