@@ -522,59 +522,57 @@ if (username !== null) {
                     goto_page('votes_end')
                 }
             } else if (ws_data.type == 'card_add') {
-                const $li = $('<li></li>')
-                    .addClass('ui-state-default')
-                    .addClass('uuid_' + ws_data.card_uuid)
-                    .addClass('pos_' + ws_data.card_add.pos)
-                    .attr('data-username', ws_data.card_add.username)
-                    .attr('data-uuid', ws_data.card_uuid)
-                    .css({
-                        'background-color': ws_data.card_add.username_color,
-                        'border-color': ws_data.card_add.username_color
-                    });
+                // Build card element safely using jQuery to avoid XSS via unescaped HTML.
+                var $li = $(
+                    `<li class='ui-state-default uuid_${ws_data.card_uuid} pos_${ws_data.card_add.pos}' ` +
+                    `data-uuid='${ws_data.card_uuid}' ` +
+                    `style='background-color: ${ws_data.card_add.username_color}; border-color: ${ws_data.card_add.username_color};'></li>`
+                );
+                $li.attr('data-username', ws_data.card_add.username);
 
-                const $cardIcon = $('<div></div>').addClass('card_icon');
+                var cardIconStyle = '';
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    $cardIcon.css('color', '#333');
+                    cardIconStyle = 'color: #333';
                 } else {
-                    $cardIcon.css('border-color', '#d3d3d3');
+                    cardIconStyle = 'border-color: #d3d3d3';
                 }
-
-                const $infoAuthor = $('<div></div>').addClass('info_author');
-                const $icon = $('<i></i>').addClass('material-icons').text('person');
-                const $authorName = $('<b></b>').text(ws_data.card_add.username);
-                $infoAuthor.append($icon).append($authorName);
+                var $cardIcon = $(`<div class='card_icon' style='${cardIconStyle}'></div>`);
+                var $infoAuthor = $(
+                    "<div class='info_author'><i class=\"material-icons\">person</i><b></b></div>"
+                );
+                $infoAuthor.find('b').text(ws_data.card_add.username);
                 $cardIcon.append($infoAuthor);
+                $li.append($cardIcon);
 
-                const $cardContent = $('<div></div>').addClass('card_content');
+                var cardContentClasses = 'card_content';
                 if (ws_data.card_add.username == username && !user_card_visibility) {
-                    $cardContent.addClass('card_not_visible');
+                    cardContentClasses += ' card_not_visible';
                 }
+                var $cardContent = $(`<div class='${cardContentClasses}'></div>`);
 
-                const $votes = $('<div></div>').addClass('votes').css('background-color', ws_data.card_add.username_color);
+                var votesStyle = `background-color: ${ws_data.card_add.username_color}`;
                 if (isLightColor(ws_data.card_add.username_color)) {
-                    $votes.css('color', '#333');
+                    votesStyle += '; color: #333';
                 } else {
-                    $votes.css('border-color', '#d3d3d3');
+                    votesStyle += '; border-color: #d3d3d3';
                 }
+                var $votes = $(
+                    `<div class='votes' style='${votesStyle}'>` +
+                    `<span>${parseInt(ws_data.card_add.votes)}</span>` +
+                    `<div class='vote_actions'>` +
+                    `<div onclick='voteCard("${ws_data.card_uuid}");'>{{ translates.board_3 }}</div>` +
+                    `</div>` +
+                    `</div>`
+                );
+                $cardContent.append($votes);
 
-                const $votesSpan = $('<span></span>').text(parseInt(ws_data.card_add.votes, 10));
-                const $voteActions = $('<div></div>').addClass('vote_actions');
-                const $voteButton = $('<div></div>').text('{{ translates.board_3 }}');
-                $voteButton.on('click', function () {
-                    voteCard(ws_data.card_uuid);
-                });
-                $voteActions.append($voteButton);
+                var $infoContent = $("<div class='info_content'></div>");
+                $infoContent.text(ws_data.card_add.cardContent);
+                $cardContent.append($infoContent);
 
-                $votes.append($votesSpan).append($voteActions);
+                $li.append($cardContent);
 
-                const $infoContent = $('<div></div>').addClass('info_content').text(ws_data.card_add.cardContent);
-
-                $cardContent.append($votes).append($infoContent);
-
-                $li.append($cardIcon).append($cardContent);
-
-                $('#col_' + ws_data.card_add.col_id + ' ul').append($li);
+                $(`#col_${ws_data.card_add.col_id} ul`).append($li);
 
             } else if (ws_data.type == 'card_vote') {
                 const safeCardVotes = parseInt(ws_data.card_votes, 10);
