@@ -1038,7 +1038,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    DEBUG = os.getenv('DEBUG', 'False')    
+    DEBUG = os.getenv('DEBUG', 'False')  
 
     if DEBUG and DEBUG != 'False':
         logging.basicConfig(
