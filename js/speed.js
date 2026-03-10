@@ -531,7 +531,10 @@ if (username !== null) {
                 $(`#col_${ws_data.card_add.col_id} ul`).append(html);
 
             } else if (ws_data.type == 'card_vote') {
-                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).html(ws_data.card_votes);
+                const safeCardVotes = parseInt(ws_data.card_votes, 10);
+                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).text(
+                    Number.isNaN(safeCardVotes) ? 0 : safeCardVotes
+                );
                 ws.send(JSON.stringify({ type: 'stats_vote' }));
             } else {
                 if (ws_data.content == 'start_speed') {
