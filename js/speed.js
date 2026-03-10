@@ -16,6 +16,15 @@ ______     _                   _ _
                           __/ |
 Do not use the console ! |___/ \x1b[0m`);
 
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
@@ -357,7 +366,19 @@ if (username !== null) {
                         } else {
                             txt_color = 'color: #f2f2f2;';
                         }
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' style='${txt_color}background: ${ws_data.color}'></div>`);
+                        var $newUser = $('<div></div>')
+                            .attr('id', `user_${ws_data.user_id}`)
+                            .addClass('user')
+                            .attr('title', ws_data.username)
+                            .attr('data-username', ws_data.username)
+                            .attr('data-count', '1');
+                        if (isLightColor(ws_data.color)) {
+                            $newUser.css('color', '#333');
+                        } else {
+                            $newUser.css('color', '#f2f2f2');
+                        }
+                        $newUser.css('background', ws_data.color);
+                        $('#users').append($newUser);
                         $(`#user_${ws_data.user_id}`).hide().html(getFirstLetters(ws_data.username)).slideDown(300, function () {
                         });
                         $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
@@ -390,7 +411,7 @@ if (username !== null) {
 
                 if (check_votes) {
                     if (username in list_votes) {
-                        $('#board_vote .title').html(list_votes[username]);
+                        $('#board_vote .title').text(String(list_votes[username]));
                         sendWsMessage(ws, JSON.stringify({
                             type: 'stats_vote',
                         }));
@@ -429,8 +450,14 @@ if (username !== null) {
                 }
 
                 $.each(board_data, function (index, value) {
-                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${index}</h1><ul></ul></div>`;
-                    $('#board').append(html);
+                    const $col = $('<div></div>')
+                        .attr('id', 'col_' + index)
+                        .attr('data-col', index)
+                        .addClass(col_class);
+                    const $header = $('<h1></h1>').text(index);
+                    const $list = $('<ul></ul>');
+                    $col.append($header).append($list);
+                    $('#board').append($col);
 
                     const entries = Object.entries(value);
                     entries.sort((a, b) => a[1].pos - b[1].pos);
@@ -439,7 +466,7 @@ if (username !== null) {
                     $.each(sortedData, function (uuid, value) {
                         html = `<li class='ui-state-default uuid_${uuid} pos_${value.pos}`
 
-                        html += `' data-username="${value.author}" data-uuid="${uuid}" style="background-color: ${value.username_color}; border-color: ${value.username_color}">`;
+                        html += `' data-username="${escapeHtml(value.author)}" data-uuid="${escapeHtml(uuid)}" style="background-color: ${value.username_color}; border-color: ${value.username_color}">`;
                         html += `<div class='card_icon' style='`;
                         if (isLightColor(value.username_color)) {
                             html += 'color: #333';
@@ -447,7 +474,7 @@ if (username !== null) {
                             html += 'color: #f2f2f2';
                         }
                         html += `'>`;
-                        html += `<div class='info_author'><i class="material-icons">person</i><b>${value.author}</b></div>`;
+                        html += `<div class='info_author'><i class="material-icons">person</i><b>${escapeHtml(value.author)}</b></div>`;
                         html += `</div>`;
 
                         html += `<div class="card_content`;
@@ -466,12 +493,12 @@ if (username !== null) {
                         }
                         html += `'><span>${value.votes}</span>
                                 <div class='vote_actions'>
-                                    <div onclick='voteCard("${uuid}");'>{{ translates.board_3 }}</div>
+                                    <div onclick='voteCard("${escapeHtml(uuid)}");'>{{ translates.board_3 }}</div>
                                 </div>
                             </div>
                             <div class='info_content' `
 
-                        html += `>${value.content}</div>`
+                        html += `>${escapeHtml(value.content)}</div>`
                         html += `</div></div>`;
                         html += `</div></li>`;
                         $(`#col_${index} ul`).append(html);
@@ -548,7 +575,10 @@ if (username !== null) {
                 $(`#col_${ws_data.card_add.col_id} ul`).append($li);
 
             } else if (ws_data.type == 'card_vote') {
-                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).html(ws_data.card_votes);
+                const safeCardVotes = parseInt(ws_data.card_votes, 10);
+                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).text(
+                    Number.isNaN(safeCardVotes) ? 0 : safeCardVotes
+                );
                 ws.send(JSON.stringify({ type: 'stats_vote' }));
             } else {
                 if (ws_data.content == 'start_speed') {
@@ -665,7 +695,9 @@ if (username !== null) {
                                 const elements = $(`#col_${id} .info_content`);
                                 if(elements.length > 0){
                                     elements.each(function() {
-                                        $(`#${lst} ul`).append(`<li>● ${$(this).text()}</li>`);
+                                        const text = $(this).text();
+                                        const $li = $('<li></li>').text(`● ${text}`);
+                                        $(`#${lst} ul`).append($li);
                                     });
                                 } else {
                                     $(`#${lst} ul`).html('<li>● {{ translates.speed_js_4 }}</li>');

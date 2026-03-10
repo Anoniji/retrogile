@@ -19,6 +19,20 @@ Do not use the console ! |___/ \x1b[0m`);
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
+
+// Escape a string for safe insertion into HTML/attribute contexts.
+function escapeHtml(str) {
+    if (str === null || str === undefined) {
+        return "";
+    }
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/\//g, "&#x2F;");
+}
 function removeNonNumeric(e){return!!e&&e.replace(/[^0-9]/g,"")}
 function isNumeric(i) { return !isNaN(parseFloat(i)) && isFinite(i) }
 function generateColumnBoundaries(e, n) { let r = []; for (let u = 0; u < e; u++)r.push(Math.round(n * u)); return r }
@@ -84,7 +98,15 @@ function resendWsMessages(websocket) {
 function showNotification(type, icon, user, message) {
     var notification = $(`<div class="notification notif_${type}">`);
     $(`.notif_${type}`).hide();
-    notification.append(`<i class="material-icons">${icon}</i> <span><b>${user}</b> ${message}</span>`);
+
+    var iconEl = $('<i class="material-icons"></i>').text(icon);
+    var spanEl = $('<span></span>');
+    var userEl = $('<b></b>').text(user);
+
+    spanEl.append(userEl).append(' ').append(document.createTextNode(message));
+
+    notification.append(iconEl).append(' ').append(spanEl);
+
     $('body #notifications').append(notification);
     notification.slideDown(300).delay(5000).slideUp(300, function () {
         $(this).remove();
@@ -192,7 +214,8 @@ const log = (text, color) => {
     const minute = now.getMinutes();
     const second = now.getSeconds();
     var board_log = $('#board_log');
-    board_log.append(`[${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}.${second.toString().padStart(2, '0')}] <span style='color: ${color}'>${text}</span><br>`);
+    const safeText = escapeHtml(String(text));
+    board_log.append(`[${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}.${second.toString().padStart(2, '0')}] <span style='color: ${color}'>${safeText}</span><br>`);
     var log_height = board_log[0].scrollHeight;
     board_log.animate({ scrollTop: log_height }, 200);
 };
@@ -230,12 +253,16 @@ function board_timer(seconds) {
 }
 
 function board_vote(maxVote) {
+    maxVote = parseInt(maxVote, 10);
+    if (isNaN(maxVote)) {
+        maxVote = 0;
+    }
     if (maxVote == 0) {
-        $('#board_vote .title').html('Vote');
+        $('#board_vote .title').text('Vote');
         $('nav #vote_progress, #board-votes-menu, .vote_actions').fadeOut(300);
         $('#cursors').fadeIn(300);
     } else {
-        $('#board_vote .title, #votes_remaining').html(maxVote);
+        $('#board_vote .title, #votes_remaining').text(maxVote);
         $('nav #vote_progress, #board-votes-menu, .vote_actions').fadeIn(300);
         $('#cursors').fadeOut(300);
     }
@@ -886,10 +913,21 @@ if (username !== null) {
             } else if (ws_data.type == 'users_list') {
                 $('#users, #cursors').html('');
                 $.each(ws_data.users_list, function (index, value) {
+                    var safeUsername = escapeHtml(value.username);
                     if (user_id && user_id != index) {
-                        $('#cursors').append(`<div id='cursor_${index}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${value.username}</div></div>`)
+                        var $cursor = $("<div>")
+                            .attr("id", "cursor_" + index)
+                            .addClass("cursor");
+                        var $cursorUsername = $("<div>")
+                            .addClass("username")
+                            .text(value.username);
+                        $cursor.append($cursorUsername);
+                        $cursor.on("dblclick", function () {
+                            cursor_clicked(this.id);
+                        });
+                        $("#cursors").append($cursor);
                     }
-                    var $div_username = $(`#users div[data-username=${value.username}]`);
+                    var $div_username = $(`#users div[data-username='${safeUsername}']`);
                     if ($($div_username).length > 0) {
                         var currentCount = parseInt($div_username.attr('data-count'));
                         $div_username.attr('data-count', currentCount + 1);
@@ -900,15 +938,26 @@ if (username !== null) {
                             txt_color = 'color: #f2f2f2;';
                         }
 
-                        $('#users').append(`<div id='user_${index}' class='user' title='${value.username}' data-username='${value.username}' data-count='1' onclick='highlightUser("${value.username}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}<div class='user_notif_status'></div></div>`);
+                        $('#users').append(`<div id='user_${index}' class='user' title='${safeUsername}' data-username='${safeUsername}' data-count='1' onclick='highlightUser("${safeUsername}");' style='${txt_color}background: ${value.color}'>${getFirstLetters(value.username)}<div class='user_notif_status'></div></div>`);
                         $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
                     }
                 });
             } else if (ws_data.type == 'user_add') {
                 if (user_id != ws_data.user_id) {
-                    $('#cursors').append(`<div id='cursor_${ws_data.user_id}' class='cursor' ondblclick='cursor_clicked(this.id);'><div class='username'>${ws_data.username}</div></div>`);
+                    var safeUsernameAdd = escapeHtml(ws_data.username);
+                    var $cursorAdd = $("<div>")
+                        .attr("id", "cursor_" + ws_data.user_id)
+                        .addClass("cursor");
+                    var $cursorAddUsername = $("<div>")
+                        .addClass("username")
+                        .text(ws_data.username);
+                    $cursorAdd.append($cursorAddUsername);
+                    $cursorAdd.on("dblclick", function () {
+                        cursor_clicked(this.id);
+                    });
+                    $("#cursors").append($cursorAdd);
 
-                    var $div_username = $(`#users div[data-username=${ws_data.username}]`);
+                    var $div_username = $(`#users div[data-username='${safeUsernameAdd}']`);
                     if ($($div_username).length > 0) {
                         var currentCount = parseInt($div_username.attr('data-count'));
                         $div_username.attr('data-count', currentCount + 1);
@@ -918,7 +967,7 @@ if (username !== null) {
                         } else {
                             txt_color = 'color: #f2f2f2;';
                         }
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' onclick='highlightUser("${ws_data.username}");' style='${txt_color}background: ${ws_data.color}'></div>`);
+                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${safeUsernameAdd}' data-username='${safeUsernameAdd}' data-count='1' onclick='highlightUser("${safeUsernameAdd}");' style='${txt_color}background: ${ws_data.color}'></div>`);
                         $(`#user_${ws_data.user_id}`).hide().html(getFirstLetters(ws_data.username) + "<div class='user_notif_status'></div>").slideDown(300, function () {
                             if (curr_highlightUser) {
                                 let tmps_highlightUser = curr_highlightUser;
@@ -990,7 +1039,7 @@ if (username !== null) {
 
                 if (check_votes) {
                     if (username in list_votes) {
-                        $('#board_vote .title').html(list_votes[username]);
+                        $('#board_vote .title').text(list_votes[username]);
                         sendWsMessage(ws, JSON.stringify({
                             type: 'stats_vote',
                         }));
@@ -1041,18 +1090,29 @@ if (username !== null) {
                         h1_name = h1_name.substring(0, 14) + '...';
                     }
 
-                    html = `<div id='col_${index}' data-col='${index}' class='${col_class}'><h1>${h1_name}<i onclick='addCard("${index}");' class='add_icon material-icons'>add</i>`;
+                    const $col = $(`<div id='col_${index}' data-col='${index}' class='${col_class}'></div>`);
+                    const $h1 = $('<h1></h1>').text(h1_name);
+                    const $addIcon = $('<i class="add_icon material-icons">add</i>')
+                        .attr('onclick', `addCard("${index}");`);
+                    $h1.append($addIcon);
                     if (board_author == username) {
-                        html += `<i onclick='deleteCol("${index}");' class='drop_icon material-icons'>delete</i>`;
+                        const $deleteIcon = $('<i class="drop_icon material-icons">delete</i>')
+                            .attr('onclick', `deleteCol("${index}");`);
+                        $h1.append($deleteIcon);
                         if (board_col_idx != 0) {
-                            html += `<i onclick='moveCol("left", "${index}");' class='left_icon material-icons'>keyboard_double_arrow_left</i>`;
+                            const $leftIcon = $('<i class="left_icon material-icons">keyboard_double_arrow_left</i>')
+                                .attr('onclick', `moveCol("left", "${index}");`);
+                            $h1.append($leftIcon);
                         }
                         if (board_col_idx != board_total_idx) {
-                            html += `<i onclick='moveCol("right", "${index}");' class='right_icon material-icons'>keyboard_double_arrow_right</i>`;
+                            const $rightIcon = $('<i class="right_icon material-icons">keyboard_double_arrow_right</i>')
+                                .attr('onclick', `moveCol("right", "${index}");`);
+                            $h1.append($rightIcon);
                         }
                     }
-                    html += `</h1><ul class='sortable'></ul></div>`;
-                    $('#board').append(html);
+                    $col.append($h1);
+                    $col.append("<ul class='sortable'></ul>");
+                    $('#board').append($col);
 
                     const entries = Object.entries(value);
                     entries.sort((a, b) => a[1].pos - b[1].pos);
@@ -1128,7 +1188,7 @@ if (username !== null) {
                 });
 
                 colLst = generateColumnBoundaries(Object.keys(board_data).length, $('.col').width() + 32);
-                $('#board_name').html(ws_data.board_info.board_name);
+                $('#board_name').text(ws_data.board_info.board_name);
                 if (curr_highlightUser) {
                     let tmps_highlightUser = curr_highlightUser;
                     curr_highlightUser = false;
@@ -1183,8 +1243,8 @@ if (username !== null) {
                 votes_total = ws_data.votes_total;
                 votes_percentage = ws_data.votes_percentage;
                 $('nav #vote_progress').css('width', `${votes_percentage}%`);
-                $('#board_vote .title').html(votes_remaining);
-                $('#votes_remaining').html(votes_total);
+                $('#board_vote .title').text(votes_remaining);
+                $('#votes_remaining').text(votes_total);
 
                 if (votes_total == 0 && votes_set != 0) {
                     $('nav #vote_progress').hide().css('width', '100%');
@@ -1260,7 +1320,7 @@ if (username !== null) {
 
                 applySavedSize("info_content");
             } else if (ws_data.type == 'card_edit') {
-                $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).html(ws_data.card_edit.cardContent);
+                $(`#col_${ws_data.card_edit.col_id} ul .uuid_${ws_data.card_edit.card_uuid} .info_content`).text(ws_data.card_edit.cardContent);
             } else if (ws_data.type == 'card_view') {
                 notif_type = 'hide';
                 notif_ico = 'visibility_off';
@@ -1293,7 +1353,7 @@ if (username !== null) {
 
                 ws.send(JSON.stringify({ type: 'board_info' }));
             } else if (ws_data.type == 'card_vote') {
-                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).html(ws_data.card_votes);
+                $(`#col_${ws_data.card_vote.col_id} ul .uuid_${ws_data.card_vote.card_uuid} .votes span`).text(ws_data.card_votes);
                 ws.send(JSON.stringify({ type: 'stats_vote' }));
             } else if (ws_data.type == 'card_delete') {
                 $(`#col_${ws_data.card_delete.col_id} ul .uuid_${ws_data.card_delete.card_uuid}`).remove();
@@ -1346,7 +1406,22 @@ if (username !== null) {
                         } else {
                             mgs_icon = 'sentiment_dissatisfied';
                         }
-                        $("#mood").html(`<i class="material-icons" style="color: ${user_selected_color}">${mgs_icon}</i>`).show();
+                        // Sanitize the user-selected color to a safe CSS color value
+                        var safeColor = '#000000';
+                        if (typeof user_selected_color === 'string') {
+                            // allow standard 3/4/6/8-digit hex colors
+                            var colorTrimmed = user_selected_color.trim();
+                            if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(colorTrimmed)) {
+                                safeColor = colorTrimmed;
+                            }
+                        }
+
+                        var $icon = $('<i></i>')
+                            .addClass('material-icons')
+                            .css('color', safeColor)
+                            .text(mgs_icon);
+
+                        $("#mood").empty().append($icon).show();
                     } else {
                         $("#mood").html("").hide();
                     }
