@@ -1,5 +1,8 @@
 name: Docker Image WS
 
+permissions:
+  contents: read
+
 on:
   push:
     tags:
