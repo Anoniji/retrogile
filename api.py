@@ -3,7 +3,7 @@
 
 """
 Author: Niji Ano
-Date: 2025-12-18
+Date: 2026-03-10
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ Version 3, 29 June 2007
 
 import os
 import sys
-import argparse
 import json
 import uuid
 import datetime
@@ -397,13 +396,13 @@ def i18n(path):
 
 if __name__ == "__main__":
     try:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--ws_subdomain', default='')
-        parser.add_argument('--debug', default=False)
-        args = parser.parse_args()
-        WS_SUBDOMAIN = args.ws_subdomain
-        DEBUG = args.debug
+        WS_SUBDOMAIN = os.getenv('WS_SUBDOMAIN', '')
+        DEBUG = os.getenv('DEBUG', False)
+        API_PORT = os.getenv('API_PORT', 8008)
         api_debug = False
+
+        if isinstance(API_PORT, str):
+            API_PORT = int(API_PORT)
 
         if DEBUG and DEBUG not in ('', '""', "''", False, "False"):
             api_debug = True
@@ -421,7 +420,7 @@ if __name__ == "__main__":
             print(f' * Ws(s) set: {WS_SUBDOMAIN}')
 
         logging.info("Server API started")
-        app.run(host="0.0.0.0", port=8008, debug=api_debug)
+        app.run(host="0.0.0.0", port=API_PORT, debug=api_debug)
 
     except OSError as e:
         logging.error(f"Server API error: {e}")
