@@ -10,4 +10,4 @@ COPY ./ ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-CMD [ "sh", "-c", "python ./ws.py --debug \"$DEBUG\"" ]
+CMD [ "sh", "-c", "python ./ws.py" ]
