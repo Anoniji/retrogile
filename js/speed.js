@@ -357,7 +357,19 @@ if (username !== null) {
                         } else {
                             txt_color = 'color: #f2f2f2;';
                         }
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${ws_data.username}' data-username='${ws_data.username}' data-count='1' style='${txt_color}background: ${ws_data.color}'></div>`);
+                        var $newUser = $('<div></div>')
+                            .attr('id', `user_${ws_data.user_id}`)
+                            .addClass('user')
+                            .attr('title', ws_data.username)
+                            .attr('data-username', ws_data.username)
+                            .attr('data-count', '1');
+                        if (isLightColor(ws_data.color)) {
+                            $newUser.css('color', '#333');
+                        } else {
+                            $newUser.css('color', '#f2f2f2');
+                        }
+                        $newUser.css('background', ws_data.color);
+                        $('#users').append($newUser);
                         $(`#user_${ws_data.user_id}`).hide().html(getFirstLetters(ws_data.username)).slideDown(300, function () {
                         });
                         $(document).tooltip({ position: { my: 'center top', at: 'center bottom' } });
