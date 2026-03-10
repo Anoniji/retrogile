@@ -351,8 +351,8 @@ def jsi(path):
             - If the file exists, returns the JavaScript file
             - If the file doesn't exist, returns a JSON response
     """
-    js_base = os.path.join(app.root_path, "js")
-    safe_path = os.path.normpath(os.path.join(js_base, path))
+    js_base = os.path.abspath(os.path.join(app.root_path, "js"))
+    safe_path = os.path.realpath(os.path.join(js_base, path))
 
     # Ensure the resolved path stays within the js directory
     if os.path.commonpath([js_base, safe_path]) != js_base:
