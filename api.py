@@ -413,14 +413,14 @@ def css(path):
             - If the file doesn't exist, returns a JSON response
     """
     allowed_extensions = {".css", ".woff2"}
-    
+
     safe_rel_path = safe_static_path("css", path, allowed_extensions)
     if safe_rel_path and os.path.isfile(os.path.join("css", safe_rel_path)):
         if safe_rel_path.endswith('.woff2'):
             return send_from_directory("css", safe_rel_path, mimetype="font/woff2")
-        elif safe_rel_path.endswith('.css'):
+        if safe_rel_path.endswith('.css'):
             return send_from_directory("css", safe_rel_path, mimetype="text/css")
-    
+
     return jsonify(["css_not_found"])
 
 
