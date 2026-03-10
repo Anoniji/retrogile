@@ -1038,9 +1038,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    DEBUG = os.getenv('DEBUG', False)    
+    DEBUG = os.getenv('DEBUG', 'False')    
 
-    if DEBUG and DEBUG not in ('', '""', "''", False, "False"):
+    if DEBUG and DEBUG != 'False':
         logging.basicConfig(
             stream=sys.stdout,
             level=logging.DEBUG,
