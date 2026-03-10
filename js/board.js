@@ -1171,11 +1171,11 @@ if (username !== null) {
 
                         child_cnt = 0;
                         $.each(value.children, function (_, child) {
-                            html += `<div class="card_child"><i class='material-icons' onclick='unmergeCard("${index}", "${uuid}", "${child_cnt}");'>radio_button_checked</i> ${child.author}: ${child.content}</div>`;
+                            html += `<div class="card_child"><i class='material-icons' onclick='unmergeCard("${escapeJsString(String(index))}", "${escapeJsString(String(uuid))}", "${escapeJsString(String(child_cnt))}");'>radio_button_checked</i> ${escapeHtml(child.author)}: ${escapeHtml(child.content)}</div>`;
                             child_cnt += 1;
                         });
 
-                        html += `    <div class='child_drop' data-parentId='${uuid}'>
+                        html += `    <div class='child_drop' data-parentId='${escapeHtml(uuid)}'>
                                     </div>
                             </div>`;
                         html += `</li>`;
