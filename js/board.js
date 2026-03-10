@@ -987,7 +987,20 @@ if (username !== null) {
                         } else {
                             txt_color = 'color: #f2f2f2;';
                         }
-                        $('#users').append(`<div id='user_${ws_data.user_id}' class='user' title='${safeUsernameAdd}' data-username='${safeUsernameAdd}' data-count='1' onclick='highlightUser("${safeUsernameAdd}");' style='${txt_color}background: ${ws_data.color}'></div>`);
+                        var $userDiv = $("<div>")
+                            .attr("id", "user_" + ws_data.user_id)
+                            .addClass("user")
+                            .attr("title", ws_data.username)
+                            .attr("data-username", ws_data.username)
+                            .attr("data-count", "1")
+                            .css({
+                                color: isLightColor(ws_data.color) ? "#333" : "#f2f2f2",
+                                background: ws_data.color
+                            })
+                            .on("click", function () {
+                                highlightUser(ws_data.username);
+                            });
+                        $('#users').append($userDiv);
                         $(`#user_${ws_data.user_id}`).hide().html(getFirstLetters(ws_data.username) + "<div class='user_notif_status'></div>").slideDown(300, function () {
                             if (curr_highlightUser) {
                                 let tmps_highlightUser = curr_highlightUser;
