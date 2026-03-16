@@ -36,6 +36,21 @@ function sanitizeIdentifier(value) {
     return str;
 }
 
+// Escapes special characters in a string for safe inclusion in JavaScript source code.
+function escapeJsString(str) {
+    if (!str && str !== 0) return "";
+    return str
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t')
+      .replace(/\f/g, '\\f')
+      .replace(/\b/g, '\\b')
+      .replace(/\v/g, '\\v');
+}
+
 // Basic HTML-escaping helper to prevent XSS when inserting text into the DOM
 function escapeHtml(str) {
     if (!str && str !== 0) return "";
