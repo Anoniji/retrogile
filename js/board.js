@@ -1307,11 +1307,18 @@ if (username !== null) {
             } else if (ws_data.type == 'card_add') {
                 // Sanitize user-controlled fields before inserting into HTML
                 const safeUsername = escapeHtml(ws_data.card_add.username || "");
-                const safeCardContent = escapeHtml(ws_data.card_add.cardContent || "");
+                const cardContent = ws_data.card_add.cardContent || "";
+                const safeCardContent;
                 const safeUserColor = sanitizeColor(ws_data.card_add.username_color || "");
                 const safeCardUuid = sanitizeIdentifier(ws_data.card_uuid);
                 const safePos = sanitizeIdentifier(ws_data.card_add.pos);
 
+                if (cardContent === "<div class='hide_content'></div>") {
+                  safeCardContent = cardContent;
+                } else {
+                  safeCardContent = escapeHtml(cardContent);
+                }
+              
                 html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${safePos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
                 html += `<div class='card_icon' style='`;
                 if (isLightColor(ws_data.card_add.username_color)) {
