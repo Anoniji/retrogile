@@ -555,12 +555,12 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
         board_info["users_list"][data.get("username")]["mood"] = data.get("mood", False)
 
     elif mode == "get_mood" and data.get("username"):
-        data["user_selected_color"] = usersdb.get_user_color(data.get('username'))
-        user_mood = board_info["users_list"][data.get("username")].get("mood", None)
+        data["user_selected_color"] = usersdb.get_user_color(data.get('selected'))
+        user_mood = board_info["users_list"][data.get("selected")].get("mood", None)
         if user_mood is None:
-            board_info["users_list"][data.get("username")]["mood"] = False
+            board_info["users_list"][data.get("selected")]["mood"] = False
 
-        data["user_selected_mood"] = board_info["users_list"][data.get("username")]["mood"]
+        data["user_selected_mood"] = board_info["users_list"][data.get("selected")]["mood"]
 
     boards.update_board(board_id, board_info)
     for tk, ws in clients.items():
