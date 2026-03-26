@@ -1308,7 +1308,7 @@ if (username !== null) {
                 // Sanitize user-controlled fields before inserting into HTML
                 const safeUsername = escapeHtml(ws_data.card_add.username || "");
                 const cardContent = ws_data.card_add.cardContent || "";
-                const safeCardContent;
+                var safeCardContent;
                 const safeUserColor = sanitizeColor(ws_data.card_add.username_color || "");
                 const safeCardUuid = sanitizeIdentifier(ws_data.card_uuid);
                 const safePos = sanitizeIdentifier(ws_data.card_add.pos);
