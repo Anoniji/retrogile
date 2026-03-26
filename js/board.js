@@ -859,7 +859,7 @@ if (username !== null) {
             if (board_author == username) {
                 sendWsMessage(ws, JSON.stringify({
                     type: 'get_mood',
-                    username: Husername,
+                    selected: Husername,
                 }));
             }
 
@@ -1295,7 +1295,8 @@ if (username !== null) {
                 $('#board_vote .title').text(votes_remaining);
                 $('#votes_remaining').text(votes_total);
 
-                if (votes_total == 0 && votes_set != 0) {
+                if (votes_total == 0 || votes_percentage == 0) {
+                    $('#board_vote .title').text('Vote');
                     $('nav #vote_progress').hide().css('width', '100%');
                     $('#board-votes-menu, .vote_actions').fadeOut(300);
                     $('#cursors').fadeIn(300);
@@ -1318,7 +1319,7 @@ if (username !== null) {
                 } else {
                   safeCardContent = escapeHtml(cardContent);
                 }
-              
+
                 html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${safePos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
                 html += `<div class='card_icon' style='`;
                 if (isLightColor(ws_data.card_add.username_color)) {
