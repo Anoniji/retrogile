@@ -1314,7 +1314,7 @@ if (username !== null) {
                 const safeCardUuid = sanitizeIdentifier(ws_data.card_uuid);
                 const safePos = sanitizeIdentifier(ws_data.card_add.pos);
 
-                if (cardContent === "<div class='hide_content'></div>") {
+                if (cardContent.includes("hide_content")) {
                   safeCardContent = cardContent;
                 } else {
                   safeCardContent = escapeHtml(cardContent);
