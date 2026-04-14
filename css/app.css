@@ -1509,6 +1509,10 @@ footer a {
     width: 8px !important;
 }
 
+.ui-sortable-handle {
+  transition: transform 0.2s ease;    
+}
+
 .child_drop .ui-sortable-handle {
     display: none !important;
 }
