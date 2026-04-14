@@ -1547,7 +1547,7 @@ if (username !== null) {
                 ws.send(JSON.stringify({ type: 'board_info' }));
                 resendWsMessages(ws);
 
-                setInterval(function () { mouse_position() }, 3000);
+                setInterval(function () { mouse_position() }, 5000);
             }
         };
 
