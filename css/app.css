@@ -1493,6 +1493,10 @@ footer a {
     border-radius: 4px;
 }
 
+.ui-sortable-helper {
+    transform: scale(0.7);
+}
+
 .ui-sortable-helper .child_drop {
     display: none !important;
 }
