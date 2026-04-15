@@ -29,8 +29,7 @@ def update_board(board_data_old):
     Updates the given board data.
 
     This function checks the current version of the board data.
-    If the version is 1, it updates the version to 2 and
-    clears the users_list.
+    If the version not up-to-date, run update.
 
     Args:
         board_data_old: A dictionary containing the old board data.
@@ -38,11 +37,12 @@ def update_board(board_data_old):
     Returns:
         The updated board data.
     """
-    if board_data_old["version"] <= 1:
+    board_version_old = board_data_old.get("version", 1)
+    if board_version_old <= 1:
         board_data_old["version"] = 2
         board_data_old["users_list"] = []
 
-    if board_data_old["version"] <= 2:
+    if board_version_old <= 2:
         board_data_old["version"] = 3
         for category in board_data_old["data"]:
             for _, child_data in board_data_old["data"][category].items():
@@ -50,7 +50,7 @@ def update_board(board_data_old):
 
         board_data_old["users_list"] = []
 
-    if board_data_old["version"] <= 3:
+    if board_version_old <= 3:
         board_data_old["version"] = 4
 
         new_users_list = {}
@@ -65,13 +65,13 @@ def update_board(board_data_old):
             for _, child_data in board_data_old["data"][category].items():
                 del child_data["hidden"]
 
-    if board_data_old["version"] <= 4:
+    if board_version_old <= 4:
         board_data_old["version"] = 5
         for user in board_data_old["users_list"].values():
             if "custom_color" in user:
                 del user["custom_color"]
 
-    if board_data_old["version"] <= 5:
+    if board_version_old <= 5:
         board_data_old["version"] = 6
 
         if len(board_data_old["votes_list"]) > 0:
@@ -87,14 +87,18 @@ def update_board(board_data_old):
 
                 board_data_old["votes_list"] = new_votes_list
 
-    if board_data_old["version"] <= 6:
+    if board_version_old <= 6:
         board_data_old["version"] = 7
         board_data_old["type"] = "board"
 
-    if board_data_old["version"] <= 7:
+    if board_version_old <= 7:
         board_data_old["version"] = 8
         for user in board_data_old["users_list"]:
             board_data_old["users_list"][user]['mood'] = False
+
+    if board_version_old <= 8:
+        board_data_old["version"] = 9
+        board_data_old["display_cursors"] = True
 
     return board_data_old
 
