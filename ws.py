@@ -931,6 +931,16 @@ def message_responce(send_list, websocket, token, data):
         usersdb.set_user_color(data.get("username"), data.get("custom_color"))
         send_list = send_list_multi(send_list, clients, data)
 
+    elif message_type == "display_cursors":
+        board_info = get_board_info_by_id(board_id)
+        if not board_info:
+            return False
+
+        board_info["display_cursors"] = data.get("enable", True)
+        boards.update_board(board_id, board_info)
+
+        send_list = send_list_multi(send_list, clients, data)
+
     elif message_type == "message":
         message_content = data.get("content")
         send_list = send_list_multi(
