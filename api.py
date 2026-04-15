@@ -241,10 +241,11 @@ def create_board(board_type, board_name, author):
     with open(f"{board_dir}{board_filename}", "w", encoding="utf-8") as file:
         json.dump(
             {
-                "version": 7,
+                "version": 9,
                 "type": board_type,
                 "board_name": tools.remove_symbols(board_name),
                 "author": tools.remove_symbols(author),
+                "display_cursors": True,
                 "timer": False,
                 "votes": False,
                 "votes_list": {},
