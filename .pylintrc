@@ -3,6 +3,7 @@ max-branches=25
 
 [design]
 max-locals=25
+max-statements=60
 
 [FORMAT]
 max-module-lines=1100
