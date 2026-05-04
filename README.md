@@ -4,8 +4,6 @@
 [![CodeQL](https://github.com/Anoniji/retrogile/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/github-code-scanning/codeql)
 [![Python 3.14](https://img.shields.io/badge/python-3.14-green?style=square)](https://www.python.org/)
 
-[![Docker Image API](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-api.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-api.yml)
-[![Docker Image WS](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-ws.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-ws.yml)
 [![Docker Image Full](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-aio.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-aio.yml)
 
 
@@ -30,16 +28,16 @@ The version provided is currently in development and may have missing features o
 
 ## Podman Launch Example
 ```
-podman run -d --restart=always -p "0.0.0.0:8008:8008" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 -e WS_SUBDOMAIN="wss." -e DEBUG="False" --name retrogile_api retrogile_api
-podman run -d --restart=always -p "0.0.0.0:8009:8009" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 -e DEBUG="False" --name retrogile_ws retrogile_ws
-podman run -d --restart=always -p "0.0.0.0:8008:8008" -p "0.0.0.0:8009:8009" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 -e WS_SUBDOMAIN="wss." -e DEBUG="False" --name retrogile retrogile
+podman run -d --restart=always -p "0.0.0.0:8008:8008" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 -e WS_SUBDOMAIN="wss." -e DEBUG="False" --name retrogile retrogile
 ```
 
 **Variables available for Retrogile:**
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `WS_SUBDOMAIN` | WebSocket subdomain for connection | `-e WS_SUBDOMAIN="wss."` |
-| `DEBUG` | Container debugging | `-e DEBUG="True/False"` |
-| `API_PORT` | API Web Server Port | `-e API_PORT="8008"` |
-
+| Variable                     | Default | Description                                   | Example                                |
+|------------------------------|---------|-----------------------------------------------|----------------------------------------|
+| `DEBUG`                      | false   | Container debugging                           | `-e DEBUG="True/False"`                |
+| `SERVICEHOST`                | 0.0.0.0 | Host address to bind the server to            | `-e SERVICEHOST="0.0.0.0"`             |
+| `SERVICEPORT`                | 8008    | HTTP/WS port the server listens on            | `-e SERVICEPORT="8008"`                |
+| `UVICORN_WORKERS`            | 1       | Number of worker processes for Uvicorn        | `-e UVICORN_WORKERS="4"`               |
+| `UVICORN_LIMIT_CONCURRENCY`  | 1000    | Max concurrent connections per worker         | `-e UVICORN_LIMIT_CONCURRENCY="500"`   |
+| `UVICORN_LIMIT_MAX_REQUESTS` | 10000   | Max requests per worker before worker restart | `-e UVICORN_LIMIT_MAX_REQUESTS="5000"` |
