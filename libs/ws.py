@@ -52,7 +52,30 @@ sesssdb = None
 
 
 async def ws_endpoint(websocket: WebSocket):
-    """Endpoint WebSocket principal pour ASGI."""
+    """
+    Main WebSocket endpoint for ASGI/Starlette applications.
+
+    Handles WebSocket connections for Retrogile collaborative boards:
+    - Authenticates clients via token from query params or message
+    - Manages client lifecycle (connect/disconnect/user_remove notifications)
+    - Routes messages through message_responce() business logic
+    - Broadcasts responses to connected clients on same board
+    - Gracefully handles disconnects and cleanup
+
+    Args:
+        websocket (WebSocket): Starlette WebSocket connection
+
+    Returns:
+        None
+
+    Raises:
+        WebSocketDisconnect: Client disconnected normally
+        json.JSONDecodeError: Invalid JSON message received
+        asyncio.TimeoutError: Receive timeout (not implemented)
+
+    Globals modified:
+        clients (dict): {token: websocket} active connections
+    """
     global clients
 
     await websocket.accept()
@@ -85,15 +108,23 @@ async def ws_endpoint(websocket: WebSocket):
                 for ws_client, message in send_list:
                     try:
                         await ws_client.send_text(json.dumps(message))
-                    except Exception:
-                        pass
+                    except WebSocketDisconnect:
+                        continue
+                    except ConnectionError:
+                        logging.debug(f"Client disconnected during send: {ws_client}")
+                        continue
+                    except json.JSONEncodeError as e:
+                        logging.error(f"JSON encode error: {e}")
+                        continue
 
             send_list = []
 
     except WebSocketDisconnect:
-        pass
-    except Exception as e:
-        logging.error(f"WS Error: {e}")
+        logging.info(f"Client disconnected normally: {token}")
+        sesssdb.set(token, False)
+    except ConnectionResetError:
+        logging.warning(f"Connection reset by peer: {token}")
+        sesssdb.remove(token)
     finally:
         del clients[token]
 
@@ -115,9 +146,7 @@ async def ws_endpoint(websocket: WebSocket):
                             }
                         )
                     )
-                except WebSocketDisconnect:
-                    pass
-                except Exception as e:
+                except (WebSocketDisconnect, ConnectionError) as e:
                     logging.error(f"WS Error: {e}")
 
         boardsdb.remove_client(board_id)
