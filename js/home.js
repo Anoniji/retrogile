@@ -88,7 +88,7 @@ if (username === null) {
 
     function connect() {
         ws_path = 'ws://';
-        if (window.location.host === 'https:') {
+        if (window.location.protocol === 'https:') {
             ws_path = 'wss://';
         }
 
