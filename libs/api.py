@@ -38,7 +38,9 @@ from asgiref.wsgi import WsgiToAsgi
 
 from libs import sessions, tools
 
+
 # ///////////////////////////////////////////////////////////////////////
+
 
 app = Flask(__name__, template_folder="../")
 
@@ -48,10 +50,26 @@ CURRENT_VERSION = "1.0dev"
 LIST_LANGS = ["fr", "es", "en"]
 api_debug = False
 
+
 # ///////////////////////////////////////////////////////////////////////
 
 
 def init_api():
+    """
+    Initialize Flask API application and convert to ASGI for uvicorn compatibility.
+
+    Sets up global variables and configures the runtime environment:
+
+    - Creates Sessions() instance for user session management
+    - Determines current year for template rendering
+    - Reads version from 'version' file if it exists
+    - Configures debug mode from DEBUG environment variable
+    - Wraps Flask WSGI app with WsgiToAsgi for ASGI/uvicorn compatibility
+
+    Returns:
+        WsgiToAsgi: ASGI-compatible application ready for Starlette/uvicorn mounting
+
+    """
     global sesssdb, current_year, CURRENT_VERSION, api_debug
 
     sesssdb = sessions.Sessions()
@@ -64,14 +82,35 @@ def init_api():
         with open("version", "r", encoding="utf-8") as file_version:
             CURRENT_VERSION = file_version.read().strip()
 
-    # Wrapper ASGI pour uvicorn
     asgi_app = WsgiToAsgi(app)
     return asgi_app
+
 
 # ///////////////////////////////////////////////////////////////////////
 
 
 def load_translate(lang):
+    """Loads translation data from a JSON file.
+
+    This function attempts to load a translation file for the specified lang.
+    If the file is found, it parses the JSON data and returns it as a dict.
+    If the specified language file is not found, it defaults to loading the
+    English translation (en.json).
+
+    Args:
+        lang: The language code (e.g., "fr", "es", "en") for the translation.
+
+    Returns:
+        A dictionary containing the translation data.  Returns the English
+        translation if the requested language file is not found.
+
+    Raises:
+        FileNotFoundError: If the default English translation file (en.json) is
+                         also not found.  (While the current code catches
+                         FileNotFoundError for the target language, it assumes
+                         en.json *must* exist.  A robust version might handle
+                         this case more explicitly).
+    """
     try:
         with open(f"./i18n/{lang}.json", "r", encoding="utf-8") as f:
             return json.load(f)
@@ -124,6 +163,7 @@ def safe_static_path(base_dir, requested_path, allowed_extensions=None):
 def path_check(path):
     """Checks if a path is safe, disallowing relative paths and separators."""
     return ".." not in path and "/" not in path and "\\" not in path
+
 
 # ///////////////////////////////////////////////////////////////////////
 
