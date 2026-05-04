@@ -2,12 +2,8 @@
 
 [![Pylint](https://github.com/Anoniji/retrogile/actions/workflows/pylint.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/pylint.yml)
 [![CodeQL](https://github.com/Anoniji/retrogile/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/github-code-scanning/codeql)
-[![Python 3.14](https://img.shields.io/badge/python-3.14-green?style=square)](https://www.python.org/)
-
 [![Docker Image Full](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-aio.yml/badge.svg)](https://github.com/Anoniji/retrogile/actions/workflows/docker-image-aio.yml)
-
-
-
+[![Python 3.14](https://img.shields.io/badge/python-3.14-green?style=square)](https://www.python.org/)
 
 # Retrogile
 Agile Retrospective Management Tool
