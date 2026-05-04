@@ -113,8 +113,8 @@ async def ws_endpoint(websocket: WebSocket):
                     except ConnectionError:
                         logging.debug(f"Client disconnected during send: {ws_client}")
                         continue
-                    except json.JSONEncodeError as e:
-                        logging.error(f"JSON encode error: {e}")
+                    except (TypeError, ValueError) as e:
+                        logging.error(f"JSON serialization failed: {e}")
                         continue
 
             send_list = []
