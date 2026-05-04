@@ -39,7 +39,7 @@ class Sessions:
         Initializes the Sessions object.
         """
         self.duration = 1 * 3600  # Convert to seconds
-        self.filename = "board/sessions.db"
+        self.filename = "../board/sessions.db"
         self.sess_dta = {}
 
         if os.path.exists(self.filename):
@@ -220,7 +220,7 @@ class Sessions:
             except json.JSONDecodeError:
                 return False
 
-            if session_id in data and not data[session_id]["data"]:
+            if session_id in data:
                 expires = data[session_id]["expires"]
                 current_time = time.time()
                 if expires > current_time:

@@ -55,7 +55,7 @@ class Board:
         """
         if board_id not in self.boards:
             try:
-                json_file = f"./board/{board_id}.json"
+                json_file = f"../board/{board_id}.json"
                 if os.path.isfile(json_file):
                     with open(json_file, "r", encoding="utf-8") as f:
                         data = json.load(f)
@@ -117,7 +117,7 @@ class Board:
 
         if board:
             try:
-                json_file = f"./board/{board_id}.json"
+                json_file = f"../board/{board_id}.json"
                 with open(json_file, 'w', encoding="utf-8") as f:
                     json.dump(new_data, f, indent=4)
 

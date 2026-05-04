@@ -321,12 +321,8 @@ if (username !== null) {
             ws_path = 'wss://';
         }
 
-        if ("{{ ws_subdomain }}" != "") {
-            ws_path = `${ws_path}{{ ws_subdomain }}${getRootDomain()}`;
-        } else {
-            ws_path = `${ws_path}${getRootDomain()}:8009`;
-        }
-        ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
+        ws_path = `${ws_path}${window.location.host}/ws`;
+        ws = new WebSocket(`${ws_path}?token={{ ws_session }}`);
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
             detectDevTool();

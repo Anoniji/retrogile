@@ -913,12 +913,8 @@ if (username !== null) {
             ws_path = 'wss://';
         }
 
-        if ("{{ ws_subdomain }}" != "") {
-            ws_path = `${ws_path}{{ ws_subdomain }}${getRootDomain()}`;
-        } else {
-            ws_path = `${ws_path}${getRootDomain()}:8009`;
-        }
-        ws = new WebSocket(`${ws_path}/?token={{ ws_session }}`);
+        ws_path = `${ws_path}${window.location.host}/ws`;
+        ws = new WebSocket(`${ws_path}?token={{ ws_session }}`);
 
         $(document).on('mousemove', function (event) {
             pos_x = (event.pageX / $(window).width()) * 100;
@@ -928,14 +924,16 @@ if (username !== null) {
         function mouse_position() {
             sendWsMessage(ws, JSON.stringify({
                 type: 'cursor_user',
-                pos_x: pos_x,
-                pos_y: pos_y,
+                pos_x: Math.trunc(pos_x),
+                pos_y: Math.trunc(pos_y),
             }));
         }
 
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
+            console.log(ws_data);
             detectDevTool();
+
             if (ws_data.type == 'connect_status') {
                 if (!ws_data.error) {
                     user_id = ws_data.user_id;

@@ -4,7 +4,7 @@
 """
 Script Name: Retrogile WS
 Author: Niji Ano
-Date: 2026-03-10
+Date: 2026-05-04
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,45 +24,103 @@ Version 3, 29 June 2007
 """
 
 import os
-import sys
 import json
 import uuid
-import asyncio
-import time
 import datetime
-from pathlib import Path
-from collections import OrderedDict
-from urllib.parse import urlparse, parse_qs
 import logging
-import websockets
+from collections import OrderedDict
+from pathlib import Path
 
-from libs import tools, sessions, boards, users
+from starlette.applications import Starlette
+from starlette.routing import WebSocketRoute
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
-
-# ///////////////////////////////////////////////////////////////////////
-
-
-DEBUG = os.getenv('DEBUG', 'False')
-if DEBUG and DEBUG != 'False':
-    logging.basicConfig(
-        stream=sys.stdout,
-        level=logging.DEBUG,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-else:
-    logging.basicConfig(
-        filename="retrogile_ws.log", level=logging.DEBUG,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+from libs import sessions, boards, users, tools
 
 
 # ///////////////////////////////////////////////////////////////////////
 
 
-boards, usersdb, sesssdb = [boards.Board(), users.Users(), sessions.Sessions()]
-BOARD_VERSION, clients = (8, {})
+BOARD_VERSION = 9
+clients = {}  # {token: websocket}
+boardsdb = None
+usersdb = None
+sesssdb = None
+
+
+# ///////////////////////////////////////////////////////////////////////
+
+
+async def ws_endpoint(websocket: WebSocket):
+    """Endpoint WebSocket principal pour ASGI."""
+    global clients
+
+    await websocket.accept()
+    token = None
+
+    try:
+        query_params = dict(websocket.query_params)
+        token = query_params.get("token", False)
+
+    except AttributeError:
+        return False
+
+    if not token or not sesssdb.check(token):
+        await websocket.close()
+        return False
+
+    clients[token], board_id, send_list = (websocket, False, [])
+    ws_stats()
+
+    try:
+        while True:
+            data_str = await websocket.receive_text()
+            data = json.loads(data_str)
+
+            send_list = message_responce(
+                send_list, websocket, token, data
+            )
+
+            if send_list:
+                for ws_client, message in send_list:
+                    try:
+                        await ws_client.send_text(json.dumps(message))
+                    except Exception:
+                        pass
+
+            send_list = []
+
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        logging.error(f"WS Error: {e}")
+    finally:
+        del clients[token]
+
+        for tk, sess in sesssdb.sess_dta.items():
+            if (
+                sesssdb.get(tk) and
+                sess.get("board_id", False) and
+                sess["board_id"] == sesssdb.get(tk)["board_id"] and
+                tk in clients
+            ):
+                try:
+                    await clients[tk].send_text(
+                        json.dumps(
+                            {
+                                "type": "user_remove",
+                                "user_id": token,
+                                "username": sess["username"],
+                                "board_id": board_id,
+                            }
+                        )
+                    )
+                except WebSocketDisconnect:
+                    pass
+                except Exception as e:
+                    logging.error(f"WS Error: {e}")
+
+        boardsdb.remove_client(board_id)
 
 
 # ///////////////////////////////////////////////////////////////////////
@@ -80,7 +138,7 @@ def get_board_list_by_author(author):
             - The name of the board.
             - The path to the board's JSON file.
     """
-    directory, author_files = ("./board/", [])
+    directory, author_files = ("../board/", [])
     for file in os.listdir(directory):
         if file.endswith(".json"):
             file_path = os.path.join(directory, file)
@@ -104,7 +162,7 @@ def get_board_list_by_author(author):
                                 "board_name": data["board_name"],
                                 "board_version": BOARD_VERSION,
                                 "current_version": curr_version,
-                                "path": file_path,
+                                "path": file_path[2:],
                                 "last_edit": date_format,
                             }
                         )
@@ -130,14 +188,14 @@ def get_board_info_by_id(board_id, username_filter=False):
             - If the board is not found, returns False.
     """
     if board_id:
-        _tmps, _ = boards.get_board(board_id)
+        _tmps, _ = boardsdb.get_board(board_id)
 
         if not _tmps or "version" not in _tmps:
             return False
 
         if _tmps["version"] != BOARD_VERSION:
             _tmps = tools.update_board(_tmps)
-            boards.update_board(board_id, _tmps)
+            boardsdb.update_board(board_id, _tmps)
 
         if not username_filter:
             return _tmps
@@ -184,7 +242,7 @@ def update_timer_in_board(board_id, new_timer_value):
     _tmps = get_board_info_by_id(board_id)
     if _tmps:
         _tmps["timer"] = int(new_timer_value.timestamp() * 1000)
-        boards.update_board(board_id, _tmps)
+        boardsdb.update_board(board_id, _tmps)
         return True
 
     return False
@@ -224,7 +282,7 @@ def board_votes_reset_by_id(board_id, data):
         elif key == "votes":
             _tmps["data"][key] = 0
 
-    boards.update_board(board_id, _tmps)
+    boardsdb.update_board(board_id, _tmps)
     return data
 
 
@@ -252,7 +310,7 @@ def board_votes_init(board_id, max_vote):
                 "votes": {}
             }
 
-    boards.update_board(board_id, _tmps)
+    boardsdb.update_board(board_id, _tmps)
     return True
 
 
@@ -402,7 +460,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         if board_info_author == data.get("username"):
             if mode == "board_template":
                 new_board_uuid = uuid.uuid4().hex
-                new_board_path = f"./board/{new_board_uuid}.json"
+                new_board_path = f"../board/{new_board_uuid}.json"
 
                 board_info["board_name"] = tools.remove_symbols(data.get("new_name"))
                 board_info["users_list"] = {}
@@ -423,18 +481,18 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
 
             else:
                 board_uuid = data.get("board_uuid")
-                board_path = f"./board/{board_uuid}.json"
+                board_path = f"../board/{board_uuid}.json"
                 if os.path.isfile(board_path):
 
                     if mode == "board_delete":
                         os.remove(board_path)
                     elif mode == "board_type":
                         board_info["type"] = "board"
-                        boards.update_board(board_uuid, board_info)
+                        boardsdb.update_board(board_uuid, board_info)
                     else:
                         board_info["board_name"] = tools.remove_symbols(
                             data.get("board_name"))
-                        boards.update_board(board_uuid, board_info)
+                        boardsdb.update_board(board_uuid, board_info)
 
                     send_list.append(
                         [
@@ -562,7 +620,7 @@ def card_manager_by_id(send_list, board_id, mode, websocket, data):
 
         data["user_selected_mood"] = board_info["users_list"][data.get("selected")]["mood"]
 
-    boards.update_board(board_id, board_info)
+    boardsdb.update_board(board_id, board_info)
     for tk, ws in clients.items():
         if (
             sesssdb.get(tk) and
@@ -711,7 +769,7 @@ def col_manager_by_board_id(board_id, mode, data):
 
         del board_info["data"][data.get("colName")]
 
-    boards.update_board(board_id, board_info)
+    boardsdb.update_board(board_id, board_info)
     return True
 
 
@@ -736,7 +794,7 @@ def add_user_to_board(board_id, username):
             "card_visibility": False,
         }
 
-    boards.update_board(board_id, board_info)
+    boardsdb.update_board(board_id, board_info)
     return True
 
 
@@ -790,7 +848,7 @@ def message_responce(send_list, websocket, token, data):
                 "username": message_username,
             })
 
-        boards.add_client(board_id)
+        boardsdb.add_client(board_id)
         color_username = usersdb.get_user_color(message_username)
         send_list.append(
             [
@@ -937,7 +995,7 @@ def message_responce(send_list, websocket, token, data):
             return False
 
         board_info["display_cursors"] = data.get("enable", True)
-        boards.update_board(board_id, board_info)
+        boardsdb.update_board(board_id, board_info)
 
         send_list = send_list_multi(send_list, clients, data)
 
@@ -959,113 +1017,28 @@ def message_responce(send_list, websocket, token, data):
 
 
 def ws_stats():
-    """
-    Prints statistics about users, clients, and the current position.
-    """
+    """Prints WS statistics."""
+    num_boards = len(boardsdb.boards) if boardsdb else 0
+    num_clients = len(clients)
+    logging.info(f"WS STATS: Boards loaded ({num_boards}) | Total clients ({num_clients})")
 
-    num_boards, num_clients = (len(boards.boards), len(clients.keys()))
-    logging.info("\n".join(
-        ["--- WS STATS ---", f"> Boards loaded: {num_boards}", f"> Total clients: {num_clients}"]))
-
-
-async def handler(websocket):
-    """
-    Handles incoming WebSocket messages and dispatches them to appropriate
-    functions based on message type.
-
-    This function manages the connection with a single websocket client.
-    It receives messages, parses them as JSON, and
-    then calls the appropriate functions based on the message type.
-
-    Args:
-        websocket: A websocket object representing the connection
-                    to the client.
-
-    Raises:
-        websockets.exceptions.ConnectionClosedOK:
-            Raised when the client closes the connection gracefully.
-        Exception: Raised for any other unexpected errors during communication.
-    """
-    # pylint: disable=W0602
-    global clients
-
-    try:
-        parsed_url = urlparse(websocket.request.path)
-        query_params = parse_qs(parsed_url.query)
-        token = query_params.get("token", False)
-        if token:
-            token = token[0]
-
-    except AttributeError:
-        return False
-
-    if not token or not sesssdb.check(token):
-        return False
-
-    clients[token], board_id, send_list = (websocket, False, [])
-    ws_stats()
-
-    try:
-        while True:
-            data = json.loads(await websocket.recv())
-            send_list = message_responce(
-                send_list, websocket, token, data
-            )
-
-            if send_list and len(send_list) > 0:
-                for ws_client, message in send_list:
-                    await ws_client.send(json.dumps(message))
-
-            send_list = []
-
-    except websockets.exceptions.ConnectionClosedOK:
-        logging.info(f"> ConnectionClosed[OK] {token}")
-        sesssdb.set(token, False)
-
-    except websockets.exceptions.ConnectionClosedError:
-        logging.info(f"> ConnectionClosed[Er] {token}")
-        sesssdb.remove(token)
-
-    finally:
-        del clients[token]
-
-        for tk, sess in sesssdb.sess_dta.items():
-            if (
-                sesssdb.get(tk) and
-                sess.get("board_id", False) and
-                sess["board_id"] == sesssdb.get(tk)["board_id"] and
-                tk in clients
-            ):
-                try:
-                    await clients[tk].send(
-                        json.dumps(
-                            {
-                                "type": "user_remove",
-                                "user_id": token,
-                                "username": sess["username"],
-                                "board_id": board_id,
-                            }
-                        )
-                    )
-                except websockets.exceptions.ConnectionClosedError:
-                    logging.info(f"> ConnectionClosed[Ex] {token}")
-
-        boards.remove_client(board_id)
+# ///////////////////////////////////////////////////////////////////////
+# APPLICATION ASGI PRINCIPALE
+# ///////////////////////////////////////////////////////////////////////
 
 
-async def main():
-    """
-    Starts a WebSocket server on port 8009, listening on all interfaces.
+def init_ws():
+    """Initialise les globals et retourne l'app ASGI."""
+    global boardsdb, usersdb, sesssdb
+    boardsdb = boards.Board()
+    usersdb = users.Users()
+    sesssdb = sessions.Sessions()
 
-    This function initiates an asynchronous WebSocket server
-    The `handler` function (not shown) is responsible for handling incoming
-    The server runs indefinitely until it's manually stopped.
-    """
-    async with websockets.serve(handler, "0.0.0.0", 8009):
-        logging.info("Server WS started")
-        await asyncio.Future()
+    # App Starlette ASGI avec route WebSocket
+    app = Starlette(
+        routes=[
+            WebSocketRoute("/ws", ws_endpoint)
+        ]
+    )
 
-
-if __name__ == "__main__":
-    time.sleep(3)
-    asyncio.run(main())
+    return app

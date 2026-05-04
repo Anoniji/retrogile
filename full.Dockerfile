@@ -10,5 +10,4 @@ COPY ./ ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-RUN chmod +x ./run.sh
-CMD [ "sh", "-c", "./run.sh" ]
+CMD [ "sh", "-c", "python ./script.py" ]
