@@ -383,12 +383,8 @@ def jsi(path):
         if referer:
             board_id = referer.split("/")[-1]
 
-        if (
-            (
-                referer and "https" in referer and
-                fetch_mode == "no-cors" and
-                fetch_dest == "script"
-            ) or (referer and "https" not in referer)
+        if referer and ("https" not in referer or (
+            fetch_mode == "no-cors" and fetch_dest == "script")
         ):
             lang = request.accept_languages.best_match(LIST_LANGS)
             data = render_template(
