@@ -83,7 +83,7 @@ if (username === null) {
 
     function openBoard(board_link) {
         if (!board_link) return;
-        location.href = `..${board_link.replace('.json', '')}`;
+        location.href = `../${board_link.replace('.json', '')}`;
     }
 
     function connect() {
