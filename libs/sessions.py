@@ -39,7 +39,7 @@ class Sessions:
         Initializes the Sessions object.
         """
         self.duration = 1 * 3600  # Convert to seconds
-        self.filename = "../board/sessions.db"
+        self.filename = "./board/sessions.db"
         self.sess_dta = {}
 
         if os.path.exists(self.filename):

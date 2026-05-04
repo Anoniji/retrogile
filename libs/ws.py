@@ -167,7 +167,7 @@ def get_board_list_by_author(author):
             - The name of the board.
             - The path to the board's JSON file.
     """
-    directory, author_files = ("../board/", [])
+    directory, author_files = ("./board/", [])
     for file in os.listdir(directory):
         if file.endswith(".json"):
             file_path = os.path.join(directory, file)
@@ -489,7 +489,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
         if board_info_author == data.get("username"):
             if mode == "board_template":
                 new_board_uuid = uuid.uuid4().hex
-                new_board_path = f"../board/{new_board_uuid}.json"
+                new_board_path = f"./board/{new_board_uuid}.json"
 
                 board_info["board_name"] = tools.remove_symbols(data.get("new_name"))
                 board_info["users_list"] = {}
@@ -510,7 +510,7 @@ def board_manager_by_id(send_list, board_id, mode, websocket, data):
 
             else:
                 board_uuid = data.get("board_uuid")
-                board_path = f"../board/{board_uuid}.json"
+                board_path = f"./board/{board_uuid}.json"
                 if os.path.isfile(board_path):
 
                     if mode == "board_delete":

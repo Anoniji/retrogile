@@ -40,7 +40,7 @@ class Users:
         Initializes the Users class.
         Loads user data from the specified file or creates an empty user dictionary.
         """
-        self.filename = "../board/users.db"
+        self.filename = "./board/users.db"
         self.users = self._load_users()
 
     def _username_color(self, username):
