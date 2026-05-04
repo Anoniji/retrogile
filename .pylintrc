@@ -9,4 +9,4 @@ max-statements=60
 max-module-lines=1100
 
 [MESSAGES CONTROL]
-disable=W1201,W1203,C0413,R0801,C0103,too-few-public-methods
+disable=W0603,W1201,W1203,C0413,R0801,C0103,too-few-public-methods
