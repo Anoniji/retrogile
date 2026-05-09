@@ -17,7 +17,7 @@ The version provided is currently in development and may have missing features o
 
 - [FULL Image Page](https://hub.docker.com/r/anoniji/retrogile)
 
-### Splitted services
+### Splitted services (v1.1.7)
 - [API Image Page](https://hub.docker.com/r/anoniji/retrogile_api)
 - [WS Image Page](https://hub.docker.com/r/anoniji/retrogile_ws)
 
