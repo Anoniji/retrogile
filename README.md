@@ -24,7 +24,7 @@ The version provided is currently in development and may have missing features o
 
 ## Podman Launch Example
 ```
-podman run -d --restart=always -p "0.0.0.0:8008:8008" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 -e WS_SUBDOMAIN="wss." -e DEBUG="False" --name retrogile retrogile
+podman run -d --restart=always -p "0.0.0.0:8008:8008" -v ./board:/mnt/retrogile/board -m=512m --cpus=1 -e DEBUG="False" --name retrogile retrogile
 ```
 
 **Variables available for Retrogile:**
