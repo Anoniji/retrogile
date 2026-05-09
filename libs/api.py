@@ -374,7 +374,15 @@ def jsi(path):
         return jsonify(["jsi_not_found"])
 
     rel_path = os.path.relpath(full_path, base_path)
-    if os.path.isfile(full_path) and path_check(rel_path):
+    if rel_path.startswith("..") or os.path.isabs(rel_path):
+        return jsonify(["jsi_not_found"])
+
+    if path_check(rel_path):
+        try:
+            send_from_directory(base_path, rel_path)
+        except NotFound:
+            return jsonify(["jsi_not_found"])
+
         fetch_mode = request.headers.get("Sec-Fetch-Mode", False)
         fetch_dest = request.headers.get("Sec-Fetch-Dest", False)
         board_id = False
