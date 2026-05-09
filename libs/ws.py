@@ -1025,7 +1025,6 @@ def message_responce(send_list, websocket, token, data):
 
         board_info["display_cursors"] = data.get("enable", True)
         boardsdb.update_board(board_id, board_info)
-
         send_list = send_list_multi(send_list, clients, data)
 
     elif message_type == "message":

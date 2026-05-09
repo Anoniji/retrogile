@@ -1424,7 +1424,7 @@ footer a {
 }
 
 #console #chat_msg {
-    width: calc(100vw - 170px);
+    width: calc(100vw - 200px);
     padding: 6px;
     font-size: 12px;
     outline: none;

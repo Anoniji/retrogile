@@ -64,6 +64,9 @@
 	"board_js_29": "is satisfied",
 	"board_js_30": "is very satisfied",
 
+	"board_js_31": "The cursors are displayed",
+	"board_js_32": "The cursors are hidden",
+
 	"speed_js_1": "Waiting for the organizer...",
 	"speed_js_2": "Launch the retrospective",
 	"speed_js_3": "Empty",

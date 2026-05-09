@@ -64,6 +64,9 @@
 	"board_js_29": "est satisfait(e)",
 	"board_js_30": "est très satisfait(e)",
 
+	"board_js_31": "Les curseurs sont affichés",
+	"board_js_32": "Les curseurs sont masqués",
+
 	"speed_js_1": "En attente de l'organisateur...",
 	"speed_js_2": "Lancer la rétrospective",
 	"speed_js_3": "Vide",

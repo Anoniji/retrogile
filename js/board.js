@@ -20,6 +20,16 @@ document.addEventListener("contextmenu",function(e){e.preventDefault()});
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
 
+const map = {
+    ':)': '🙂', ':-)': '🙂', '(:': '🙂', ':D': '😄', ':-D': '😄', '=D': '😃', '=-D': '😃',
+    ':>': '😆', ':-)': '😆', 'XD': '😆', 'xD': '😆', ';)': '😉', ';-)': '😉', 'O:)': '😇',
+    'o:)': '😇', 'O:-)': '😇', ':p': '😛', ':P': '😛', ':-p': '😛', ';-p': '😜', ';P': '😜',
+    '8)': '😎', 'B)': '😎', '8-)': '😎', ':*': '😚', ':-*': '😚', ':x': '😘', ':X': '😘',
+    ':(': '🙁', ':-(': '🙁', ":'(": '😢', ":-'(": '😢', ':c': '😔', ':C': '😔', ':|': '😐',
+    ':/': '😕', ':-/': '😕', ':\\': '😕', ':-\\': '😕', ':o': '😮', ':O': '😮', ':-o': '😮',
+    '>:(': '😠', '>:-(': '😠', '<3': '❤️', '</3': '💔', ':o)': '🐵', ':j': '😏'
+};
+
 // Sanitize a value so it is safe to use as an HTML id/class fragment or data-* identifier.
 // Only allows alphanumeric characters and enforces a reasonable maximum length.
 function sanitizeIdentifier(value) {
@@ -35,6 +45,17 @@ function sanitizeIdentifier(value) {
     }
     return str;
 }
+
+const regex_emoji = new RegExp(Object.keys(map).map(k => k.replace(/([.*+?^${}()|[\]\\])/g, '\\$1')).join('|'), 'g');
+$('.emoji_coverter').on('input', function () {
+    const $el = $(this);
+    const val = $el.val();
+    const newVal = val.replace(regex_emoji, m => map[m]);
+
+    if (val !== newVal) {
+        $el.val(newVal);
+    }
+});
 
 // Escapes special characters in a string for safe inclusion in JavaScript source code.
 function escapeJsString(str) {
@@ -75,9 +96,6 @@ function getFirstLetters(t) { return "string" != typeof t || 0 === t.length ? "<
 function rgbToHex(t) { t.includes("none") && (t = t.split(" none", 1)[0]); let n = t.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/); if (!n) throw Error("Format RGB invalide"); let e = parseInt(n[1], 10), _ = parseInt(n[2], 10), i = parseInt(n[3], 10); return e = e.toString(16), _ = _.toString(16), i = i.toString(16), e = 1 === e.length ? "0" + e : e, _ = 1 === _.length ? "0" + _ : _, i = 1 === i.length ? "0" + i : i, "#" + e + _ + i }
 function hexToRgb(r) { hex = r.replace("#", ""); let n = parseInt(hex.substring(0, 2), 16), s = parseInt(hex.substring(2, 4), 16), t = parseInt(hex.substring(4, 6), 16); return { r: n, g: s, b: t } }
 function isLightColor(r) { let t = hexToRgb(r), _ = (299 * t.r + 587 * t.g + 114 * t.b) / 1e3; return _ > 128 }
-const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
-const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
-function getRootDomain() { const hostname = window.location.hostname; if (ipv4Regex.test(hostname)) { const parts = hostname.split('.'); if (parts.every(part => { const num = parseInt(part, 10); return num >= 0 && num <= 255; })) { return hostname; } } if (ipv6Regex.test(hostname)) { return hostname; } const parts = hostname.split('.'); if (parts.length <= 2) return hostname; return parts.slice(-2).join('.'); }
 
 var username = localStorage.getItem('username');
 if (username === null) {
@@ -186,14 +204,14 @@ var waiting_unfreeze = false;
 function customPrompt(col_id, message, defaultValue) {
     freeze_board = true;
     $('.custom-prompt').remove();
+
     const dialog = document.createElement('li');
-    dialog.classList.add('custom-prompt');
-    dialog.classList.add('unsortable');
+    dialog.classList.add('custom-prompt', 'unsortable');
 
     const input = document.createElement('textarea');
-    input.type = 'text';
     input.value = defaultValue || '';
     input.placeholder = message;
+    input.classList.add('emoji_coverter');
     dialog.appendChild(input);
 
     const button = document.createElement('button');
@@ -211,6 +229,9 @@ function customPrompt(col_id, message, defaultValue) {
         input.style.height = (input.scrollHeight - 18) + 'px';
     }
 
+    const keys = Object.keys(map).map(k => k.replace(/([.*+?^${}()|[\]\\])/g, '\\$1'));
+    const regex = new RegExp(keys.join('|'), 'g');
+
     return new Promise((resolve) => {
         button.addEventListener('click', () => {
             const value = escapeHtml(input.value);
@@ -220,6 +241,13 @@ function customPrompt(col_id, message, defaultValue) {
         });
 
         input.addEventListener('input', () => {
+            const value = input.value;
+            const converted = value.replace(regex, m => map[m]);
+
+            if (value !== converted) {
+                input.value = converted;
+            }
+
             input.style.height = 'auto';
             input.style.height = (input.scrollHeight - 18) + 'px';
         });
@@ -473,6 +501,7 @@ if (username !== null) {
     let line;
     let startX, startY;
 
+    var mouse_loop = false;
     var pos_x;
     var pos_y;
     var curr_highlightUser;
@@ -1250,6 +1279,10 @@ if (username !== null) {
                     $('.child_drop').show();
                 }
 
+                if (ws_data.board_info.display_cursors) {
+                    mouse_loop = setInterval(function () { mouse_position() }, 5000);
+                }
+
                 applySavedSize("info_content");
             } else if (ws_data.type == 'start_timer') {
                 board_timer(ws_data.timerInSeconds);
@@ -1313,9 +1346,9 @@ if (username !== null) {
                 const safePos = sanitizeIdentifier(ws_data.card_add.pos);
 
                 if (cardContent.includes("hide_content")) {
-                  safeCardContent = cardContent;
+                    safeCardContent = "<div class='hide_content'></div>";
                 } else {
-                  safeCardContent = escapeHtml(cardContent);
+                    safeCardContent = cardContent;
                 }
 
                 html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${safePos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
@@ -1488,6 +1521,15 @@ if (username !== null) {
                         $("#mood").html("").hide();
                     }
                 }
+            } else if (ws_data.type == 'display_cursors') {
+                if (ws_data.enable && !mouse_loop) {
+                    mouse_loop = setInterval(mouse_position, 5000);
+                    showNotification('display_cursors', 'visibility', '', '{{ translates.board_js_31 }}');
+                } else if (!ws_data.enable && mouse_loop) {
+                    clearInterval(mouse_loop);
+                    mouse_loop = false;
+                    showNotification('display_cursors', 'visibility_off', '', '{{ translates.board_js_32 }}');
+                }
             } else {
                 if ($("#console").css("display") !== "block" && ws_data.username != username) {
                     $('#console_dot').show('fade');
@@ -1505,6 +1547,29 @@ if (username !== null) {
         document.getElementById('form').onsubmit = ev => {
             ev.preventDefault();
 
+            const textField = document.getElementById('chat_msg');
+            if (textField.value.length == 0) return;
+
+            if (textField.value.startsWith('/display_cursors')) {
+                display_cursors_eta = false;
+                if(textField.value.split(' ')[1] == 'true') {
+                    display_cursors_eta = true;
+                }
+
+                if (board_author != username) {
+                    textField.value = '';
+                    return;
+                }
+
+                sendWsMessage(ws, JSON.stringify({
+                    type: 'display_cursors',
+                    enable: display_cursors_eta,
+                }));
+
+                textField.value = '';
+                return;
+            }
+
             const now = Date.now();
             antispam.messages = antispam.messages.filter(timestamp => now - timestamp < antispam.timeWindow);
             antispam.messages.push(now);
@@ -1518,7 +1583,6 @@ if (username !== null) {
                 return;
             }
 
-            const textField = document.getElementById('chat_msg');
             sendWsMessage(ws, JSON.stringify({
                 type: 'message',
                 content: escapeHtml(textField.value),
@@ -1544,8 +1608,6 @@ if (username !== null) {
 
                 ws.send(JSON.stringify({ type: 'board_info' }));
                 resendWsMessages(ws);
-
-                setInterval(function () { mouse_position() }, 5000);
             }
         };
 
