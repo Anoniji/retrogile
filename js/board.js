@@ -17,7 +17,7 @@ ______     _                   _ _
 Do not use the console ! |___/ \x1b[0m`);
 
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
-function detectDevTool(e) { return } //isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
+function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
 
 const map = {
