@@ -966,7 +966,6 @@ if (username !== null) {
 
         ws.addEventListener('message', ev => {
             ws_data = JSON.parse(ev.data);
-            console.log(ws_data);
             detectDevTool();
 
             if (ws_data.type == 'connect_status') {
