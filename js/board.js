@@ -17,7 +17,7 @@ ______     _                   _ _
 Do not use the console ! |___/ \x1b[0m`);
 
 document.addEventListener("contextmenu",function(e){e.preventDefault()});
-function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
+function detectDevTool(e) { return } //isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
 function removeNonAlphanumeric(e){return!!e&&e.replace(/[^a-zA-Z0-9]/g,"")}
 
 const map = {
@@ -723,17 +723,20 @@ if (username !== null) {
 
         var col_id = $(`.uuid_${card_uuid}`).parent().parent().attr('data-col');
         var cur_vote = $(`.uuid_${card_uuid} .votes span`).text();
+        var cur_user_vote = $(`.uuid_${card_uuid} .votes .user_curr_vote`).text();
         var maxVote = $('#board_vote .title').text();
 
         if (act == "remove" && cur_vote == "0") return;
         if (act == "add" && maxVote == "0") return;
 
         if (!isNaN(maxVote)) {
+            cur_user_vote = parseInt(cur_user_vote);
             maxVote = parseInt(maxVote);
             maxVote -= 1
             $('#board_vote .title').text(maxVote);
 
             if (act == "add") {
+                cur_user_vote += 1;
                 sendWsMessage(ws, JSON.stringify({
                     type: 'card_vote',
                     user_id: user_id,
@@ -741,6 +744,7 @@ if (username !== null) {
                     card_uuid: card_uuid,
                 }));
             } else {
+                cur_user_vote -= 1;
                 sendWsMessage(ws, JSON.stringify({
                     type: 'card_vote',
                     user_id: user_id,
@@ -750,6 +754,7 @@ if (username !== null) {
                 }));
             }
 
+            $(`.uuid_${card_uuid} .votes .user_curr_vote`).text(cur_user_vote);
             $(`.uuid_${card_uuid} .votes`).effect('highlight', { color: "#f2f2f2" }, 700);
         }
     }
@@ -917,10 +922,11 @@ if (username !== null) {
                     const bVotes = parseInt($(b).find('.votes span').text());
                     return bVotes - aVotes;
                 }).appendTo($sortableList);
-            });
+            }).sortable('disable');
             vote_order = true;
         } else {
             vote_order = false;
+            $('.sortable').sortable('enable');
             ws.send(JSON.stringify({ type: 'board_info' }));
         }
     }
@@ -1230,15 +1236,31 @@ if (username !== null) {
                         } else {
                             html += '; border-color: #d3d3d3';
                         }
+
                         html += `'><span>${value.votes}</span>
                                 <div class='vote_actions'>
                                     <div onclick='voteCard("${uuid}", "remove");'>-</div>
+                                    <div class='user_curr_vote'>`;
+
+                        if (username in list_votes) {
+                            list_user_votes = list_votes[username]['votes'];
+
+                            if(uuid in list_user_votes) {
+                                list_user_votes_cnt = list_user_votes[uuid];
+                                html += list_user_votes_cnt;
+                            } else {
+                                html += 0;
+                            }
+
+                        }
+
+                        html +=    `</div>
                                     <div onclick='voteCard("${uuid}", "add");'>+</div>
                                 </div>
                             </div>
-                            <div class='info_content' `
+                            <div class='info_content' `;
 
-                        html += `>${value.content}</div>`
+                        html += `>${value.content}</div>`;
                         html += `</div></div>`;
 
                         child_cnt = 0;

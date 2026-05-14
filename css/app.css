@@ -1242,6 +1242,14 @@ footer a {
     margin-right: -2px;
 }
 
+#board .col ul li .votes .vote_actions .user_curr_vote {
+    position: absolute;
+    border-radius: 8px;
+    font-size: 8px;
+    left: -3px;
+    top: 32px;
+}
+
 #board .col ul li .votes .vote_actions div:last-child {
     border-radius: 0 8px 8px 0;
     margin-left: -2px;
