@@ -1333,6 +1333,7 @@ if (username !== null) {
             } else if (ws_data.type == 'start_vote') {
                 if (ws_data.maxVote != 0) {
                     $('.votes span').html(0);
+                    $('.user_curr_vote').html(0);                  
                     ws.send(JSON.stringify({ type: 'stats_vote' }));
                     $('#wallpaper2').effect('highlight');
                 }
