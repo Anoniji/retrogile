@@ -1408,6 +1408,7 @@ if (username !== null) {
                 html += `'><span>${parseInt(ws_data.card_add.votes)}</span>
                         <div class='vote_actions'>
                             <div onclick='voteCard("${safeCardUuid}", "remove");'>-</div>
+                            <div class='user_curr_vote'>0</div>                          
                             <div onclick='voteCard("${safeCardUuid}", "add");'>+</div>
                         </div>
                     </div>
