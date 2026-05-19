@@ -1257,9 +1257,15 @@ if (username !== null) {
                                     <div onclick='voteCard("${uuid}", "add");'>+</div>
                                 </div>
                             </div>
-                            <div class='info_content' `;
+                            <div class='info_content'>`;
 
-                        html += `>${value.content}</div>`;
+                        if(value.hide) {
+                            html += "<div class='hide_content'></div>";
+                        } else {
+                            html += value.content;
+                        }
+
+                        html += `</div>`;
                         html += `</div></div>`;
 
                         child_cnt = 0;
@@ -1362,16 +1368,11 @@ if (username !== null) {
                 // Sanitize user-controlled fields before inserting into HTML
                 const safeUsername = escapeHtml(ws_data.card_add.username || "");
                 const cardContent = ws_data.card_add.cardContent || "";
+                const cardHide = ws_data.card_add.hide || false;
                 var safeCardContent;
                 const safeUserColor = sanitizeColor(ws_data.card_add.username_color || "");
                 const safeCardUuid = sanitizeIdentifier(ws_data.card_uuid);
                 const safePos = sanitizeIdentifier(ws_data.card_add.pos);
-
-                if (cardContent.includes("hide_content")) {
-                    safeCardContent = "<div class='hide_content'></div>";
-                } else {
-                    safeCardContent = cardContent;
-                }
 
                 html = `<li class='ui-state-default uuid_${safeCardUuid} pos_${safePos}' data-username="${safeUsername}" data-uuid="${safeCardUuid}" style="background-color: ${safeUserColor}; border-color: ${safeUserColor}">`;
                 html += `<div class='card_icon' style='`;
@@ -1413,7 +1414,15 @@ if (username !== null) {
                             <div onclick='voteCard("${safeCardUuid}", "add");'>+</div>
                         </div>
                     </div>
-                    <div class='info_content'>${safeCardContent}</div>
+                    <div class='info_content'>`;
+
+                if (cardHide) {
+                    html += "<div class='hide_content'></div>";
+                } else {
+                    html += cardContent;
+                }
+
+                html += `</div>
                     <div class='child_drop' data-parentId='${safeCardUuid}'></div>
                     </div>`;
                 html += `</li>`;
