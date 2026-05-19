@@ -236,11 +236,10 @@ def get_board_info_by_id(board_id, username_filter=False):
                 if user_param:
                     card_visibility = user_param["card_visibility"]
 
+                _tmps["data"][col_name][card_uuid]["hide"] = False
                 if card_data["author"] != username_filter and not card_visibility:
-                    _tmps["data"][
-                        col_name][
-                        card_uuid][
-                        "content"] = "<div class='hide_content'></div>"
+                    _tmps["data"][col_name][card_uuid]["content"] = ""
+                    _tmps["data"][col_name][card_uuid]["hide"] = True
 
                 _tmps["data"][
                     col_name][
@@ -363,11 +362,14 @@ def board_manager_response(ws_lst, data, board_info, card_data):
     message_data = data.copy()
     if mode in ("card_add", "card_edit"):
         message_data["cardContent"] = tools.remove_symbols(data["cardContent"])
+        message_data["hide"] = False
         if (
             websocket != ws
             and not board_info["users_list"].get(message_data["username"])["card_visibility"]
         ):
-            message_data["cardContent"] = "<div class='hide_content'></div>"
+            message_data["cardContent"] = ""
+            message_data["hide"] = True
+
         message_data["username_color"] = usersdb.get_user_color(message_data["username"])
 
     return [
