@@ -168,7 +168,7 @@ class Sessions:
             dict or False: The session data if the session ID exists, False otherwise.
         """
         if session_id in self.sess_dta:
-            return self.sess_dta[session_id]["data"]
+            return self.sess_dta[session_id].get("data", False)
 
         return False
 
