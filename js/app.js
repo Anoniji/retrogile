@@ -29,7 +29,7 @@ function removeNonAlphanumeric(str) {
 
 function removeNonAlphanumericSpace(str) {
 	if (!str) return false;
-	return str.replace(/[^a-zA-Z0-9 ]/g, '');
+	return str.replace(/[^a-zA-Zàâäæçèéêëìîïðñòôöœùûüýþÿ0-9 ]/g, '');
 }
 
 var username = localStorage.getItem('username');
