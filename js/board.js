@@ -307,6 +307,7 @@ function board_timer(seconds) {
         if (distance < 0) {
             clearInterval($countdownElement.data('intervalId'));
             $countdownElement.text('{{ translates.board_js_1 }}');
+            console.log('board_timer: highlight');
             $('#wallpaper2').effect('highlight');
         }
     };
@@ -1343,8 +1344,9 @@ if (username !== null) {
             } else if (ws_data.type == 'start_vote') {
                 if (ws_data.maxVote != 0) {
                     $('.votes span').html(0);
-                    $('.user_curr_vote').html(0);                  
+                    $('.user_curr_vote').html(0);
                     ws.send(JSON.stringify({ type: 'stats_vote' }));
+                    console.log('start_vote: highlight');
                     $('#wallpaper2').effect('highlight');
                 }
                 maxVoteTotal = $('#users .user').length * ws_data.maxVote;
@@ -1363,6 +1365,7 @@ if (username !== null) {
                     $('nav #vote_progress').hide().css('width', '100%');
                     $('#board-votes-menu, .vote_actions').fadeOut(300);
                     $('#cursors').fadeIn(300);
+                    console.log('stats_vote: highlight');
                     $('#wallpaper2').effect('highlight');
                 } else {
                     $('nav #vote_progress, #board-votes-menu, .vote_actions').fadeIn(300);
