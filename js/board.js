@@ -1569,6 +1569,9 @@ if (username !== null) {
                     mouse_loop = false;
                     showNotification('display_cursors', 'visibility_off', '', '{{ translates.board_js_32 }}');
                 }
+            } else if (ws_data.type == 'display_cards') {
+                showNotification('display_cards', 'visibility', ws_data.username, '{{ translates.board_js_33 }}');
+                ws.send(JSON.stringify({ type: 'board_info' }));
             } else {
                 if ($("#console").css("display") !== "block" && ws_data.username != username) {
                     $('#console_dot').show('fade');
@@ -1603,6 +1606,21 @@ if (username !== null) {
                 sendWsMessage(ws, JSON.stringify({
                     type: 'display_cursors',
                     enable: display_cursors_eta,
+                }));
+
+                textField.value = '';
+                return;
+            } else if (textField.value.startsWith('/display_cards')) {
+                force_user = textField.value.split(' ')[1];
+
+                if (board_author != username || force_user == '') {
+                    textField.value = '';
+                    return;
+                }
+
+                sendWsMessage(ws, JSON.stringify({
+                    type: 'display_cards',
+                    enable: force_user,
                 }));
 
                 textField.value = '';
