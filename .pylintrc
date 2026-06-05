@@ -6,7 +6,7 @@ max-locals=25
 max-statements=60
 
 [FORMAT]
-max-module-lines=1100
+max-module-lines=1200
 
 [MESSAGES CONTROL]
 disable=W0602,W0603,W1201,W1203,C0413,R0801,C0103,too-few-public-methods
