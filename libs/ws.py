@@ -879,7 +879,7 @@ def display_forced(message_type, board_id, data, send_list):
         boardsdb.update_board(board_id, board_info)
         return send_list_multi(send_list, clients, data)
 
-    elif message_type == 'display_cards':
+    if message_type == 'display_cards':
         get_data_username = data.get("enable", False)
         if not get_data_username:
             return False
