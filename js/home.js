@@ -18,7 +18,7 @@ Do not use the console ! |___/ \x1b[0m`);
 
 document.addEventListener("contextmenu", function (e) { e.preventDefault() });
 function detectDevTool(e) { isNaN(+e) && (e = 100); var t = +new Date; debugger; var n = +new Date; (isNaN(t) || isNaN(n) || n - t > e) && (window.fetch = window.WebSocket = console.error) }
-function removeNonAlphanumericSpace(str) { if (!str) return false; return str.replace(/[^a-zA-Z0-9 ]/g, ''); }
+function removeNonAlphanumericSpace(str) { if (!str) return false; return str.replace(/[^a-zA-Zàâäæçèéêëìîïðñòôöœùûüýþÿ0-9 ]/g, ''); }
 
 
 function showNotification(type, user, message) {
