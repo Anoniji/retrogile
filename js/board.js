@@ -914,6 +914,10 @@ if (username !== null) {
 
     var vote_order = false;
     function board_vote_order(force = false) {
+        if (!vote_order) {
+            $('.sortable').animate({ scrollTop: 0 }, 180);
+        }
+
         if (!vote_order || force) {
             $('.sortable').each(function () {
                 const $sortableList = $(this);
