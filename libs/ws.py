@@ -850,6 +850,50 @@ def set_confetti_color(data):
     return data
 
 
+def display_forced(message_type, board_id, data, send_list):
+    """
+    Processes a forced display message for a board,
+    updating board settings and user visibility based on the message type.
+
+    Args:
+        message_type (str): Type of message to handle.
+                            Expected values: 'display_cursors' (note: both branches
+                            currently use this same value, likely a bug).
+        board_id (str): Identifier of the board to update.
+        data (dict): A dictionary containing message data, including:
+                     - 'username' (str): Username of the request author.
+                     - 'enable' (bool, optional): Whether to enable cursors.
+        send_list (list): List used to build the message recipients.
+
+    Returns:
+        bool | dict: False if the board is not found or the user is not the author,
+                     otherwise the result of send_list_multi() after updating the board.
+
+    """
+    board_info = get_board_info_by_id(board_id)
+    if not board_info and board_info['author'] != data.get('username', False):
+        return False
+
+    if message_type == 'display_cursors':
+        board_info["display_cursors"] = data.get("enable", True)
+        boardsdb.update_board(board_id, board_info)
+        return send_list_multi(send_list, clients, data)
+
+    elif message_type == 'display_cards':
+        get_data_username = data.get("enable", False)
+        if not get_data_username:
+            return False
+
+        if not board_info["users_list"].get(get_data_username, False):
+            return False
+
+        board_info["users_list"][get_data_username]["card_visibility"] = True
+        boardsdb.update_board(board_id, board_info)
+        return send_list_multi(send_list, clients, data)
+
+    return False
+
+
 def message_responce(send_list, websocket, token, data):
     """
     Processes a received message and builds a list of messages to send.
@@ -1020,14 +1064,8 @@ def message_responce(send_list, websocket, token, data):
         usersdb.set_user_color(data.get("username"), data.get("custom_color"))
         send_list = send_list_multi(send_list, clients, data)
 
-    elif message_type == "display_cursors":
-        board_info = get_board_info_by_id(board_id)
-        if not board_info:
-            return False
-
-        board_info["display_cursors"] = data.get("enable", True)
-        boardsdb.update_board(board_id, board_info)
-        send_list = send_list_multi(send_list, clients, data)
+    elif message_type.startswith("display_"):
+        send_list = display_forced(message_type, board_id, data, send_list)
 
     elif message_type == "message":
         message_content = data.get("content")
