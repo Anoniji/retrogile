@@ -66,6 +66,7 @@
 
 	"board_js_31": "Les curseurs sont affichés",
 	"board_js_32": "Les curseurs sont masqués",
+	"board_js_33": "=> Cartes affichées en forcé",
 
 	"speed_js_1": "En attente de l'organisateur...",
 	"speed_js_2": "Lancer la rétrospective",
