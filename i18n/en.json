@@ -66,6 +66,7 @@
 
 	"board_js_31": "The cursors are displayed",
 	"board_js_32": "The cursors are hidden",
+	"board_js_33": "=> Cards displayed in forced mode",
 
 	"speed_js_1": "Waiting for the organizer...",
 	"speed_js_2": "Launch the retrospective",
