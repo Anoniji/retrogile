@@ -1,4 +1,4 @@
-FROM python:3.14-alpine3.24
+FROM python:3.14-slim
 
 RUN apk upgrade --no-cache && \
     apk add --no-cache busybox && \
