@@ -1,9 +1,11 @@
 FROM python:3.14-slim
 
-RUN apk upgrade --no-cache && \
-    apk add --no-cache busybox && \
-    apk add --no-cache zlib-ng && \
-    apk add --no-cache --clean-protected zlib-ng-compat
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+        busybox \
+        zlib1g && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mnt/retrogile
 
